@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-farm-bg text-gray-100 font-sans;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-farm-card;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-farm-border rounded-full;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-farm-card border border-farm-border rounded-xl p-4;
+  }
+  .badge-online {
+    @apply inline-block w-2 h-2 rounded-full bg-farm-accent;
+  }
+  .badge-busy {
+    @apply inline-block w-2 h-2 rounded-full bg-farm-warn;
+  }
+  .badge-offline {
+    @apply inline-block w-2 h-2 rounded-full bg-gray-500;
+  }
+}
