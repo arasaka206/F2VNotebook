@@ -3,8 +3,16 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi import FastAPI
+from app.database import engine
+from app.models import Base  # Import file models.py bạn vừa tạo
+
 from app.core.config import settings
 from app.routers import auth, livestock, treatments, sensors, consults, ai, dashboard
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Farm2Vets API")
 
 app = FastAPI(
     title=settings.APP_NAME,

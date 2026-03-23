@@ -2,6 +2,8 @@ import { useState } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import Dashboard from './pages/Dashboard';
+// 1. Import trang LivestockPage vào
+import LivestockPage from './pages/LivestocksPage'; 
 
 const PAGE_TITLES: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -20,6 +22,9 @@ function App() {
     switch (activePage) {
       case 'dashboard':
         return <Dashboard />;
+      // 2. Thêm case này để hiển thị trang Livestock
+      case 'livestock':
+        return <LivestockPage />;
       default:
         return (
           <div className="flex flex-1 items-center justify-center p-6">

@@ -6,14 +6,23 @@ interface SensorCardProps {
   isLoading?: boolean;
 }
 
+// ĐÃ SỬA: Đồng bộ lại danh sách trạng thái cho khớp chính xác với Backend
 const statusColors: Record<string, string> = {
-  normal: 'text-green-400',
+  ok: 'text-green-400',
   warning: 'text-yellow-400',
-  critical: 'text-red-400',
+  danger: 'text-red-400',
 };
 
 const SensorCard: React.FC<SensorCardProps> = ({ sensor, isLoading }) => {
-  const statusClass = statusColors[sensor.status] ?? 'text-gray-400';
+  // Lớp bảo vệ: Nếu Backend trả về null (lúc DB chưa có dữ liệu cảm biến nào)
+  const safeSensor = sensor || {
+    temperature_c: 0,
+    humidity_pct: 0,
+    ammonia_ppm: 0,
+    status: 'ok'
+  };
+
+  const statusClass = statusColors[safeSensor.status] ?? 'text-gray-400';
 
   return (
     <div className="card">
@@ -25,43 +34,37 @@ const SensorCard: React.FC<SensorCardProps> = ({ sensor, isLoading }) => {
         <span className="text-2xl">📡</span>
       </div>
 
-      {isLoading ? (
-        <div className="space-y-2 animate-pulse">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-8 bg-farm-border rounded" />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <SensorRow
-            label="Temperature"
-            value={`${sensor.temperature_c}°C`}
-            icon="🌡️"
-            barPercent={Math.min((sensor.temperature_c / 40) * 100, 100)}
-            barColor={sensor.temperature_c > 30 ? 'bg-red-500' : 'bg-blue-400'}
-          />
-          <SensorRow
-            label="Humidity"
-            value={`${sensor.humidity_pct}%`}
-            icon="💧"
-            barPercent={Math.min(sensor.humidity_pct, 100)}
-            barColor={sensor.humidity_pct > 80 ? 'bg-yellow-400' : 'bg-cyan-400'}
-          />
-          <SensorRow
-            label="Ammonia"
-            value={`${sensor.ammonia_ppm} ppm`}
-            icon="⚗️"
-            barPercent={Math.min((sensor.ammonia_ppm / 30) * 100, 100)}
-            barColor={sensor.ammonia_ppm > 20 ? 'bg-red-500' : sensor.ammonia_ppm > 12 ? 'bg-yellow-400' : 'bg-green-400'}
-          />
-        </div>
-      )}
+      <div className="space-y-3">
+        <SensorRow
+          label="Temperature"
+          value={`${safeSensor.temperature_c}°C`}
+          icon="🌡️"
+          barPercent={Math.min((safeSensor.temperature_c / 40) * 100, 100)}
+          // ĐÃ SỬA: Cập nhật mức nhiệt độ để thanh bar đổi màu đỏ khi > 35 độ
+          barColor={safeSensor.temperature_c > 35 ? 'bg-red-500' : safeSensor.temperature_c > 30 ? 'bg-yellow-400' : 'bg-blue-400'}
+        />
+        <SensorRow
+          label="Humidity"
+          value={`${safeSensor.humidity_pct}%`}
+          icon="💧"
+          barPercent={Math.min(safeSensor.humidity_pct, 100)}
+          barColor={safeSensor.humidity_pct > 80 ? 'bg-yellow-400' : 'bg-cyan-400'}
+        />
+        <SensorRow
+          label="Ammonia"
+          value={`${safeSensor.ammonia_ppm} ppm`}
+          icon="⚗️"
+          barPercent={Math.min((safeSensor.ammonia_ppm / 30) * 100, 100)}
+          barColor={safeSensor.ammonia_ppm > 25 ? 'bg-red-500' : safeSensor.ammonia_ppm > 15 ? 'bg-yellow-400' : 'bg-green-400'}
+        />
+      </div>
 
       <div className={`mt-3 text-xs font-semibold ${statusClass} flex items-center gap-1`}>
+        {/* ĐÃ SỬA: Đồng bộ logic dấu chấm hiển thị trạng thái */}
         <span className={`inline-block w-2 h-2 rounded-full ${
-          sensor.status === 'normal' ? 'bg-green-400' : sensor.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+          safeSensor.status === 'ok' ? 'bg-green-400' : safeSensor.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
         }`} />
-        Status: {sensor.status.toUpperCase()}
+        Status: {safeSensor.status.toUpperCase()}
       </div>
     </div>
   );

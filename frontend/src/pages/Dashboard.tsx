@@ -8,27 +8,54 @@ import QuickActions from '../components/dashboard/QuickActions';
 import ChatPanel from '../components/chat/ChatPanel';
 import VetPanel from '../components/consult/VetPanel';
 import { fetchDashboardSummary, fetchVets } from '../services/farm2vets';
-import { MOCK_DASHBOARD, MOCK_VETS } from '../data/mockData';
 import type { DashboardSummary, Vet } from '../types';
 
 const Dashboard: React.FC = () => {
-  const [summary, setSummary] = useState<DashboardSummary>(MOCK_DASHBOARD);
-  const [vets, setVets] = useState<Vet[]>(MOCK_VETS);
+  // 1. Khởi tạo state an toàn
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [vets, setVets] = useState<Vet[]>([]);
   const [loading, setLoading] = useState(true);
   const [vetsLoading, setVetsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // 2. Gọi API lấy dữ liệu thật
   useEffect(() => {
-    fetchDashboardSummary()
-      .then(setSummary)
-      .catch(() => {/* use mock data if backend unavailable */})
-      .finally(() => setLoading(false));
+    setError(null);
 
-    fetchVets()
-      .then(setVets)
-      .catch(() => {/* use mock data */})
-      .finally(() => setVetsLoading(false));
+    Promise.all([
+      fetchDashboardSummary().then(setSummary),
+      fetchVets().then(setVets)
+    ])
+    .catch((err) => {
+      console.error("Lỗi khi tải dữ liệu thật:", err);
+      setError("Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại Backend.");
+    })
+    .finally(() => {
+      setLoading(false);
+      setVetsLoading(false);
+    });
   }, []);
 
+  // 3. CHẶN LỖI NULL: Nếu đang tải, trả về màn hình Loading ngay lập tức
+  if (loading || vetsLoading) {
+    return (
+      <div className="flex-1 p-6 flex justify-center items-center text-gray-400">
+        <span className="animate-pulse">Đang tải dữ liệu từ hệ thống...</span>
+      </div>
+    );
+  }
+
+  // 4. CHẶN LỖI NULL: Nếu có lỗi hoặc không có summary, dừng lại và báo lỗi
+  if (error || !summary) {
+    return (
+      <div className="flex-1 p-6 flex flex-col justify-center items-center text-red-400">
+        <span className="text-4xl mb-4">⚠️</span>
+        <p>{error || "Không có dữ liệu. Vui lòng kiểm tra lại Backend."}</p>
+      </div>
+    );
+  }
+
+  // 5. LÚC NÀY `summary` CHẮC CHẮN ĐÃ CÓ DATA: Thoải mái tính toán mà không sợ crash
   const healthScoreColor =
     summary.herd_health_score >= 80
       ? 'text-green-400'
@@ -44,7 +71,7 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard
             title="Overall Herd Health Score"
-            value={loading ? '...' : `${summary.herd_health_score}`}
+            value={`${summary.herd_health_score}`}
             subtitle={`${summary.total_livestock} livestock registered`}
             icon="💚"
             accentColor={healthScoreColor}
@@ -52,7 +79,7 @@ const Dashboard: React.FC = () => {
           />
           <StatCard
             title="Active Treatment Cases"
-            value={loading ? '...' : summary.active_treatment_cases}
+            value={summary.active_treatment_cases}
             subtitle="Ongoing treatments"
             icon="💊"
             accentColor="text-orange-400"
@@ -60,7 +87,7 @@ const Dashboard: React.FC = () => {
           />
           <StatCard
             title="Total Livestock"
-            value={loading ? '...' : summary.total_livestock}
+            value={summary.total_livestock}
             subtitle="Cattle · Swine · Poultry"
             icon="🐄"
             accentColor="text-blue-400"
@@ -78,7 +105,7 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SensorCard
             sensor={summary.latest_sensor}
-            isLoading={loading}
+            isLoading={false}
           />
           <AlertCard level={summary.disease_alert_level} />
         </div>
@@ -86,7 +113,7 @@ const Dashboard: React.FC = () => {
         {/* Chart + Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <HerdGrowthChart />
-          <ActivityStream events={summary.activity_stream} isLoading={loading} />
+          <ActivityStream events={summary.activity_stream} isLoading={false} />
         </div>
       </div>
 
@@ -94,7 +121,7 @@ const Dashboard: React.FC = () => {
       <div className="w-72 xl:w-80 flex-shrink-0 overflow-y-auto space-y-4">
         <QuickActions />
         <ChatPanel />
-        <VetPanel vets={vets} isLoading={vetsLoading} />
+        <VetPanel vets={vets} isLoading={false} />
       </div>
     </div>
   );
