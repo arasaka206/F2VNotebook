@@ -3,7 +3,8 @@ import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import Dashboard from './pages/Dashboard';
 // 1. Import trang LivestockPage vào
-import LivestockPage from './pages/LivestocksPage'; 
+import LivestockPage from './pages/LivestocksPage';
+import PublicDashboard from './pages/PublicDashboard';
 
 const PAGE_TITLES: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -11,6 +12,7 @@ const PAGE_TITLES: Record<string, string> = {
   livestock: 'Livestock Profiles',
   'disease-map': 'Disease Risk Map',
   'vet-connect': 'Veterinary Connect',
+  'public-dashboard': 'Community Forum',
   inventory: 'Inventory & Supplies',
   reports: 'Reports & Analytics',
 };
@@ -25,6 +27,8 @@ function App() {
       // 2. Thêm case này để hiển thị trang Livestock
       case 'livestock':
         return <LivestockPage />;
+      case 'public-dashboard':
+        return <PublicDashboard />;
       default:
         return (
           <div className="flex flex-1 items-center justify-center p-6">

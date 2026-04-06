@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # CORS – space-separated list of allowed origins
-    CORS_ORIGINS: str = "http://localhost:5173 http://localhost:3000"
+    CORS_ORIGINS: str = "http://localhost:5173 http://localhost:5174 http://localhost:5175 http://localhost:5176 http://localhost:3000"
 
     # JWT / Auth (stub values – replace in production)
     SECRET_KEY: str = "change-me-in-production"

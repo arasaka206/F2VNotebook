@@ -3,23 +3,22 @@ import type { SensorReading } from '../../types';
 
 interface SensorCardProps {
   sensor: SensorReading;
-  isLoading?: boolean;
 }
 
 // ĐÃ SỬA: Đồng bộ lại danh sách trạng thái cho khớp chính xác với Backend
 const statusColors: Record<string, string> = {
-  ok: 'text-green-400',
+  normal: 'text-green-400',
   warning: 'text-yellow-400',
-  danger: 'text-red-400',
+  critical: 'text-red-400',
 };
 
-const SensorCard: React.FC<SensorCardProps> = ({ sensor, isLoading }) => {
+const SensorCard: React.FC<SensorCardProps> = ({ sensor }) => {
   // Lớp bảo vệ: Nếu Backend trả về null (lúc DB chưa có dữ liệu cảm biến nào)
   const safeSensor = sensor || {
     temperature_c: 0,
     humidity_pct: 0,
     ammonia_ppm: 0,
-    status: 'ok'
+    status: 'normal'
   };
 
   const statusClass = statusColors[safeSensor.status] ?? 'text-gray-400';
@@ -62,7 +61,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ sensor, isLoading }) => {
       <div className={`mt-3 text-xs font-semibold ${statusClass} flex items-center gap-1`}>
         {/* ĐÃ SỬA: Đồng bộ logic dấu chấm hiển thị trạng thái */}
         <span className={`inline-block w-2 h-2 rounded-full ${
-          safeSensor.status === 'ok' ? 'bg-green-400' : safeSensor.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+          safeSensor.status === 'normal' ? 'bg-green-400' : safeSensor.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
         }`} />
         Status: {safeSensor.status.toUpperCase()}
       </div>

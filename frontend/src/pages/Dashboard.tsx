@@ -7,6 +7,7 @@ import HerdGrowthChart from '../components/dashboard/HerdGrowthChart';
 import QuickActions from '../components/dashboard/QuickActions';
 import ChatPanel from '../components/chat/ChatPanel';
 import VetPanel from '../components/consult/VetPanel';
+import HeatmapChart from '../components/dashboard/HeatmapChart';
 import { fetchDashboardSummary, fetchVets } from '../services/farm2vets';
 import type { DashboardSummary, Vet } from '../types';
 
@@ -105,10 +106,12 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SensorCard
             sensor={summary.latest_sensor}
-            isLoading={false}
           />
           <AlertCard level={summary.disease_alert_level} />
         </div>
+
+        {/* Heatmap */}
+        <HeatmapChart barnId="barn-1" dataType="health" width={400} height={300} />
 
         {/* Chart + Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

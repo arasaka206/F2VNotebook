@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Float, DateTime, Date, ForeignKey
+from sqlalchemy import Column, String, Float, DateTime, Date, ForeignKey, Integer, Text, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import declarative_base
 
@@ -56,3 +56,92 @@ class SensorReading(Base):
 
     # [TỰ ĐỘNG] Thời gian nhận dữ liệu chính xác đến từng giây
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NHÓM 3: HEATMAP DATA (Bản đồ nhiệt - trực quan hóa dữ liệu cảm biến)
+# ─────────────────────────────────────────────────────────────────────────────
+class HeatmapData(Base):
+    __tablename__ = "heatmap_data"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    barn_id = Column(String, index=True, nullable=False)
+    
+    # Vị trí trên bản đồ (X, Y coordinates)
+    location_x = Column(Float, nullable=False)
+    location_y = Column(Float, nullable=False)
+    
+    # Giá trị cường độ (0-100)
+    intensity = Column(Float, nullable=False)  # Độ mạnh (dựa trên health_score)
+    
+    # Loại dữ liệu heatmap
+    data_type = Column(String, default="health")  # health, temperature, humidity, etc.
+    
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NHÓM 4: PUBLIC DASHBOARD - FORUM (Diễn đàn công cộng)
+# ─────────────────────────────────────────────────────────────────────────────
+class ForumPost(Base):
+    __tablename__ = "forum_posts"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    author_id = Column(String, index=True, nullable=False)
+    author_name = Column(String, nullable=False)
+    
+    # Nội dung bài viết
+    title = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+    
+    # Số lượng reactions
+    reaction_count = Column(Integer, default=0)
+    comment_count = Column(Integer, default=0)
+    
+    # Trạng thái
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+class ForumComment(Base):
+    __tablename__ = "forum_comments"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    post_id = Column(String, ForeignKey("forum_posts.id"), nullable=False, index=True)
+    author_id = Column(String, index=True, nullable=False)
+    author_name = Column(String, nullable=False)
+    
+    # Nội dung bình luận
+    content = Column(Text, nullable=False)
+    
+    # Số lượng reactions trên comment
+    reaction_count = Column(Integer, default=0)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+class ForumReaction(Base):
+    __tablename__ = "forum_reactions"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    
+    # Phản ứng có thể là cho Post hoặc Comment
+    post_id = Column(String, ForeignKey("forum_posts.id"), nullable=True, index=True)
+    comment_id = Column(String, ForeignKey("forum_comments.id"), nullable=True, index=True)
+    
+    # Người phản ứng
+    user_id = Column(String, index=True, nullable=False)
+    reaction_type = Column(String, default="like")  # like, love, haha, sad, angry
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class ForumHashtag(Base):
+    __tablename__ = "forum_hashtags"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    post_id = Column(String, ForeignKey("forum_posts.id"), nullable=False, index=True)
+    tag = Column(String, nullable=False, index=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

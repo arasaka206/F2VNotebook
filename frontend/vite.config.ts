@@ -13,4 +13,11 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: [
+      '@deck.gl/react',
+      '@deck.gl/core',
+      '@deck.gl/aggregation-layers',
+    ],
+  },
 })

@@ -32,6 +32,7 @@ export const NAV_ITEMS = [
   { id: 'livestock', label: 'Livestock Profiles', icon: '🐄' },
   { id: 'disease-map', label: 'Disease Risk Map', icon: '🗺️' },
   { id: 'vet-connect', label: 'Veterinary Connect', icon: '🩺' },
+  { id: 'public-dashboard', label: 'Community Forum', icon: '💬' },
   { id: 'inventory', label: 'Inventory & Supplies', icon: '📦' },
   { id: 'reports', label: 'Reports & Analytics', icon: '📈' },
 ];
