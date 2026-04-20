@@ -2,6 +2,7 @@ import uuid
 from sqlalchemy import Column, String, Float, DateTime, Date, ForeignKey, Integer, Text, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import declarative_base
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -334,3 +335,16 @@ class UserAwarenessScore(Base):
     
     # Lần cập nhật cuối
     last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+class NotebookLog(Base):
+    __tablename__ = "notebook_logs"
+    
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    content = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    
+    # Các trường dành cho AI (lưu dưới dạng chuỗi Text nếu là mảng/list)
+    summary = Column(String, nullable=True)
+    urgency = Column(String, nullable=True)
+    tags = Column(Text, nullable=True) # Lưu json string: '["tag1", "tag2"]'
+    recommendations = Column(Text, nullable=True) # Lưu json string

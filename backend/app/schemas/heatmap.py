@@ -1,7 +1,20 @@
 from __future__ import annotations
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
+class GeoHeatmapDataOut(BaseModel):
+    id: str
+    latitude: float
+    longitude: float
+    intensity: float
+    data_type: str
+    timestamp: datetime
+    province: Optional[str] = None
+    city: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 class HeatmapDataOut(BaseModel):
     id: str

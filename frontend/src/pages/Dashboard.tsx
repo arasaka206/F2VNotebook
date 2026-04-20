@@ -9,6 +9,7 @@ import QuickActions from '../components/dashboard/QuickActions';
 import ChatPanel from '../components/chat/ChatPanel';
 import VetPanel from '../components/consult/VetPanel';
 import HeatmapChart from '../components/dashboard/HeatmapChart';
+import GeoHeatmapChart from '../components/dashboard/GeoHeatmapChart';
 import { fetchDashboardSummary, fetchVets } from '../services/farm2vets';
 import type { DashboardSummary, Vet } from '../types';
 
@@ -114,6 +115,11 @@ const Dashboard: React.FC = () => {
         {/* Alarming Notifications */}
         <AlarmingNotifications />
 
+        {/* GeoHeatmap */}
+        <div className="mt-6">
+          <GeoHeatmapChart />
+        </div>
+
         {/* Heatmap */}
         <HeatmapChart barnId="barn-1" dataType="health" width={400} height={300} />
 
@@ -129,6 +135,7 @@ const Dashboard: React.FC = () => {
         <QuickActions />
         <ChatPanel />
         <VetPanel vets={vets} isLoading={false} />
+        
       </div>
     </div>
   );
