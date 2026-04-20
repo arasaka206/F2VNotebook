@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import StatCard from '../components/dashboard/StatCard';
 import SensorCard from '../components/dashboard/SensorCard';
 import AlertCard from '../components/dashboard/AlertCard';
+import AlarmingNotifications from '../components/dashboard/AlarmingNotifications';
 import ActivityStream from '../components/dashboard/ActivityStream';
 import HerdGrowthChart from '../components/dashboard/HerdGrowthChart';
 import QuickActions from '../components/dashboard/QuickActions';
@@ -109,6 +110,9 @@ const Dashboard: React.FC = () => {
           />
           <AlertCard level={summary.disease_alert_level} />
         </div>
+
+        {/* Alarming Notifications */}
+        <AlarmingNotifications />
 
         {/* Heatmap */}
         <HeatmapChart barnId="barn-1" dataType="health" width={400} height={300} />

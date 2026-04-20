@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import api from '../services/api';
 import { fetchForumPosts, searchForumPosts, fetchTrendingHashtags } from '../services/farm2vets';
 import type { ForumPost, ForumHashtagTrend } from '../types';
 import ForumPostCard from '../components/forum/ForumPostCard';
@@ -16,6 +17,26 @@ const PublicDashboard: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 10;
+
+  const handleReport = async (postId: string) => {
+    // Simple report dialog - in real app this would be a modal
+    const reason = prompt('Please provide a reason for reporting this post:');
+    if (!reason) return;
+
+    try {
+      await api.post('/public-dashboard/reports', {
+        target_type: 'post',
+        target_id: postId,
+        reporter_id: 'user-123', // Mock user ID
+        reason: 'Inappropriate content',
+        description: reason
+      });
+      alert('Report submitted successfully. Thank you for helping keep our community safe.');
+    } catch (error) {
+      console.error('Failed to submit report:', error);
+      alert('Failed to submit report. Please try again.');
+    }
+  };
 
   // Load posts when page or sort changes
   useEffect(() => {
@@ -139,6 +160,7 @@ const PublicDashboard: React.FC = () => {
                     key={post.id}
                     post={post}
                     onViewDetails={() => setSelectedPost(post.id)}
+                    onReport={handleReport}
                   />
                 ))}
               </>

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func, desc
 from app.database import get_db
-from app.models import ForumPost, ForumComment, ForumReaction, ForumHashtag
+from app.models import ForumPost, ForumComment, ForumReaction, ForumHashtag, Report
 from app.schemas.public_dashboard import (
     ForumPostOut,
     ForumPostCreate,
@@ -13,6 +13,7 @@ from app.schemas.public_dashboard import (
     ForumPostDetail,
     ForumSearchResult
 )
+from app.schemas.report import ReportCreate, ReportOut
 import uuid
 
 router = APIRouter(prefix="/public-dashboard", tags=["public-dashboard"])
@@ -346,3 +347,70 @@ def get_trending_hashtags(
     ).group_by(ForumHashtag.tag).order_by(desc(func.count(ForumHashtag.id))).limit(limit).all()
     
     return [{"tag": tag[0], "count": tag[1]} for tag in trending_tags]
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# REPORTS (Báo cáo vi phạm)
+# ═════════════════════════════════════════════════════════════════════════════
+
+@router.post("/reports", response_model=ReportOut)
+def create_report(
+    report_data: ReportCreate,
+    db: Session = Depends(get_db)
+):
+    """Tạo báo cáo về bài viết, bình luận, hoặc người dùng vi phạm."""
+    # Kiểm tra target có tồn tại không
+    if report_data.target_type == "post":
+        target = db.query(ForumPost).filter(ForumPost.id == report_data.target_id).first()
+        if not target:
+            raise HTTPException(status_code=404, detail="Post not found")
+    elif report_data.target_type == "comment":
+        target = db.query(ForumComment).filter(ForumComment.id == report_data.target_id).first()
+        if not target:
+            raise HTTPException(status_code=404, detail="Comment not found")
+    
+    report = Report(**report_data.model_dump())
+    db.add(report)
+    db.commit()
+    db.refresh(report)
+    return report
+
+
+@router.get("/reports", response_model=list[ReportOut])
+def get_reports(
+    status: str = Query("pending"),
+    target_type: str = Query(None),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    """Lấy danh sách báo cáo (dành cho admin/moderator)."""
+    query = db.query(Report).filter(Report.status == status)
+    
+    if target_type:
+        query = query.filter(Report.target_type == target_type)
+    
+    reports = query.order_by(desc(Report.created_at)).limit(limit).all()
+    return reports
+
+
+@router.put("/reports/{report_id}", response_model=ReportOut)
+def update_report_status(
+    report_id: str,
+    status: str = Query(...),
+    reviewed_by: str = Query(...),
+    review_notes: str = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Cập nhật trạng thái báo cáo (dành cho admin/moderator)."""
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    report.status = status
+    report.reviewed_by = reviewed_by
+    if review_notes:
+        report.review_notes = review_notes
+    
+    db.commit()
+    db.refresh(report)
+    return report
