@@ -2,8 +2,12 @@ import { useState } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import Dashboard from './pages/Dashboard';
-// 1. Import trang LivestockPage vào
-import LivestockPage from './pages/LivestocksPage'; 
+import LivestockPage from './pages/LivestocksPage';
+import PublicDashboard from './pages/PublicDashboard';
+import QuizPage from './pages/QuizPage';
+
+// 1. Thêm dòng import này
+import NotebookPage from './pages/NotebookPage';
 
 const PAGE_TITLES: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -11,6 +15,8 @@ const PAGE_TITLES: Record<string, string> = {
   livestock: 'Livestock Profiles',
   'disease-map': 'Disease Risk Map',
   'vet-connect': 'Veterinary Connect',
+  quizzes: 'Disease Awareness Quizzes',
+  'public-dashboard': 'Community Forum',
   inventory: 'Inventory & Supplies',
   reports: 'Reports & Analytics',
 };
@@ -22,9 +28,15 @@ function App() {
     switch (activePage) {
       case 'dashboard':
         return <Dashboard />;
-      // 2. Thêm case này để hiển thị trang Livestock
+      // 2. Thêm case cho trang Notebook
+      case 'notebook':
+        return <NotebookPage />;
       case 'livestock':
         return <LivestockPage />;
+      case 'quizzes':
+        return <QuizPage />;
+      case 'public-dashboard':
+        return <PublicDashboard />;
       default:
         return (
           <div className="flex flex-1 items-center justify-center p-6">

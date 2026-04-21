@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import StatCard from '../components/dashboard/StatCard';
 import SensorCard from '../components/dashboard/SensorCard';
 import AlertCard from '../components/dashboard/AlertCard';
+import AlarmingNotifications from '../components/dashboard/AlarmingNotifications';
 import ActivityStream from '../components/dashboard/ActivityStream';
 import HerdGrowthChart from '../components/dashboard/HerdGrowthChart';
 import QuickActions from '../components/dashboard/QuickActions';
 import ChatPanel from '../components/chat/ChatPanel';
 import VetPanel from '../components/consult/VetPanel';
+import HeatmapChart from '../components/dashboard/HeatmapChart';
+import GeoHeatmapChart from '../components/dashboard/GeoHeatmapChart';
 import { fetchDashboardSummary, fetchVets } from '../services/farm2vets';
 import type { DashboardSummary, Vet } from '../types';
 
@@ -105,10 +108,20 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SensorCard
             sensor={summary.latest_sensor}
-            isLoading={false}
           />
           <AlertCard level={summary.disease_alert_level} />
         </div>
+
+        {/* Alarming Notifications */}
+        <AlarmingNotifications />
+
+        {/* GeoHeatmap */}
+        <div className="mt-6">
+          <GeoHeatmapChart />
+        </div>
+
+        {/* Heatmap */}
+        <HeatmapChart barnId="barn-1" dataType="health" width={400} height={300} />
 
         {/* Chart + Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -122,6 +135,7 @@ const Dashboard: React.FC = () => {
         <QuickActions />
         <ChatPanel />
         <VetPanel vets={vets} isLoading={false} />
+        
       </div>
     </div>
   );

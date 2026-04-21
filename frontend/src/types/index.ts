@@ -91,3 +91,161 @@ export interface TokenResponse {
   token_type: string;
   role: string;
 }
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HEATMAP TYPES
+// ═════════════════════════════════════════════════════════════════════════════
+
+export interface HeatmapPoint {
+  x: number;
+  y: number;
+  intensity: number;
+}
+
+export interface HeatmapData {
+  barn_id: string;
+  data_type: 'health' | 'temperature' | 'humidity';
+  grid_data: HeatmapPoint[];
+  timestamp: string;
+}
+
+export interface HeatmapSummary {
+  barn_id: string;
+  min_intensity: number;
+  max_intensity: number;
+  avg_intensity: number;
+  data_points: number;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// PUBLIC DASHBOARD (FORUM) TYPES
+// ═════════════════════════════════════════════════════════════════════════════
+
+export interface ForumComment {
+  id: string;
+  post_id: string;
+  author_id: string;
+  author_name: string;
+  content: string;
+  reaction_count: number;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface ForumPost {
+  id: string;
+  author_id: string;
+  author_name: string;
+  title: string;
+  content: string;
+  reaction_count: number;
+  comment_count: number;
+  hashtags: string[];
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface ForumPostDetail extends ForumPost {
+  comments: ForumComment[];
+}
+
+export interface ForumPostCreate {
+  title: string;
+  content: string;
+  hashtags: string[];
+}
+
+export interface ForumSearchResult {
+  posts: ForumPost[];
+  total_count: number;
+  page: number;
+  page_size: number;
+}
+
+export interface ForumHashtagTrend {
+  tag: string;
+  count: number;
+}
+
+export type ReactionType = 'like' | 'love' | 'haha' | 'sad' | 'angry';
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ALERTS & NOTIFICATIONS TYPES
+// ═════════════════════════════════════════════════════════════════════════════
+
+export interface Alert {
+  id: string;
+  alert_type: string;
+  severity: 'info' | 'warning' | 'critical';
+  title: string;
+  message: string;
+  scope: string;
+  target_id?: string;
+  is_active: boolean;
+  is_read: boolean;
+  created_by?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// QUIZZES & EDUCATION TYPES
+// ═════════════════════════════════════════════════════════════════════════════
+
+export interface Quiz {
+  id: string;
+  title: string;
+  description?: string;
+  topic: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  time_limit?: number;
+  passing_score: number;
+  is_active: boolean;
+  created_by?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  quiz_id: string;
+  question: string;
+  options: string[];
+  correct_answer: number;
+  explanation?: string;
+  order: number;
+  created_at: string;
+}
+
+export interface QuizWithQuestions extends Quiz {
+  questions: QuizQuestion[];
+}
+
+export interface UserQuizAttempt {
+  id: string;
+  user_id: string;
+  quiz_id: string;
+  score: number;
+  correct_answers: number;
+  total_questions: number;
+  time_taken?: number;
+  status: 'completed' | 'failed';
+  answers?: string;
+  created_at: string;
+}
+
+export interface UserAwarenessScore {
+  id: string;
+  user_id: string;
+  overall_score: number;
+  quizzes_completed: number;
+  quizzes_passed: number;
+  status: 'good' | 'needs_improvement' | 'restricted';
+  last_updated: string;
+}
+
+export interface QuizAttemptRequest {
+  quiz_id: string;
+  answers: number[];
+  time_taken?: number;
+}

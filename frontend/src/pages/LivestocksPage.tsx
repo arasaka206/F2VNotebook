@@ -102,12 +102,12 @@ const LivestockPage: React.FC = () => {
             <div className="flex justify-between items-start mb-3">
               <span className="text-3xl">{animal.species === 'Bò' ? '🐄' : animal.species === 'Lợn' ? '🐖' : '🐔'}</span>
               <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                animal.health_status === 'Bình thường' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                animal.health_status === 'healthy' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
               }`}>
                 {animal.health_status}
               </span>
             </div>
-            <h3 className="text-lg font-bold text-white tracking-wide">{animal.tag_number}</h3>
+            <h3 className="text-lg font-bold text-white tracking-wide">{animal.tag_id}</h3>
             <p className="text-sm text-gray-400 mb-4">{animal.species}</p>
             
             <div className="space-y-1.5 border-t border-farm-border pt-3">

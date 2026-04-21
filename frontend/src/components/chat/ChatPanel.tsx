@@ -14,6 +14,7 @@ const ChatPanel: React.FC = () => {
   const [input, setInput] = useState('');
   const [sessionId, setSessionId] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,15 +61,24 @@ const ChatPanel: React.FC = () => {
   };
 
   return (
-    <div className="card flex flex-col h-80">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-xl">🤖</span>
-        <div>
-          <p className="text-sm font-semibold text-white">AI Assistant</p>
-          <p className="text-[10px] text-green-400 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block" /> Online
-          </p>
+    <div className={`card flex flex-col ${isMaximized ? 'h-full' : 'h-80'}`}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🤖</span>
+          <div>
+            <p className="text-sm font-semibold text-white">AI Assistant</p>
+            <p className="text-[10px] text-green-400 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block" /> Online
+            </p>
+          </div>
         </div>
+        <button
+          onClick={() => setIsMaximized(!isMaximized)}
+          className="text-gray-400 hover:text-white text-lg"
+          title={isMaximized ? 'Minimize' : 'Maximize'}
+        >
+          {isMaximized ? '🪟' : '⛶'}
+        </button>
       </div>
 
       {/* Messages */}
