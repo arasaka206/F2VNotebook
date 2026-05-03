@@ -9,6 +9,11 @@ class SensorReadingCreate(BaseModel):
     humidity_pct: float
     ammonia_ppm: float
 
+class SensorDataUpload(BaseModel):
+    barn_id: str
+    temperature_c: Optional[float] = None
+    humidity_pct: Optional[float] = None
+    # ammonia_ppm is omitted from the request since the BME280 cannot provide it.
 
 class SensorSummaryOut(BaseModel):
     farm_id: str

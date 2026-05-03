@@ -8,40 +8,6 @@ from sqlalchemy import func
 
 router = APIRouter(prefix="/heatmap", tags=["heatmap"])
 
-@router.get("/geo-data")
-def get_geo_heatmap_data(
-    region: str = Query("Vietnam"), # 'Vietnam', 'Hanoi', 'HCMC', etc.
-    data_type: str = Query("health"),
-    db: Session = Depends(get_db)
-):
-    """
-    Lấy dữ liệu heatmap dựa trên toạ độ địa lý (lat, lng) theo khu vực.
-    """
-    query = db.query(HeatmapData).filter(HeatmapData.data_type == data_type)
-    
-    # Lọc theo vùng nếu không phải là toàn bộ Việt Nam
-    if region != "Vietnam":
-        query = query.filter(HeatmapData.province == region)
-        
-    heatmap_points = query.order_by(HeatmapData.timestamp.desc()).limit(1000).all()
-    
-    grid_data = [
-        {
-            "latitude": point.latitude,
-            "longitude": point.longitude,
-            "intensity": point.intensity
-        }
-        for point in heatmap_points
-    ]
-    
-    return {
-        "region": region,
-        "data_type": data_type,
-        "points": grid_data,
-        "timestamp": datetime.utcnow()
-    }
-
-
 
 @router.get("/data/{barn_id}")
 def get_heatmap_data(

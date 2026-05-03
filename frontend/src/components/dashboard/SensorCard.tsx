@@ -7,9 +7,9 @@ interface SensorCardProps {
 
 // ĐÃ SỬA: Đồng bộ lại danh sách trạng thái cho khớp chính xác với Backend
 const statusColors: Record<string, string> = {
-  normal: 'text-green-400',
+  ok: 'text-green-400',
   warning: 'text-yellow-400',
-  critical: 'text-red-400',
+  danger: 'text-red-400',
 };
 
 const SensorCard: React.FC<SensorCardProps> = ({ sensor }) => {
@@ -18,7 +18,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ sensor }) => {
     temperature_c: 0,
     humidity_pct: 0,
     ammonia_ppm: 0,
-    status: 'normal'
+    status: 'ok'
   };
 
   const statusClass = statusColors[safeSensor.status] ?? 'text-gray-400';
@@ -61,7 +61,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ sensor }) => {
       <div className={`mt-3 text-xs font-semibold ${statusClass} flex items-center gap-1`}>
         {/* ĐÃ SỬA: Đồng bộ logic dấu chấm hiển thị trạng thái */}
         <span className={`inline-block w-2 h-2 rounded-full ${
-          safeSensor.status === 'normal' ? 'bg-green-400' : safeSensor.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+          safeSensor.status === 'ok' ? 'bg-green-400' : safeSensor.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
         }`} />
         Status: {safeSensor.status.toUpperCase()}
       </div>

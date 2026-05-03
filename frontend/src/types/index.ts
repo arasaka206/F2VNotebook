@@ -5,13 +5,29 @@ export type AlertLevel = 'low' | 'medium' | 'high' | 'critical';
 export type VetStatus = 'online' | 'busy' | 'offline';
 export type ConsultPriority = 'low' | 'normal' | 'high' | 'emergency';
 export type ConsultStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
-export type SensorStatus = 'normal' | 'warning' | 'critical';
+export type SensorStatus = 'ok' | 'warning' | 'danger';
 
 export interface SensorReading {
   temperature_c: number;
   humidity_pct: number;
   ammonia_ppm: number;
   status: SensorStatus;
+}
+
+export interface SensorAggregate {
+  barn_id: string;
+  window_hours: number;
+  min_temperature_c: number;
+  max_temperature_c: number;
+  avg_temperature_c: number;
+  min_humidity_pct: number;
+  max_humidity_pct: number;
+  avg_humidity_pct: number;
+  min_ammonia_ppm: number;
+  max_ammonia_ppm: number;
+  avg_ammonia_ppm: number;
+  last_updated: string | null;
+  data_points: number;
 }
 
 export interface ActivityEvent {
@@ -168,84 +184,3 @@ export interface ForumHashtagTrend {
 }
 
 export type ReactionType = 'like' | 'love' | 'haha' | 'sad' | 'angry';
-
-// ═════════════════════════════════════════════════════════════════════════════
-// ALERTS & NOTIFICATIONS TYPES
-// ═════════════════════════════════════════════════════════════════════════════
-
-export interface Alert {
-  id: string;
-  alert_type: string;
-  severity: 'info' | 'warning' | 'critical';
-  title: string;
-  message: string;
-  scope: string;
-  target_id?: string;
-  is_active: boolean;
-  is_read: boolean;
-  created_by?: string;
-  created_at: string;
-  updated_at?: string;
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// QUIZZES & EDUCATION TYPES
-// ═════════════════════════════════════════════════════════════════════════════
-
-export interface Quiz {
-  id: string;
-  title: string;
-  description?: string;
-  topic: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  time_limit?: number;
-  passing_score: number;
-  is_active: boolean;
-  created_by?: string;
-  created_at: string;
-  updated_at?: string;
-}
-
-export interface QuizQuestion {
-  id: string;
-  quiz_id: string;
-  question: string;
-  options: string[];
-  correct_answer: number;
-  explanation?: string;
-  order: number;
-  created_at: string;
-}
-
-export interface QuizWithQuestions extends Quiz {
-  questions: QuizQuestion[];
-}
-
-export interface UserQuizAttempt {
-  id: string;
-  user_id: string;
-  quiz_id: string;
-  score: number;
-  correct_answers: number;
-  total_questions: number;
-  time_taken?: number;
-  status: 'completed' | 'failed';
-  answers?: string;
-  created_at: string;
-}
-
-export interface UserAwarenessScore {
-  id: string;
-  user_id: string;
-  overall_score: number;
-  quizzes_completed: number;
-  quizzes_passed: number;
-  status: 'good' | 'needs_improvement' | 'restricted';
-  last_updated: string;
-}
-
-export interface QuizAttemptRequest {
-  quiz_id: string;
-  answers: number[];
-  time_taken?: number;
-}

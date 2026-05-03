@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { fetchHeatmapSummary, generateHeatmapFromSensors } from '../../services/farm2vets';
+import { fetchHeatmapData, fetchHeatmapSummary, generateHeatmapFromSensors } from '../../services/farm2vets';
 import api from '../../services/api';
-import type { HeatmapSummary } from '../../types';
+import type { HeatmapPoint, HeatmapSummary } from '../../types';
 
 interface HeatmapProps {
   barnId?: string;
@@ -32,7 +32,7 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
   const [generatingDemo, setGeneratingDemo] = useState(false);
   const [generatingReal, setGeneratingReal] = useState(false);
   
-  const [renderPoints, setRenderPoints] = useState<any[]>([]); 
+  const [renderPoints, setRenderPoints] = useState<HeatmapPoint[]>([]); 
   const [debugMessage, setDebugMessage] = useState<string>('Loading data...');
 
   const loadHeatmapData = async () => {
@@ -40,23 +40,22 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
       setLoading(true);
       setError(null);
       
-      const [gridResponse, summaryData] = await Promise.all([
-        api.get(`/api/heatmap/grid/${barnId}?data_type=${dataType}`).catch(() => ({ data: { grid_data: [] } })),
+      const [heatmapData, summaryData] = await Promise.all([
+        fetchHeatmapData(barnId, dataType as 'health' | 'temperature' | 'humidity').catch(() => ({ barn_id: barnId, data_type: dataType as 'health' | 'temperature' | 'humidity', grid_data: [] as HeatmapPoint[], timestamp: '' })),
         fetchHeatmapSummary(barnId).catch(() => null)
       ]);
       
-      const data = gridResponse.data;
-      let points = data?.grid_data || [];
+      const points = heatmapData?.grid_data || [];
       
       if (points.length === 0) {
-        points = MOCK_POINTS;
+        setRenderPoints(MOCK_POINTS);
         setDebugMessage('Backend is empty. Displaying mock data.');
       } else {
+        setRenderPoints(points);
         setDebugMessage(`Successfully loaded ${points.length} data points.`);
       }
 
       setSummary(summaryData);
-      setRenderPoints(points);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error while loading heatmap');
@@ -69,7 +68,7 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
     try {
       setGeneratingDemo(true);
       setDebugMessage('Generating demo data on backend...');
-      await api.post(`/api/heatmap/demo-data/${barnId}`);
+      await api.post(`/heatmap/demo-data/${barnId}`);
       await loadHeatmapData();
     } catch (err) {
       console.error(err);

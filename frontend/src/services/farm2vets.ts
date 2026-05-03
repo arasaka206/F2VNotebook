@@ -9,6 +9,8 @@ import type {
   TokenResponse,
   HeatmapData,
   HeatmapSummary,
+  SensorReading,
+  SensorAggregate,
   ForumPost,
   ForumPostCreate,
   ForumPostDetail,
@@ -47,6 +49,21 @@ export const fetchActiveTreatments = async (): Promise<Treatment[]> => {
 // ── Vets ──────────────────────────────────────────────────────────────────
 export const fetchVets = async (): Promise<Vet[]> => {
   const { data } = await api.get<Vet[]>('/consults/vets');
+  return data;
+};
+
+export const fetchLatestSensor = async (): Promise<SensorReading> => {
+  const { data } = await api.get<SensorReading>('/sensors/latest');
+  return data;
+};
+
+export const fetchSensorAggregate = async (
+  barnId: string,
+  windowHours: number = 24
+): Promise<SensorAggregate> => {
+  const { data } = await api.get<SensorAggregate>('/sensors/aggregate', {
+    params: { barn_id: barnId, window_hours: windowHours }
+  });
   return data;
 };
 

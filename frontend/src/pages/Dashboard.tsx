@@ -2,41 +2,48 @@ import React, { useEffect, useState } from 'react';
 import StatCard from '../components/dashboard/StatCard';
 import SensorCard from '../components/dashboard/SensorCard';
 import AlertCard from '../components/dashboard/AlertCard';
-import AlarmingNotifications from '../components/dashboard/AlarmingNotifications';
 import ActivityStream from '../components/dashboard/ActivityStream';
 import HerdGrowthChart from '../components/dashboard/HerdGrowthChart';
 import QuickActions from '../components/dashboard/QuickActions';
 import ChatPanel from '../components/chat/ChatPanel';
 import VetPanel from '../components/consult/VetPanel';
 import HeatmapChart from '../components/dashboard/HeatmapChart';
-import GeoHeatmapChart from '../components/dashboard/GeoHeatmapChart';
-import { fetchDashboardSummary, fetchVets } from '../services/farm2vets';
-import type { DashboardSummary, Vet } from '../types';
+import { fetchDashboardSummary, fetchVets, fetchSensorAggregate } from '../services/farm2vets';
+import type { DashboardSummary, SensorAggregate, Vet } from '../types';
 
 const Dashboard: React.FC = () => {
   // 1. Khởi tạo state an toàn
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [sensorAggregate, setSensorAggregate] = useState<SensorAggregate | null>(null);
   const [vets, setVets] = useState<Vet[]>([]);
   const [loading, setLoading] = useState(true);
   const [vetsLoading, setVetsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 2. Gọi API lấy dữ liệu thật
-  useEffect(() => {
+  const loadDashboardData = async (showLoader = false) => {
+    if (showLoader) setLoading(true);
     setError(null);
 
-    Promise.all([
-      fetchDashboardSummary().then(setSummary),
-      fetchVets().then(setVets)
-    ])
-    .catch((err) => {
-      console.error("Lỗi khi tải dữ liệu thật:", err);
-      setError("Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại Backend.");
-    })
-    .finally(() => {
-      setLoading(false);
+    try {
+      await Promise.all([
+        fetchDashboardSummary().then(setSummary),
+        fetchVets().then(setVets),
+        fetchSensorAggregate('barn-1', 24).then(setSensorAggregate),
+      ]);
+    } catch (err) {
+      console.error('Lỗi khi tải dữ liệu thật:', err);
+      setError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại Backend.');
+    } finally {
+      if (showLoader) setLoading(false);
       setVetsLoading(false);
-    });
+    }
+  };
+
+  useEffect(() => {
+    loadDashboardData(true);
+    const interval = window.setInterval(() => loadDashboardData(false), 10000);
+
+    return () => window.clearInterval(interval);
   }, []);
 
   // 3. CHẶN LỖI NULL: Nếu đang tải, trả về màn hình Loading ngay lập tức
@@ -104,20 +111,45 @@ const Dashboard: React.FC = () => {
           />
         </div>
 
+        {sensorAggregate && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <StatCard
+              title="Avg Temperature"
+              value={`${sensorAggregate.avg_temperature_c.toFixed(1)}°C`}
+              subtitle={`Last ${sensorAggregate.window_hours}h`}
+              icon="🌡️"
+              accentColor="text-cyan-400"
+            />
+            <StatCard
+              title="Avg Humidity"
+              value={`${sensorAggregate.avg_humidity_pct.toFixed(0)}%`}
+              subtitle={`Last ${sensorAggregate.window_hours}h`}
+              icon="💧"
+              accentColor="text-blue-400"
+            />
+            <StatCard
+              title="Avg Ammonia"
+              value={`${sensorAggregate.avg_ammonia_ppm.toFixed(1)} ppm`}
+              subtitle={`Last ${sensorAggregate.window_hours}h`}
+              icon="⚗️"
+              accentColor="text-amber-400"
+            />
+            <StatCard
+              title="Sensor Reads"
+              value={sensorAggregate.data_points}
+              subtitle={`Measurements in ${sensorAggregate.window_hours}h`}
+              icon="📊"
+              accentColor="text-green-400"
+            />
+          </div>
+        )}
+
         {/* Sensor + Alert */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SensorCard
             sensor={summary.latest_sensor}
           />
           <AlertCard level={summary.disease_alert_level} />
-        </div>
-
-        {/* Alarming Notifications */}
-        <AlarmingNotifications />
-
-        {/* GeoHeatmap */}
-        <div className="mt-6">
-          <GeoHeatmapChart />
         </div>
 
         {/* Heatmap */}
@@ -135,7 +167,6 @@ const Dashboard: React.FC = () => {
         <QuickActions />
         <ChatPanel />
         <VetPanel vets={vets} isLoading={false} />
-        
       </div>
     </div>
   );

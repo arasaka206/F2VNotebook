@@ -4,10 +4,9 @@ import type { ForumPost } from '../../types';
 interface ForumPostCardProps {
   post: ForumPost;
   onViewDetails?: (postId: string) => void;
-  onReport?: (postId: string) => void;
 }
 
-const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, onViewDetails, onReport }) => {
+const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, onViewDetails }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -54,26 +53,15 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post, onViewDetails, onRe
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-sm text-gray-400 border-t border-gray-700 pt-4">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span>👍</span>
-            <span>{post.reaction_count}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span>💬</span>
-            <span>{post.comment_count}</span>
-          </div>
+      <div className="flex items-center gap-6 text-sm text-gray-400 border-t border-gray-700 pt-4">
+        <div className="flex items-center gap-2">
+          <span>👍</span>
+          <span>{post.reaction_count}</span>
         </div>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onReport?.(post.id);
-          }}
-          className="text-red-400 hover:text-red-300 text-xs underline hover:no-underline"
-        >
-          Report
-        </button>
+        <div className="flex items-center gap-2">
+          <span>💬</span>
+          <span>{post.comment_count}</span>
+        </div>
       </div>
     </div>
   );
