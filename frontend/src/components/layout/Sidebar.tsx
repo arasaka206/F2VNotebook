@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NAV_ITEMS } from '../../data/mockData';
+import type { UserAwarenessScore } from '../../types';
 
 interface SidebarProps {
   activeItem: string;
@@ -9,6 +10,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
   const { t } = useTranslation();
+  const [awarenessScore, setAwarenessScore] = useState<UserAwarenessScore | null>(null);
 
   const getTranslatedLabel = (id: string) => {
     const labelMap: Record<string, string> = {
@@ -23,6 +25,43 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
       reports: t('app.reports'),
     };
     return labelMap[id] || id;
+  };
+
+  const loadScore = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/api/quizzes/user/user-123/awareness`);
+      if (!response.ok) return;
+      const data = await response.json();
+      setAwarenessScore(data);
+    } catch (error) {
+      console.error('Failed to load awareness score:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadScore();
+    window.addEventListener('awarenessScoreUpdated', loadScore);
+    return () => {
+      window.removeEventListener('awarenessScoreUpdated', loadScore);
+    };
+  }, []);
+
+  const getBadgeText = (status: string | undefined) => {
+    switch (status) {
+      case 'good': return 'Proficient Farmer';
+      case 'needs_improvement': return 'Growing Farmer';
+      case 'restricted': return 'Lagged Farmer';
+      default: return 'Farmer';
+    }
+  };
+
+  const getBadgeClasses = (status: string | undefined) => {
+    switch (status) {
+      case 'good': return 'bg-green-600 text-green-100';
+      case 'needs_improvement': return 'bg-yellow-600 text-yellow-100';
+      case 'restricted': return 'bg-red-600 text-red-100';
+      default: return 'bg-gray-700 text-gray-100';
+    }
   };
 
   return (
@@ -67,6 +106,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
             <div className="text-xs text-gray-400">Farmer · Farm-001</div>
           </div>
         </div>
+        {awarenessScore && (
+          <div className="mt-3 flex items-center gap-2">
+            <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${getBadgeClasses(awarenessScore.status)}`}>
+              {getBadgeText(awarenessScore.status)}
+            </span>
+          </div>
+        )}
       </div>
     </aside>
   );

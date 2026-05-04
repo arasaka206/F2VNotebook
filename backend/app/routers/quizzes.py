@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 from app.database import get_db
-from app.models import Quiz, QuizQuestion, UserQuizAttempt, UserAwarenessScore
+from app.models import Quiz, QuizQuestion, UserQuizAttempt, UserAwarenessScore, NotebookLog
 from app.schemas.quiz import (
     QuizCreate, QuizUpdate, QuizOut, QuizWithQuestions,
     QuizQuestionCreate, QuizQuestionOut,
@@ -11,8 +11,183 @@ from app.schemas.quiz import (
 )
 import json
 import uuid
+import google.generativeai as genai
+from app.core.config import settings
 
 router = APIRouter(prefix="/quizzes", tags=["quizzes"])
+
+if settings.GEMINI_API_KEY:
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    quiz_model = genai.GenerativeModel("gemini-2.5-flash")
+else:
+    quiz_model = None
+
+
+def _clean_ai_json(text: str) -> str:
+    text = text.strip()
+    for marker in ['```json', '```', 'json']:
+        text = text.replace(marker, '')
+    return text.strip()
+
+
+def _build_fallback_quiz_payload(note: NotebookLog) -> dict:
+    summary = (note.summary or note.content.split('.')[:1][0]).strip()
+    tags = json.loads(note.tags) if note.tags else []
+    recommendations = json.loads(note.recommendations) if note.recommendations else []
+    difficulty = 'advanced' if note.urgency in ['High', 'Critical'] else 'intermediate'
+
+    first_recommendation = recommendations[0] if recommendations else 'Review herd condition and follow veterinary advice.'
+    first_tag = tags[0] if tags else 'health'
+
+    return {
+        'title': f'Notebook Quiz on {first_tag.capitalize()}',
+        'description': f'Questions derived from the farmer notebook entry: "{summary}".',
+        'topic': 'notebook',
+        'difficulty': difficulty,
+        'time_limit': 10,
+        'passing_score': 80.0,
+        'questions': [
+            {
+                'question': 'What was the main issue described in the notebook entry?',
+                'options': [summary, 'No issue was described', 'A feed delivery delay', 'A water supply problem'],
+                'correct_answer': 0,
+                'explanation': 'The notebook entry described the primary issue in the summary.'
+            },
+            {
+                'question': 'Which action was recommended for this situation?',
+                'options': [first_recommendation, 'Ignore the symptoms', 'Change the herd immediately', 'Reduce water intake'],
+                'correct_answer': 0,
+                'explanation': 'The recommended action is based on the notebook note analysis.'
+            },
+            {
+                'question': 'What topic does this notebook entry relate to?',
+                'options': [first_tag.capitalize(), 'Finance', 'Transportation', 'Weather'],
+                'correct_answer': 0,
+                'explanation': 'The notebook note is classified under the primary tag from the note data.'
+            }
+        ]
+    }
+
+
+def _build_quiz_payload_from_note(note: NotebookLog) -> dict:
+    note_content = note.content.strip()
+    note_summary = note.summary or note_content.split('.')[:1][0].strip()
+    note_tags = json.loads(note.tags) if note.tags else []
+    note_recommendations = json.loads(note.recommendations) if note.recommendations else []
+    difficulty = 'advanced' if note.urgency in ['High', 'Critical'] else 'intermediate'
+
+    if not quiz_model:
+        return _build_fallback_quiz_payload(note)
+
+    prompt = f"""
+You are an expert AI quiz author for a livestock farmer learning system. Read the field notebook note below and create a short quiz that tests the farmer's understanding of the problem described.
+
+Notebook note:
+{note_content}
+
+Note summary:
+{note_summary}
+
+Tags: {note_tags}
+Recommendations: {note_recommendations}
+
+Create exactly 3 multiple-choice questions. Each question should have 4 answer options, one correct answer indexed from 0, and a short explanation.
+
+Return valid JSON only with this structure:
+{{
+  "title": "...",
+  "description": "...",
+  "topic": "notebook",
+  "difficulty": "beginner|intermediate|advanced",
+  "time_limit": 10,
+  "passing_score": 80.0,
+  "questions": [
+    {{
+      "question": "...",
+      "options": ["...", "...", "...", "..."],
+      "correct_answer": 0,
+      "explanation": "..."
+    }},
+    ...
+  ]
+}}
+Do not include markdown fences or any extra text.
+"""
+
+    try:
+        response = quiz_model.generate_content(prompt)
+        payload_text = _clean_ai_json(response.text)
+        return json.loads(payload_text)
+    except Exception:
+        return _build_fallback_quiz_payload(note)
+
+
+@router.post("/from-notebook/{note_id}", response_model=QuizWithQuestions)
+def generate_quiz_from_notebook(
+    note_id: str,
+    db: Session = Depends(get_db)
+):
+    note = db.query(NotebookLog).filter(NotebookLog.id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Notebook entry not found")
+
+    payload = _build_quiz_payload_from_note(note)
+
+    quiz = Quiz(
+        title=payload['title'],
+        description=payload.get('description'),
+        topic=payload.get('topic', 'notebook'),
+        difficulty=payload.get('difficulty', 'intermediate'),
+        time_limit=payload.get('time_limit', 10),
+        passing_score=payload.get('passing_score', 80.0),
+        is_active=True,
+        created_by=f'notebook:{note_id}',
+    )
+    db.add(quiz)
+    db.flush()
+
+    questions_out = []
+    for index, question_data in enumerate(payload.get('questions', [])):
+        if len(question_data.get('options', [])) != 4:
+            continue
+        question = QuizQuestion(
+            quiz_id=quiz.id,
+            question=question_data['question'],
+            options=json.dumps(question_data['options'], ensure_ascii=False),
+            correct_answer=question_data['correct_answer'],
+            explanation=question_data.get('explanation'),
+            order=index,
+        )
+        db.add(question)
+        db.flush()
+        questions_out.append(QuizQuestionOut(
+            id=question.id,
+            quiz_id=question.quiz_id,
+            question=question.question,
+            options=question_data['options'],
+            correct_answer=question.correct_answer,
+            explanation=question.explanation,
+            order=question.order,
+            created_at=question.created_at
+        ))
+
+    db.commit()
+    db.refresh(quiz)
+
+    return QuizWithQuestions(
+        id=quiz.id,
+        title=quiz.title,
+        description=quiz.description,
+        topic=quiz.topic,
+        difficulty=quiz.difficulty,
+        time_limit=quiz.time_limit,
+        passing_score=quiz.passing_score,
+        is_active=quiz.is_active,
+        created_by=quiz.created_by,
+        created_at=quiz.created_at,
+        updated_at=quiz.updated_at,
+        questions=questions_out
+    )
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -215,15 +390,21 @@ def get_user_awareness_score(
 
 
 def update_user_awareness_score(user_id: str, db: Session):
-    """Update user's overall awareness score based on quiz attempts."""
-    attempts = db.query(UserQuizAttempt).filter(UserQuizAttempt.user_id == user_id).all()
+    """Update user's overall awareness score based on latest quiz attempts per quiz."""
+    attempts = db.query(UserQuizAttempt).filter(UserQuizAttempt.user_id == user_id).order_by(UserQuizAttempt.quiz_id, UserQuizAttempt.created_at.desc()).all()
 
     if not attempts:
         return
 
-    total_score = sum(attempt.score for attempt in attempts) / len(attempts)
-    quizzes_completed = len(attempts)
-    quizzes_passed = len([a for a in attempts if a.status == "completed"])
+    latest_attempts = {}
+    for attempt in attempts:
+        if attempt.quiz_id not in latest_attempts:
+            latest_attempts[attempt.quiz_id] = attempt
+
+    latest_list = list(latest_attempts.values())
+    total_score = round(sum(attempt.score for attempt in latest_list) / len(latest_list), 2)
+    quizzes_completed = len(latest_list)
+    quizzes_passed = len([a for a in latest_list if a.status == "completed"])
 
     # Determine status
     if total_score >= 80:

@@ -10,11 +10,20 @@ const QuizPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [awarenessScore, setAwarenessScore] = useState<UserAwarenessScore | null>(null);
   const [attempts, setAttempts] = useState<UserQuizAttempt[]>([]);
+  const [lastAttempt, setLastAttempt] = useState<UserQuizAttempt | null>(null);
 
   useEffect(() => {
     loadQuizzes();
     loadUserData();
   }, []);
+
+  useEffect(() => {
+    const pendingQuizId = window.localStorage.getItem('notebookGeneratedQuizId');
+    if (pendingQuizId) {
+      window.localStorage.removeItem('notebookGeneratedQuizId');
+      startQuiz(pendingQuizId);
+    }
+  }, [quizzes]);
 
   const loadQuizzes = async () => {
     try {
@@ -37,6 +46,7 @@ const QuizPage: React.FC = () => {
       ]);
       setAwarenessScore(scoreResponse.data);
       setAttempts(attemptsResponse.data);
+      window.dispatchEvent(new Event('awarenessScoreUpdated'));
     } catch (error) {
       console.error('Failed to load user data:', error);
     }
@@ -66,6 +76,7 @@ const QuizPage: React.FC = () => {
       });
 
       setAttempts(prev => [response.data, ...prev]);
+      setLastAttempt(response.data);
       setShowResults(true);
       loadUserData(); // Refresh awareness score
     } catch (error) {
@@ -77,6 +88,13 @@ const QuizPage: React.FC = () => {
     if (score >= 80) return 'text-green-400';
     if (score >= 60) return 'text-yellow-400';
     return 'text-red-400';
+  };
+
+  const getNextQuiz = () => {
+    if (!selectedQuiz) return null;
+    const difficultyOrder = ['beginner', 'intermediate', 'advanced'];
+    const currentIndex = difficultyOrder.indexOf(selectedQuiz.difficulty);
+    return quizzes.find((quiz) => difficultyOrder.indexOf(quiz.difficulty) > currentIndex && quiz.id !== selectedQuiz.id) || null;
   };
 
   const getStatusColor = (status: string) => {
@@ -142,8 +160,11 @@ const QuizPage: React.FC = () => {
             </div>
 
             {selectedQuiz.description && (
-              <p className="text-gray-300 mb-6">{selectedQuiz.description}</p>
+              <p className="text-gray-300 mb-2">{selectedQuiz.description}</p>
             )}
+            <p className="text-xs text-gray-500 mb-6">
+              Passing score: {selectedQuiz.passing_score}% · Type: {selectedQuiz.topic === 'notebook' ? 'Notebook-based' : 'General knowledge'}
+            </p>
 
             <div className="space-y-6">
               {selectedQuiz.questions.map((question, qIndex) => (
@@ -183,6 +204,38 @@ const QuizPage: React.FC = () => {
                 </div>
               ))}
             </div>
+
+            {showResults && lastAttempt && (
+              <div className="mt-6 p-4 rounded-lg border border-gray-700 bg-gray-900/80">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{lastAttempt.status === 'completed' ? 'Certificate Earned' : 'Review and Retry'}</h3>
+                    <p className="text-sm text-gray-400 mt-1">
+                      {lastAttempt.status === 'completed'
+                        ? `You scored ${lastAttempt.score.toFixed(1)}% and earned a certificate for this quiz.`
+                        : `You scored ${lastAttempt.score.toFixed(1)}%. Review the notebook note and try again later to earn the certificate.`}
+                    </p>
+                  </div>
+                  <span className={`px-2 py-1 rounded text-xs ${lastAttempt.status === 'completed' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
+                    {lastAttempt.status === 'completed' ? 'Passed' : 'Failed'}
+                  </span>
+                </div>
+                {lastAttempt.status !== 'completed' && (
+                  <p className="text-xs text-gray-500 mt-3">If the score is below passing, consider reviewing the notebook note and taking a new quiz later.</p>
+                )}
+                {lastAttempt.status === 'completed' && getNextQuiz() && (
+                  <button
+                    onClick={() => {
+                      const nextQuiz = getNextQuiz();
+                      if (nextQuiz) startQuiz(nextQuiz.id);
+                    }}
+                    className="mt-4 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-white text-sm"
+                  >
+                    Continue to next quiz
+                  </button>
+                )}
+              </div>
+            )}
 
             {!showResults ? (
               <div className="flex justify-end mt-6">
@@ -224,7 +277,7 @@ const QuizPage: React.FC = () => {
                     <p className="text-gray-300 text-sm mb-4 line-clamp-2">{quiz.description}</p>
                   )}
                   <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
-                    <span>Topic: {quiz.topic}</span>
+                    <span>{quiz.topic === 'notebook' ? 'Notebook-based quiz' : `Topic: ${quiz.topic}`}</span>
                     <span>Difficulty: {quiz.difficulty}</span>
                   </div>
                   <div className="flex items-center justify-between">

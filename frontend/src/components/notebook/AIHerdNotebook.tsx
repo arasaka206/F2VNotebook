@@ -19,6 +19,8 @@ const AIHerdNotebook: React.FC = () => {
   const [log, setLog] = useState('');
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
+  const [generatingNoteQuizId, setGeneratingNoteQuizId] = useState<string | null>(null);
+  const [generatedNoteQuizIds, setGeneratedNoteQuizIds] = useState<Record<string, string>>({});
 
   // 1. TẢI LỊCH SỬ TỪ DATABASE KHI MỞ TRANG
   const fetchNotes = async () => {
@@ -65,10 +67,25 @@ const AIHerdNotebook: React.FC = () => {
       const aiRes = await api.post('/ai/analyze-log', { content: log });
       
       // B2: Lưu nội dung + Kết quả AI xuống DB
-      await api.post('/ai/notebook', {
+      const saveRes = await api.post('/ai/notebook', {
         content: log,
         ...aiRes.data // Rải các trường summary, urgency, tags, recommendations vào
       });
+
+      const noteId = saveRes.data.id;
+
+      if (aiRes.data.urgency === 'Critical') {
+        try {
+          const quizRes = await api.post(`/quizzes/from-notebook/${noteId}`);
+          const quizId = quizRes.data.id;
+          window.localStorage.setItem('notebookGeneratedQuizId', quizId);
+          setGeneratedNoteQuizIds((prev) => ({ ...prev, [noteId]: quizId }));
+          alert('Critical note detected — quiz was auto-generated. Open the Quiz page to take it.');
+        } catch (quizError) {
+          console.error('Failed to auto-generate quiz from critical note:', quizError);
+          alert('Ghi chú quan trọng đã được lưu, nhưng tạo quiz tự động thất bại.');
+        }
+      }
 
       await fetchNotes(); // Tải lại danh sách
       setLog('');
@@ -76,6 +93,22 @@ const AIHerdNotebook: React.FC = () => {
       alert('Không thể kết nối đến AI hoặc lỗi lưu trữ.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateQuiz = async (noteId: string) => {
+    setGeneratingNoteQuizId(noteId);
+    try {
+      const response = await api.post(`/quizzes/from-notebook/${noteId}`);
+      const quizId = response.data.id;
+      window.localStorage.setItem('notebookGeneratedQuizId', quizId);
+      setGeneratedNoteQuizIds((prev) => ({ ...prev, [noteId]: quizId }));
+      alert('Quiz được tạo thành công! Vui lòng mở trang Quiz để bắt đầu.');
+    } catch (error) {
+      console.error('Failed to generate quiz from note:', error);
+      alert('Không thể tạo quiz từ ghi chú này.');
+    } finally {
+      setGeneratingNoteQuizId(null);
     }
   };
 
@@ -170,6 +203,19 @@ const AIHerdNotebook: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <button
+                  onClick={() => handleGenerateQuiz(note.id)}
+                  disabled={generatingNoteQuizId === note.id}
+                  className="flex-1 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-white text-sm font-medium"
+                >
+                  {generatingNoteQuizId === note.id ? 'Đang tạo quiz...' : 'Tạo quiz từ ghi chú'}
+                </button>
+                {generatedNoteQuizIds[note.id] && (
+                  <span className="text-xs text-green-300">Quiz đã tạo, mở trang Quiz để bắt đầu.</span>
+                )}
+              </div>
             </div>
           ))
         )}
