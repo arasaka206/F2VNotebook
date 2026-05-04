@@ -110,7 +110,7 @@ const FullChatPanel: React.FC = () => {
         <button
           onClick={handleClearHistory}
           className="text-xs text-gray-400 hover:text-white border border-farm-border px-3 py-1 rounded-lg transition-colors"
-          title="Clear chat history"
+          title={t('chat.clearHistory')}
         >
           {t('chat.clearHistory')}
         </button>
