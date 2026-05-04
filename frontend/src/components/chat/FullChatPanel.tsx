@@ -5,28 +5,15 @@ import { sendChatMessage } from '../../services/farm2vets';
 
 const STORAGE_KEY = 'f2v_chat_history';
 
-const INITIAL_MESSAGE: ChatMessage = {
-  id: 'init',
-  role: 'assistant',
-  content: "Hello! I'm your Farm2Vets AI assistant. Ask me about your herd health, treatment plans, or disease alerts.",
-  timestamp: new Date(),
-};
-
-const SUGGESTIONS = [
-  'What is the current herd health score?',
-  'Show me active treatment cases.',
-  'Any disease alerts I should know about?',
-];
-
-function loadHistory(): ChatMessage[] {
+function loadHistory(welcomeMessage: string): ChatMessage[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [INITIAL_MESSAGE];
+    if (!raw) return [{ id: 'init', role: 'assistant', content: welcomeMessage, timestamp: new Date() }];
     const parsed: Array<{ id: string; role: 'user' | 'assistant'; content: string; timestamp: string }> =
       JSON.parse(raw);
     return parsed.map((m) => ({ ...m, timestamp: new Date(m.timestamp) }));
   } catch {
-    return [INITIAL_MESSAGE];
+    return [{ id: 'init', role: 'assistant', content: welcomeMessage, timestamp: new Date() }];
   }
 }
 
@@ -39,12 +26,19 @@ function saveHistory(messages: ChatMessage[]) {
 }
 
 const FullChatPanel: React.FC = () => {
-  const { i18n } = useTranslation();
-  const [messages, setMessages] = useState<ChatMessage[]>(loadHistory);
+  const { t, i18n } = useTranslation();
+  const welcomeMessage = t('chat.welcome');
+  const [messages, setMessages] = useState<ChatMessage[]>(() => loadHistory(welcomeMessage));
   const [input, setInput] = useState('');
   const [sessionId, setSessionId] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const suggestions = [
+    t('chat.suggestion1'),
+    t('chat.suggestion2'),
+    t('chat.suggestion3'),
+  ];
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -84,7 +78,7 @@ const FullChatPanel: React.FC = () => {
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content: 'Unable to reach AI assistant. Please check your connection.',
+          content: t('chat.errorMessage'),
           timestamp: new Date(),
         },
       ]);
@@ -94,7 +88,7 @@ const FullChatPanel: React.FC = () => {
   };
 
   const handleClearHistory = () => {
-    const fresh = [INITIAL_MESSAGE];
+    const fresh = [{ id: 'init', role: 'assistant' as const, content: welcomeMessage, timestamp: new Date() }];
     setMessages(fresh);
     saveHistory(fresh);
     setSessionId(undefined);
@@ -107,9 +101,9 @@ const FullChatPanel: React.FC = () => {
         <div className="flex items-center gap-3">
           <span className="text-2xl">🤖</span>
           <div>
-            <p className="text-base font-semibold text-white">AI Assistant</p>
+            <p className="text-base font-semibold text-white">{t('chat.title')}</p>
             <p className="text-xs text-green-400 flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-400 rounded-full inline-block" /> Online
+              <span className="w-2 h-2 bg-green-400 rounded-full inline-block" /> {t('chat.online')}
             </p>
           </div>
         </div>
@@ -118,7 +112,7 @@ const FullChatPanel: React.FC = () => {
           className="text-xs text-gray-400 hover:text-white border border-farm-border px-3 py-1 rounded-lg transition-colors"
           title="Clear chat history"
         >
-          Clear history
+          {t('chat.clearHistory')}
         </button>
       </div>
 
@@ -160,7 +154,7 @@ const FullChatPanel: React.FC = () => {
 
       {/* Suggestions */}
       <div className="flex gap-2 mb-3 flex-wrap flex-shrink-0">
-        {SUGGESTIONS.map((suggestion) => (
+        {suggestions.map((suggestion) => (
           <button
             key={suggestion}
             onClick={() => handleSend(suggestion)}
@@ -179,7 +173,7 @@ const FullChatPanel: React.FC = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Ask about your herd..."
+          placeholder={t('chat.placeholder')}
           className="flex-1 bg-farm-card text-sm text-white placeholder-gray-500 rounded-xl px-4 py-2.5 outline-none focus:ring-1 focus:ring-primary-500 border border-farm-border"
         />
         <button

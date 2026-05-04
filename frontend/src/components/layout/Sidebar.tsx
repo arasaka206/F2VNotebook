@@ -21,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
       'vet-connect': t('app.vetConnect'),
       quizzes: t('app.quizzes'),
       'public-dashboard': t('app.publicDashboard'),
-      chat: 'AI Chat',
+      chat: t('app.chat'),
       inventory: t('app.inventory'),
       reports: t('app.reports'),
       profile: 'Farmer Profile',
