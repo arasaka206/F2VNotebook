@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import Dashboard from './pages/Dashboard';
@@ -9,20 +10,21 @@ import QuizPage from './pages/QuizPage';
 // 1. Thêm dòng import này
 import NotebookPage from './pages/NotebookPage';
 
-const PAGE_TITLES: Record<string, string> = {
-  dashboard: 'Dashboard',
-  notebook: 'AI Herd Notebook',
-  livestock: 'Livestock Profiles',
-  'disease-map': 'Disease Risk Map',
-  'vet-connect': 'Veterinary Connect',
-  quizzes: 'Disease Awareness Quizzes',
-  'public-dashboard': 'Community Forum',
-  inventory: 'Inventory & Supplies',
-  reports: 'Reports & Analytics',
-};
-
 function App() {
+  const { t } = useTranslation();
   const [activePage, setActivePage] = useState('dashboard');
+
+  const PAGE_TITLES: Record<string, string> = {
+    dashboard: t('app.dashboard'),
+    notebook: t('app.notebook'),
+    livestock: t('app.livestock'),
+    'disease-map': t('app.diseaseMap'),
+    'vet-connect': t('app.vetConnect'),
+    quizzes: t('app.quizzes'),
+    'public-dashboard': t('app.publicDashboard'),
+    inventory: t('app.inventory'),
+    reports: t('app.reports'),
+  };
 
   const renderPage = () => {
     switch (activePage) {
@@ -43,7 +45,7 @@ function App() {
             <div className="text-center">
               <div className="text-6xl mb-4">🚧</div>
               <h2 className="text-xl font-bold text-white mb-2">{PAGE_TITLES[activePage]}</h2>
-              <p className="text-gray-400 text-sm">This section is coming soon.</p>
+              <p className="text-gray-400 text-sm">{t('app.comingSoon')}</p>
             </div>
           </div>
         );

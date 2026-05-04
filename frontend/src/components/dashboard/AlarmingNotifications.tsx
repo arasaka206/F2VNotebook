@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 
 interface AlarmingNotification {
@@ -11,6 +12,7 @@ interface AlarmingNotification {
 }
 
 const AlarmingNotifications: React.FC = () => {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState<AlarmingNotification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -71,7 +73,7 @@ const AlarmingNotifications: React.FC = () => {
   if (loading) {
     return (
       <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-        <div className="animate-pulse text-gray-400">Loading alerts...</div>
+        <div className="animate-pulse text-gray-400">{t('dashboard.loadingAlerts')}</div>
       </div>
     );
   }
@@ -83,7 +85,7 @@ const AlarmingNotifications: React.FC = () => {
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-100 flex items-center gap-2">
-            🚨 Alarming Notifications
+            🚨 {t('dashboard.alarmingNotifications')}
             {unreadCount > 0 && (
               <span className="bg-red-600 text-white text-xs px-2 py-1 rounded-full">
                 {unreadCount}
@@ -95,8 +97,12 @@ const AlarmingNotifications: React.FC = () => {
 
       <div className="max-h-96 overflow-y-auto">
         {notifications.length === 0 ? (
-          <div className="p-4 text-gray-400 text-center">
-            No alarming notifications at this time.
+          <div className="p-4 text-center">
+            <div className="animate-pulse">
+              <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto mb-2"></div>
+              <div className="h-3 bg-gray-700 rounded w-1/2 mx-auto"></div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">{t('dashboard.awaitingFirstSensorReading')}</p>
           </div>
         ) : (
           notifications.map((notification) => {
@@ -117,7 +123,7 @@ const AlarmingNotifications: React.FC = () => {
                       </h4>
                       {!notification.isRead && (
                         <span className="bg-red-600 text-white text-xs px-2 py-1 rounded">
-                          NEW
+                          {t('dashboard.newAlert')}
                         </span>
                       )}
                     </div>
@@ -133,7 +139,7 @@ const AlarmingNotifications: React.FC = () => {
                       onClick={() => markAsRead(notification.id)}
                       className="ml-4 text-xs text-gray-300 hover:text-white underline"
                     >
-                      Mark Read
+                      {t('dashboard.markRead')}
                     </button>
                   )}
                 </div>

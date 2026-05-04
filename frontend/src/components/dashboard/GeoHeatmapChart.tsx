@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, useMap } from 'react-leaflet';
+import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
 import api from '../../services/api';
 
@@ -21,6 +22,7 @@ const MapController = ({ center, zoom }: { center: [number, number], zoom: numbe
 };
 
 const GeoHeatmapChart: React.FC = () => {
+  const { t } = useTranslation();
   const [points, setPoints] = useState<any[]>([]);
   const [region, setRegion] = useState<keyof typeof REGIONS>('Vietnam');
   const [mapCenter, setMapCenter] = useState<[number, number]>([REGIONS.Vietnam.lat, REGIONS.Vietnam.lng]);
@@ -75,24 +77,24 @@ const GeoHeatmapChart: React.FC = () => {
   return (
     <div className="bg-gray-900 rounded-lg p-6 space-y-4 shadow-lg w-full">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-200">Epidemic Geo-Heatmap</h3>
+        <h3 className="text-lg font-semibold text-gray-200">{t('dashboard.epidemicGeoHeatmap')}</h3>
         <div className="flex items-center gap-3">
           <select 
             value={region} 
             onChange={handleRegionChange}
             className="bg-gray-800 text-white border border-gray-700 rounded px-3 py-1 text-sm outline-none"
           >
-            <option value="Vietnam">Whole Vietnam</option>
-            <option value="Hanoi">Hanoi City</option>
-            <option value="HCMC">Ho Chi Minh City</option>
-            <option value="DaNang">Da Nang</option>
+            <option value="Vietnam">{t('dashboard.wholeVietnam')}</option>
+            <option value="Hanoi">{t('dashboard.hanoiCity')}</option>
+            <option value="HCMC">{t('dashboard.hoChiMinhCity')}</option>
+            <option value="DaNang">{t('dashboard.daNang')}</option>
           </select>
 
           <button 
             onClick={handleMyLocation}
             className="flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition"
           >
-            📍 My Location
+            📍 {t('dashboard.myLocation')}
           </button>
         </div>
       </div>

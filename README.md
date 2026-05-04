@@ -114,6 +114,7 @@ Frontend will be available at http://localhost:5173
 | `GET` | `/api/treatments/` | List treatments |
 | `POST` | `/api/treatments/` | Create treatment |
 | `GET` | `/api/sensors/latest` | Latest sensor reading |
+| `GET` | `/api/sensors/aggregate` | Statistical aggregates (24h, custom window) |
 | `POST` | `/api/sensors/ingest` | Ingest sensor data |
 | `GET` | `/api/consults/vets` | Available vets |
 | `GET` | `/api/consults/` | List consult requests |
@@ -125,6 +126,136 @@ Full interactive docs: http://localhost:8000/docs
 
 ---
 
+## 📡 IoT Sensor Data Flow
+
+This section explains how sensor data from IoT devices flows from collection to frontend display.
+
+### 🏗️ Architecture Overview
+
+```
+IoT Sensors → Backend API → Database → Frontend Dashboard
+     ↓            ↓            ↓            ↓
+  BME280      FastAPI      SQLite      React Components
+  (Temp/      /ingest      sensor_     SensorCard
+   Humidity)   endpoint     readings   + StatCards
+```
+
+### 1. 📥 Data Collection (IoT Sensors)
+
+**Supported Sensors:**
+- **BME280**: Temperature (°C) + Humidity (%) 
+- **MQ-135**: Ammonia (ppm) - *planned integration*
+
+**Data Format:**
+```json
+{
+  "barn_id": "barn-1",
+  "temperature_c": 28.5,
+  "humidity_pct": 65.2,
+  "ammonia_ppm": 12.3
+}
+```
+
+**API Endpoint:** `POST /api/sensors/ingest`
+- Accepts partial data (nullable fields allowed)
+- Automatic status calculation based on thresholds
+- Real-time processing with immediate database storage
+
+### 2. 🔄 Backend Processing
+
+**Status Logic:**
+```python
+status = "ok"
+if temperature_c > 35.0:
+    status = "warning" 
+if ammonia_ppm > 25.0:
+    status = "danger"
+```
+
+**Database Schema** (`sensor_readings` table):
+- `id`: UUID primary key
+- `barn_id`: Barn identifier (indexed)
+- `temperature_c`: Float (nullable)
+- `humidity_pct`: Float (nullable) 
+- `ammonia_ppm`: Float (nullable)
+- `status`: String ("ok" | "warning" | "danger")
+- `timestamp`: DateTime (auto-generated)
+
+**Available Endpoints:**
+- `GET /api/sensors/latest` - Most recent reading across all barns
+- `GET /api/sensors/aggregate?barn_id=X&window_hours=Y` - Statistical aggregates
+
+### 3. 📊 Frontend Display
+
+**Real-time Updates:**
+- Dashboard auto-refreshes every 10 seconds
+- Fetches latest sensor data on load
+- Displays current readings with status indicators
+
+**Components:**
+- **SensorCard**: Real-time temperature, humidity, ammonia with progress bars
+- **StatCards**: 24h aggregates (avg temp, humidity, ammonia, data points)
+- **Status Colors**: 
+  - 🟢 Green: "ok" (normal conditions)
+  - 🟡 Yellow: "warning" (elevated readings)  
+  - 🔴 Red: "danger" (critical thresholds exceeded)
+
+**Data Flow in Code:**
+```typescript
+// services/farm2vets.ts
+export const fetchLatestSensor = async (): Promise<SensorReading> => {
+  const { data } = await api.get<SensorReading>('/sensors/latest');
+  return data;
+};
+
+// pages/Dashboard.tsx  
+const [summary, setSummary] = useState<DashboardSummary | null>(null);
+useEffect(() => {
+  const interval = setInterval(() => loadDashboardData(), 10000);
+  return () => clearInterval(interval);
+}, []);
+```
+
+### 4. 🚀 Integration Examples
+
+**Simulate Sensor Data:**
+```bash
+# Send test sensor reading
+curl -X POST http://localhost:8000/api/sensors/ingest \
+  -H "Content-Type: application/json" \
+  -d '{
+    "barn_id": "barn-1",
+    "temperature_c": 32.1,
+    "humidity_pct": 78.5,
+    "ammonia_ppm": 18.2
+  }'
+```
+
+**Query Sensor Data:**
+```bash
+# Get latest reading
+curl http://localhost:8000/api/sensors/latest
+
+# Get 24h aggregates for barn-1
+curl "http://localhost:8000/api/sensors/aggregate?barn_id=barn-1&window_hours=24"
+```
+
+### 5. 🔧 Configuration & Thresholds
+
+**Alert Thresholds** (configurable in backend):
+- **Temperature**: >35°C = Warning
+- **Ammonia**: >25 ppm = Danger
+
+**Environment Variables:**
+- `VITE_API_URL`: Frontend API base URL (default: http://localhost:8000)
+
+**Database:**
+- SQLite file: `backend/farm2vets.db`
+- Auto-created on first run
+- Persistent storage across restarts
+
+---
+
 ## 🎨 UI Features
 
 - **Dark-mode dashboard** with notebook-style UX
@@ -133,6 +264,96 @@ Full interactive docs: http://localhost:8000/docs
 - **Herd Growth Chart** (SVG placeholder, ready for Recharts)
 - **AI Activity Stream** with event types (ai_note, treatment, consult, sensor)
 - **Right panel**: Quick Actions (Voice Note, Photo Analysis, SOS), AI Chatbot, Vet Status + Consult Request
+
+---
+
+## 🌐 Multilingual Support (i18n)
+
+Farm2Vets supports **bilingual interface** with automatic language detection and instant switching:
+
+### ✨ Supported Languages
+- **English** (en) - Default
+- **Vietnamese** (vi) - Full translation
+
+### 🔄 Language Detection & Switching
+
+**Auto-detection:**
+- Browser language preference automatically detected on first visit
+- Fallback to English if browser language not supported
+
+**Manual Toggle:**
+- Language switcher in top-right corner (EN / VN button)
+- Preference persisted in browser localStorage
+- All UI updates instantly without page reload
+
+### 📝 Translated Components
+
+**Fully Bilingual:**
+- ✅ **Dashboard Page**: All KPI cards, titles, status labels
+- ✅ **Alarming Notifications**: Alert titles, severity badges, timestamps
+- ✅ **Veterinary Connect**: Vet status (online/busy/offline), consult buttons
+- ✅ **Heatmap-Health Block**: All controls, labels, intensity ranges, error messages
+- ✅ **Geo-Heatmap (Disease Risk Map)**: Region selector, risk levels, descriptions
+- ✅ **IoT Sensors**: Temperature, Humidity, Ammonia labels
+- ✅ **Regional Disease Alerts**: Risk level labels (Low/Medium/High/Critical) and descriptions
+- ✅ **Activity Stream**: Component titles
+- ✅ **AI Chat**: Language parameter sent to backend for AI responses in selected language
+
+### 🔧 Technology Stack
+
+**Frontend i18n:**
+- `react-i18next`: React bindings for i18next
+- `i18next`: Core internationalization framework
+- `i18next-browser-languagedetector`: Auto-detect browser language
+
+**Backend AI Language:**
+- FastAPI receives `language` parameter from frontend
+- Gemini AI API receives language instruction in system prompt
+- Responses returned in user's selected language
+
+### 📂 Translation Files
+
+```
+frontend/src/locales/
+├── en.json        # English translations (~100+ keys)
+└── vi.json        # Vietnamese translations
+```
+
+**Translation Key Structure:**
+```json
+{
+  "app": { "dashboard": "Dashboard", ... },
+  "dashboard": { 
+    "herdHealthScore": "Overall Herd Health Score",
+    "alarmingNotifications": "Alarming Notifications",
+    "veterinaryConnect": "Veterinary Connect",
+    ...
+  },
+  "topbar": { "subtitle": "..." },
+  "quickActions": { ... },
+  "common": { "cancel": "Cancel", "save": "Save", ... }
+}
+```
+
+### 🚀 Usage Example
+
+```typescript
+// In any React component
+import { useTranslation } from 'react-i18next';
+
+const MyComponent = () => {
+  const { t, i18n } = useTranslation();
+  
+  return (
+    <div>
+      <h1>{t('dashboard.herdHealthScore')}</h1>
+      <button onClick={() => i18n.changeLanguage('vi')}>
+        {t('common.vietnamese')}
+      </button>
+    </div>
+  );
+};
+```
 
 ---
 

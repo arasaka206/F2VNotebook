@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ChatMessage } from '../../types';
 import { sendChatMessage } from '../../services/farm2vets';
 
 const ChatPanel: React.FC = () => {
+  const { i18n } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'init',
@@ -36,7 +38,7 @@ const ChatPanel: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const res = await sendChatMessage(text, sessionId);
+      const res = await sendChatMessage(text, sessionId, i18n.language);
       setSessionId(res.session_id);
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
