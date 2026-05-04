@@ -27,14 +27,25 @@ def chat(body: ChatRequest) -> ChatResponse:
 
     session_id = body.session_id or f"sess-{uuid.uuid4().hex[:8]}"
 
+    # Set language for AI responses
+    language = body.language or "en"
+    lang_instruction = ""
+    if language == "vi":
+        lang_instruction = "Please provide your response in Vietnamese."
+    else:
+        lang_instruction = "Please provide your response in English."
+
     # Kết hợp ngữ cảnh (context) nếu có do frontend gửi lên
     prompt = body.message
     if body.context:
         prompt = f"Thông tin bổ sung: {body.context}\n\nCâu hỏi của người dùng: {body.message}"
 
+    # Add language instruction to the prompt
+    full_prompt = f"{lang_instruction}\n\n{prompt}"
+
     try:
         # Gọi Gemini API
-        response = model.generate_content(prompt)
+        response = model.generate_content(full_prompt)
         reply = response.text
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi khi kết nối với Gemini: {str(e)}")

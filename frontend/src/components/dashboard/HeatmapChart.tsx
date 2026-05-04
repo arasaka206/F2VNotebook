@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fetchHeatmapSummary, generateHeatmapFromSensors } from '../../services/farm2vets';
 import api from '../../services/api';
 import type { HeatmapSummary } from '../../types';
@@ -26,6 +27,7 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
   width = '100%',
   height = 300
 }) => {
+  const { t } = useTranslation();
   const [summary, setSummary] = useState<HeatmapSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,8 +35,7 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
   const [generatingReal, setGeneratingReal] = useState(false);
   
   const [renderPoints, setRenderPoints] = useState<any[]>([]); 
-  const [debugMessage, setDebugMessage] = useState<string>('Loading data...');
-
+  const [debugMessage, setDebugMessage] = useState<string>(t('dashboard.loadingData'));
   const loadHeatmapData = async () => {
     try {
       setLoading(true);
@@ -50,9 +51,9 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
       
       if (points.length === 0) {
         points = MOCK_POINTS;
-        setDebugMessage('Backend is empty. Displaying mock data.');
+        setDebugMessage(t('dashboard.backendEmpty'));
       } else {
-        setDebugMessage(`Successfully loaded ${points.length} data points.`);
+        setDebugMessage(t('dashboard.loadedDataPoints', { count: points.length }));
       }
 
       setSummary(summaryData);
@@ -68,12 +69,12 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
   const handleGenerateDemo = async () => {
     try {
       setGeneratingDemo(true);
-      setDebugMessage('Generating demo data on backend...');
+      setDebugMessage(t('dashboard.generatingDemoData'));
       await api.post(`/api/heatmap/demo-data/${barnId}`);
       await loadHeatmapData();
     } catch (err) {
       console.error(err);
-      setError('Error creating demo data.');
+      setError(t('dashboard.errorCreatingDemoData'));
     } finally {
       setGeneratingDemo(false);
     }
@@ -82,12 +83,12 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
   const handleGenerateReal = async () => {
     try {
       setGeneratingReal(true);
-      setDebugMessage('Analyzing sensor data...');
+      setDebugMessage(t('dashboard.analyzingSensorData'));
       await generateHeatmapFromSensors(barnId);
       await loadHeatmapData();
     } catch (err) {
       console.error(err);
-      setError('Error extracting data from sensors.');
+      setError(t('dashboard.errorExtractingData'));
     } finally {
       setGeneratingReal(false);
     }
@@ -107,7 +108,7 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center p-6 bg-gray-900 rounded-lg" style={{ height: height + 100 }}>
-        <span className="text-gray-400 animate-pulse">Loading heatmap...</span>
+        <span className="text-gray-400 animate-pulse">{t('dashboard.loadingHeatmap')}</span>
       </div>
     );
   }
@@ -115,7 +116,7 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
   if (error) {
     return (
       <div className="flex items-center justify-center p-6 bg-gray-900 rounded-lg" style={{ height: height + 100 }}>
-        <span className="text-red-400">Error: {error}</span>
+        <span className="text-red-400">{t('dashboard.error')}: {error}</span>
       </div>
     );
   }
@@ -124,17 +125,17 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
     <div className="bg-gray-900 rounded-lg p-6 space-y-4 shadow-lg" style={{ width: typeof width === 'number' ? `${width}px` : width }}>
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-200">
-          Heatmap - {dataType.charAt(0).toUpperCase() + dataType.slice(1)}
+          {t('dashboard.heatmap')} - {dataType.charAt(0).toUpperCase() + dataType.slice(1)}
         </h3>
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={handleGenerateReal} disabled={generatingReal} className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition">
-            From Sensors
+            {t('dashboard.fromSensors')}
           </button>
           <button onClick={handleGenerateDemo} disabled={generatingDemo} className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition">
-            Demo Data
+            {t('dashboard.demoData')}
           </button>
           <button onClick={loadHeatmapData} disabled={loading} className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition">
-            Refresh
+            {t('dashboard.refresh')}
           </button>
         </div>
       </div>
@@ -164,25 +165,25 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
 
       <div className="flex items-center justify-between text-xs text-gray-400 px-1">
         <span className="text-yellow-400">{debugMessage}</span>
-        <span>Loaded points: {renderPoints.length}</span>
+        <span>{t('dashboard.loadedPoints', { count: renderPoints.length })}</span>
       </div>
 
       {summary && (
         <div className="grid grid-cols-4 gap-2 pt-4 border-t border-gray-700">
           <div className="text-center">
-            <span className="text-xs text-gray-500">Min</span>
+            <span className="text-xs text-gray-500">{t('dashboard.min')}</span>
             <p className="text-sm font-semibold text-blue-400">{summary.min_intensity?.toFixed(1) || 0}</p>
           </div>
           <div className="text-center">
-            <span className="text-xs text-gray-500">Avg</span>
+            <span className="text-xs text-gray-500">{t('dashboard.avg')}</span>
             <p className="text-sm font-semibold text-green-400">{summary.avg_intensity?.toFixed(1) || 0}</p>
           </div>
           <div className="text-center">
-            <span className="text-xs text-gray-500">Max</span>
+            <span className="text-xs text-gray-500">{t('dashboard.max')}</span>
             <p className="text-sm font-semibold text-red-400">{summary.max_intensity?.toFixed(1) || 0}</p>
           </div>
           <div className="text-center">
-            <span className="text-xs text-gray-500">Data Points</span>
+            <span className="text-xs text-gray-500">{t('dashboard.dataPoints')}</span>
             <p className="text-sm font-semibold text-gray-300">{summary.data_points || 0}</p>
           </div>
         </div>
@@ -190,16 +191,16 @@ const HeatmapChart: React.FC<HeatmapProps> = ({
 
       <div className="flex items-center gap-4 pt-4 text-xs border-t border-gray-700">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-blue-500"></div><span className="text-gray-400">Low (0-25)</span>
+          <div className="w-3 h-3 rounded-full bg-blue-500"></div><span className="text-gray-400">{t('dashboard.low0to25')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-emerald-500"></div><span className="text-gray-400">Normal (25-50)</span>
+          <div className="w-3 h-3 rounded-full bg-emerald-500"></div><span className="text-gray-400">{t('dashboard.normal25to50')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-amber-500"></div><span className="text-gray-400">Elevated (50-75)</span>
+          <div className="w-3 h-3 rounded-full bg-amber-500"></div><span className="text-gray-400">{t('dashboard.elevated50to75')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div><span className="text-gray-400">Critical (75-100)</span>
+          <div className="w-3 h-3 rounded-full bg-red-500"></div><span className="text-gray-400">{t('dashboard.critical75to100')}</span>
         </div>
       </div>
     </div>

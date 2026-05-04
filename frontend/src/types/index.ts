@@ -14,6 +14,13 @@ export interface SensorReading {
   status: SensorStatus;
 }
 
+export interface SensorAggregate {
+  avg_temperature_c: number | null;
+  avg_humidity_pct: number | null;
+  avg_ammonia_ppm: number | null;
+  data_points: number;
+}
+
 export interface ActivityEvent {
   id: string;
   timestamp: string;

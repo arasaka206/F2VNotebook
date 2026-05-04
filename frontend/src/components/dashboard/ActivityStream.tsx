@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ActivityEvent } from '../../types';
 
 interface ActivityStreamProps {
@@ -26,10 +27,11 @@ function formatTimestamp(iso: string): string {
 }
 
 const ActivityStream: React.FC<ActivityStreamProps> = ({ events, isLoading }) => {
+  const { t } = useTranslation();
   return (
     <div className="card">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-white">AI Notebook Activity Stream</p>
+        <p className="text-sm font-semibold text-white">{t('dashboard.activityStream')}</p>
         <span className="text-xl">📓</span>
       </div>
       {isLoading ? (

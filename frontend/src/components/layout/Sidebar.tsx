@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { NAV_ITEMS } from '../../data/mockData';
 
 interface SidebarProps {
@@ -7,6 +8,23 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
+  const { t } = useTranslation();
+
+  const getTranslatedLabel = (id: string) => {
+    const labelMap: Record<string, string> = {
+      dashboard: t('app.dashboard'),
+      notebook: t('app.notebook'),
+      livestock: t('app.livestock'),
+      'disease-map': t('app.diseaseMap'),
+      'vet-connect': t('app.vetConnect'),
+      quizzes: t('app.quizzes'),
+      'public-dashboard': t('app.publicDashboard'),
+      inventory: t('app.inventory'),
+      reports: t('app.reports'),
+    };
+    return labelMap[id] || id;
+  };
+
   return (
     <aside className="flex flex-col w-64 min-h-screen bg-farm-card border-r border-farm-border flex-shrink-0">
       {/* Logo */}
@@ -33,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
             }`}
           >
             <span className="text-base">{item.icon}</span>
-            <span>{item.label}</span>
+            <span>{getTranslatedLabel(item.id)}</span>
           </button>
         ))}
       </nav>
