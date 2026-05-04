@@ -86,8 +86,9 @@ export const submitConsultRequest = async (req: ConsultRequest): Promise<Consult
 export const sendChatMessage = async (
   message: string,
   sessionId?: string,
+  language?: string,
 ): Promise<{ reply: string; session_id: string }> => {
-  const { data } = await api.post('/ai/chat', { message, session_id: sessionId });
+  const { data } = await api.post('/ai/chat', { message, session_id: sessionId, language });
   return data;
 };
 

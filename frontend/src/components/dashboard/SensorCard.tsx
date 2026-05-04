@@ -1,8 +1,10 @@
 import React from 'react';
-import type { SensorReading } from '../../types';
+import { useTranslation } from 'react-i18next';
+import type { SensorReading, SensorAggregate } from '../../types';
 
 interface SensorCardProps {
   sensor: SensorReading;
+  sensorStats?: SensorAggregate;
 }
 
 // ĐÃ SỬA: Đồng bộ lại danh sách trạng thái cho khớp chính xác với Backend
@@ -12,7 +14,8 @@ const statusColors: Record<string, string> = {
   critical: 'text-red-400',
 };
 
-const SensorCard: React.FC<SensorCardProps> = ({ sensor }) => {
+const SensorCard: React.FC<SensorCardProps> = ({ sensor, sensorStats }) => {
+  const { t } = useTranslation();
   // Lớp bảo vệ: Nếu Backend trả về null (lúc DB chưa có dữ liệu cảm biến nào)
   const safeSensor = sensor || {
     temperature_c: 0,
@@ -27,34 +30,39 @@ const SensorCard: React.FC<SensorCardProps> = ({ sensor }) => {
     <div className="card">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">IoT Farm Sensors</p>
-          <p className="text-sm font-semibold text-white mt-0.5">Barn A · Real-time</p>
+          <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{t('dashboard.iotFarmSensors')}</p>
+          <p className="text-sm font-semibold text-white mt-0.5">{t('dashboard.barnARealtime')}</p>
         </div>
         <span className="text-2xl">📡</span>
       </div>
 
       <div className="space-y-3">
         <SensorRow
-          label="Temperature"
+          label={t('dashboard.temperature')}
           value={`${safeSensor.temperature_c}°C`}
           icon="🌡️"
           barPercent={Math.min((safeSensor.temperature_c / 40) * 100, 100)}
-          // ĐÃ SỬA: Cập nhật mức nhiệt độ để thanh bar đổi màu đỏ khi > 35 độ
           barColor={safeSensor.temperature_c > 35 ? 'bg-red-500' : safeSensor.temperature_c > 30 ? 'bg-yellow-400' : 'bg-blue-400'}
+          avgValue={sensorStats && sensorStats.avg_temperature_c !== null ? `${sensorStats.avg_temperature_c}°C ${t('dashboard.avg')}` : t('dashboard.noData')}
+          t={t}
         />
         <SensorRow
-          label="Humidity"
+          label={t('dashboard.humidity')}
           value={`${safeSensor.humidity_pct}%`}
           icon="💧"
           barPercent={Math.min(safeSensor.humidity_pct, 100)}
           barColor={safeSensor.humidity_pct > 80 ? 'bg-yellow-400' : 'bg-cyan-400'}
+          avgValue={sensorStats && sensorStats.avg_humidity_pct !== null ? `${sensorStats.avg_humidity_pct}% ${t('dashboard.avg')}` : t('dashboard.noData')}
+          t={t}
         />
         <SensorRow
-          label="Ammonia"
+          label={t('dashboard.ammonia')}
           value={`${safeSensor.ammonia_ppm} ppm`}
           icon="⚗️"
           barPercent={Math.min((safeSensor.ammonia_ppm / 30) * 100, 100)}
           barColor={safeSensor.ammonia_ppm > 25 ? 'bg-red-500' : safeSensor.ammonia_ppm > 15 ? 'bg-yellow-400' : 'bg-green-400'}
+          avgValue={sensorStats && sensorStats.avg_ammonia_ppm !== null ? `${sensorStats.avg_ammonia_ppm} ppm ${t('dashboard.avg')}` : t('dashboard.noData')}
+          t={t}
         />
       </div>
 
@@ -63,7 +71,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ sensor }) => {
         <span className={`inline-block w-2 h-2 rounded-full ${
           safeSensor.status === 'normal' ? 'bg-green-400' : safeSensor.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
         }`} />
-        Status: {safeSensor.status.toUpperCase()}
+        {t('dashboard.status')}: {safeSensor.status === 'normal' ? t('dashboard.normal') : safeSensor.status === 'warning' ? t('dashboard.warning') : t('dashboard.critical')}
       </div>
     </div>
   );
@@ -75,9 +83,11 @@ interface SensorRowProps {
   icon: string;
   barPercent: number;
   barColor: string;
+  avgValue?: string;
+  t: any;
 }
 
-const SensorRow: React.FC<SensorRowProps> = ({ label, value, icon, barPercent, barColor }) => (
+const SensorRow: React.FC<SensorRowProps> = ({ label, value, icon, barPercent, barColor, avgValue, t }) => (
   <div>
     <div className="flex items-center justify-between mb-1">
       <span className="text-xs text-gray-400 flex items-center gap-1.5">
@@ -85,9 +95,14 @@ const SensorRow: React.FC<SensorRowProps> = ({ label, value, icon, barPercent, b
       </span>
       <span className="text-xs font-semibold text-white">{value}</span>
     </div>
-    <div className="h-1.5 bg-farm-border rounded-full overflow-hidden">
+    <div className="h-1.5 bg-farm-border rounded-full overflow-hidden mb-1">
       <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${barPercent}%` }} />
     </div>
+    {avgValue && (
+      <div className="text-[10px] text-gray-500">
+        24h {t('dashboard.avg')}: {avgValue}
+      </div>
+    )}
   </div>
 );
 

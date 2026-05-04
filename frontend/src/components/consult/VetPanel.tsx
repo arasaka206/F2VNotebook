@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Vet } from '../../types';
 import { submitConsultRequest } from '../../services/farm2vets';
 
@@ -14,6 +15,7 @@ const statusBadge: Record<string, string> = {
 };
 
 const VetPanel: React.FC<VetPanelProps> = ({ vets, isLoading }) => {
+  const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -38,7 +40,7 @@ const VetPanel: React.FC<VetPanelProps> = ({ vets, isLoading }) => {
   return (
     <div className="card space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-white">Veterinary Connect</p>
+        <p className="text-sm font-semibold text-white">{t('dashboard.veterinaryConnect')}</p>
         <span className="text-xl">🩺</span>
       </div>
 
@@ -63,7 +65,7 @@ const VetPanel: React.FC<VetPanelProps> = ({ vets, isLoading }) => {
               </div>
               <span className={`flex items-center gap-1 text-[10px] text-gray-400`}>
                 <span className={statusBadge[vet.status] ?? 'badge-offline'} />
-                {vet.status}
+                {t(`dashboard.${vet.status}`)}
               </span>
             </div>
           ))}
@@ -79,7 +81,7 @@ const VetPanel: React.FC<VetPanelProps> = ({ vets, isLoading }) => {
             : 'bg-primary-600 hover:bg-primary-500 disabled:opacity-60 text-white'
         }`}
       >
-        {success ? '✅ Consult Requested!' : submitting ? 'Sending...' : 'Request Consult'}
+        {success ? t('dashboard.consultRequested') : submitting ? t('dashboard.sending') : t('dashboard.requestConsult')}
       </button>
     </div>
   );

@@ -7,6 +7,7 @@ class ChatRequest(BaseModel):
     message: str
     context: Optional[str] = None  # e.g. "livestock_id:abc123"
     session_id: Optional[str] = None
+    language: Optional[str] = None  # e.g. "en" or "vi"
 
 
 class ChatResponse(BaseModel):
