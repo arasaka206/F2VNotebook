@@ -34,6 +34,7 @@ export const NAV_ITEMS = [
   { id: 'vet-connect', label: 'Veterinary Connect', icon: '🩺' },
   { id: 'quizzes', label: 'Disease Quizzes', icon: '📝' },
   { id: 'public-dashboard', label: 'Community Forum', icon: '💬' },
+  { id: 'chat', label: 'AI Chat', icon: '🤖' },
   { id: 'inventory', label: 'Inventory & Supplies', icon: '📦' },
   { id: 'reports', label: 'Reports & Analytics', icon: '📈' },
   { id: 'profile', label: 'Farmer Profile', icon: '👤' },
