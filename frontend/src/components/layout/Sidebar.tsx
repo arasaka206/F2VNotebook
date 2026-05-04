@@ -23,6 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
       'public-dashboard': t('app.publicDashboard'),
       inventory: t('app.inventory'),
       reports: t('app.reports'),
+      profile: 'Farmer Profile',
     };
     return labelMap[id] || id;
   };

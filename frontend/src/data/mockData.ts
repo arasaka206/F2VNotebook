@@ -36,4 +36,5 @@ export const NAV_ITEMS = [
   { id: 'public-dashboard', label: 'Community Forum', icon: '💬' },
   { id: 'inventory', label: 'Inventory & Supplies', icon: '📦' },
   { id: 'reports', label: 'Reports & Analytics', icon: '📈' },
+  { id: 'profile', label: 'Farmer Profile', icon: '👤' },
 ];

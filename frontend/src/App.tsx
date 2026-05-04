@@ -6,9 +6,8 @@ import Dashboard from './pages/Dashboard';
 import LivestockPage from './pages/LivestocksPage';
 import PublicDashboard from './pages/PublicDashboard';
 import QuizPage from './pages/QuizPage';
-
-// 1. Thêm dòng import này
 import NotebookPage from './pages/NotebookPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   const { t } = useTranslation();
@@ -24,13 +23,13 @@ function App() {
     'public-dashboard': t('app.publicDashboard'),
     inventory: t('app.inventory'),
     reports: t('app.reports'),
+    profile: 'Farmer Profile',
   };
 
   const renderPage = () => {
     switch (activePage) {
       case 'dashboard':
         return <Dashboard />;
-      // 2. Thêm case cho trang Notebook
       case 'notebook':
         return <NotebookPage />;
       case 'livestock':
@@ -39,6 +38,8 @@ function App() {
         return <QuizPage />;
       case 'public-dashboard':
         return <PublicDashboard />;
+      case 'profile':
+        return <ProfilePage />;
       default:
         return (
           <div className="flex flex-1 items-center justify-center p-6">
