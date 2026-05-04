@@ -44,6 +44,32 @@ export const fetchActiveTreatments = async (): Promise<Treatment[]> => {
   return data;
 };
 
+// ── Sensors ───────────────────────────────────────────────────────────────
+export const fetchLatestSensor = async (): Promise<any> => {
+  const { data } = await api.get('/sensors/latest');
+  return data;
+};
+
+export const fetchSensorAggregate = async (
+  barn_id: string,
+  window_hours: number = 24
+): Promise<any> => {
+  const { data } = await api.get('/sensors/aggregate', {
+    params: { barn_id, window_hours }
+  });
+  return data;
+};
+
+export const ingestSensorData = async (payload: {
+  barn_id: string;
+  temperature_c?: number;
+  humidity_pct?: number;
+  ammonia_ppm?: number;
+}): Promise<any> => {
+  const { data } = await api.post('/sensors/ingest', payload);
+  return data;
+};
+
 // ── Vets ──────────────────────────────────────────────────────────────────
 export const fetchVets = async (): Promise<Vet[]> => {
   const { data } = await api.get<Vet[]>('/consults/vets');

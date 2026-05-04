@@ -10,24 +10,53 @@ import ChatPanel from '../components/chat/ChatPanel';
 import VetPanel from '../components/consult/VetPanel';
 import HeatmapChart from '../components/dashboard/HeatmapChart';
 import GeoHeatmapChart from '../components/dashboard/GeoHeatmapChart';
-import { fetchDashboardSummary, fetchVets } from '../services/farm2vets';
-import type { DashboardSummary, Vet } from '../types';
+import { fetchDashboardSummary, fetchVets, fetchLatestSensor, fetchSensorAggregate } from '../services/farm2vets';
+import type { DashboardSummary, Vet, SensorReading } from '../types';
 
 const Dashboard: React.FC = () => {
   // 1. Khởi tạo state an toàn
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [vets, setVets] = useState<Vet[]>([]);
+  const [sensorData, setSensorData] = useState<SensorReading | null>(null);
+  const [sensorStats, setSensorStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [vetsLoading, setVetsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 2. Gọi API lấy dữ liệu thật
+  // 2. Hàm tải dữ liệu dashboard
+  const loadDashboardData = async () => {
+    try {
+      setError(null);
+      const summaryData = await fetchDashboardSummary();
+      setSummary(summaryData);
+    } catch (err) {
+      console.error("Lỗi khi tải dashboard:", err);
+      setError("Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại Backend.");
+    }
+  };
+
+  // 3. Hàm tải dữ liệu cảm biến
+  const loadSensorData = async () => {
+    try {
+      const latest = await fetchLatestSensor();
+      setSensorData(latest);
+      
+      // Fetch 24h aggregates
+      const stats = await fetchSensorAggregate('barn-1', 24);
+      setSensorStats(stats);
+    } catch (err) {
+      console.error("Lỗi khi tải dữ liệu cảm biến:", err);
+    }
+  };
+
+  // 4. Gọi API lấy dữ liệu thật một lần khi component mount
   useEffect(() => {
     setError(null);
 
     Promise.all([
       fetchDashboardSummary().then(setSummary),
-      fetchVets().then(setVets)
+      fetchVets().then(setVets),
+      loadSensorData()
     ])
     .catch((err) => {
       console.error("Lỗi khi tải dữ liệu thật:", err);
@@ -37,9 +66,17 @@ const Dashboard: React.FC = () => {
       setLoading(false);
       setVetsLoading(false);
     });
+
+    // 5. Thiết lập auto-refresh mỗi 10 giây
+    const interval = setInterval(() => {
+      loadDashboardData();
+      loadSensorData();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  // 3. CHẶN LỖI NULL: Nếu đang tải, trả về màn hình Loading ngay lập tức
+  // 6. CHẶN LỖI NULL: Nếu đang tải, trả về màn hình Loading ngay lập tức
   if (loading || vetsLoading) {
     return (
       <div className="flex-1 p-6 flex justify-center items-center text-gray-400">
@@ -48,7 +85,7 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  // 4. CHẶN LỖI NULL: Nếu có lỗi hoặc không có summary, dừng lại và báo lỗi
+  // 7. CHẶN LỖI NULL: Nếu có lỗi hoặc không có summary, dừng lại và báo lỗi
   if (error || !summary) {
     return (
       <div className="flex-1 p-6 flex flex-col justify-center items-center text-red-400">
@@ -58,7 +95,7 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  // 5. LÚC NÀY `summary` CHẮC CHẮN ĐÃ CÓ DATA: Thoải mái tính toán mà không sợ crash
+  // 8. LÚC NÀY `summary` CHẮC CHẮN ĐÃ CÓ DATA: Thoải mái tính toán mà không sợ crash
   const healthScoreColor =
     summary.herd_health_score >= 80
       ? 'text-green-400'
@@ -107,10 +144,37 @@ const Dashboard: React.FC = () => {
         {/* Sensor + Alert */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SensorCard
-            sensor={summary.latest_sensor}
+            sensor={sensorData || summary.latest_sensor}
           />
           <AlertCard level={summary.disease_alert_level} />
         </div>
+
+        {/* 24h Sensor Statistics */}
+        {sensorStats && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <StatCard
+              title="24h Avg Temperature"
+              value={sensorStats.avg_temperature_c !== null ? `${sensorStats.avg_temperature_c}°C` : 'N/A'}
+              subtitle={`${sensorStats.data_points} readings`}
+              icon="🌡️"
+              accentColor="text-blue-400"
+            />
+            <StatCard
+              title="24h Avg Humidity"
+              value={sensorStats.avg_humidity_pct !== null ? `${sensorStats.avg_humidity_pct}%` : 'N/A'}
+              subtitle={`${sensorStats.data_points} readings`}
+              icon="💧"
+              accentColor="text-cyan-400"
+            />
+            <StatCard
+              title="24h Avg Ammonia"
+              value={sensorStats.avg_ammonia_ppm !== null ? `${sensorStats.avg_ammonia_ppm} ppm` : 'N/A'}
+              subtitle={`${sensorStats.data_points} readings`}
+              icon="⚗️"
+              accentColor="text-yellow-400"
+            />
+          </div>
+        )}
 
         {/* Alarming Notifications */}
         <AlarmingNotifications />
