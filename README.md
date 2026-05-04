@@ -267,6 +267,96 @@ curl "http://localhost:8000/api/sensors/aggregate?barn_id=barn-1&window_hours=24
 
 ---
 
+## 🌐 Multilingual Support (i18n)
+
+Farm2Vets supports **bilingual interface** with automatic language detection and instant switching:
+
+### ✨ Supported Languages
+- **English** (en) - Default
+- **Vietnamese** (vi) - Full translation
+
+### 🔄 Language Detection & Switching
+
+**Auto-detection:**
+- Browser language preference automatically detected on first visit
+- Fallback to English if browser language not supported
+
+**Manual Toggle:**
+- Language switcher in top-right corner (EN / VN button)
+- Preference persisted in browser localStorage
+- All UI updates instantly without page reload
+
+### 📝 Translated Components
+
+**Fully Bilingual:**
+- ✅ **Dashboard Page**: All KPI cards, titles, status labels
+- ✅ **Alarming Notifications**: Alert titles, severity badges, timestamps
+- ✅ **Veterinary Connect**: Vet status (online/busy/offline), consult buttons
+- ✅ **Heatmap-Health Block**: All controls, labels, intensity ranges, error messages
+- ✅ **Geo-Heatmap (Disease Risk Map)**: Region selector, risk levels, descriptions
+- ✅ **IoT Sensors**: Temperature, Humidity, Ammonia labels
+- ✅ **Regional Disease Alerts**: Risk level labels (Low/Medium/High/Critical) and descriptions
+- ✅ **Activity Stream**: Component titles
+- ✅ **AI Chat**: Language parameter sent to backend for AI responses in selected language
+
+### 🔧 Technology Stack
+
+**Frontend i18n:**
+- `react-i18next`: React bindings for i18next
+- `i18next`: Core internationalization framework
+- `i18next-browser-languagedetector`: Auto-detect browser language
+
+**Backend AI Language:**
+- FastAPI receives `language` parameter from frontend
+- Gemini AI API receives language instruction in system prompt
+- Responses returned in user's selected language
+
+### 📂 Translation Files
+
+```
+frontend/src/locales/
+├── en.json        # English translations (~100+ keys)
+└── vi.json        # Vietnamese translations
+```
+
+**Translation Key Structure:**
+```json
+{
+  "app": { "dashboard": "Dashboard", ... },
+  "dashboard": { 
+    "herdHealthScore": "Overall Herd Health Score",
+    "alarmingNotifications": "Alarming Notifications",
+    "veterinaryConnect": "Veterinary Connect",
+    ...
+  },
+  "topbar": { "subtitle": "..." },
+  "quickActions": { ... },
+  "common": { "cancel": "Cancel", "save": "Save", ... }
+}
+```
+
+### 🚀 Usage Example
+
+```typescript
+// In any React component
+import { useTranslation } from 'react-i18next';
+
+const MyComponent = () => {
+  const { t, i18n } = useTranslation();
+  
+  return (
+    <div>
+      <h1>{t('dashboard.herdHealthScore')}</h1>
+      <button onClick={() => i18n.changeLanguage('vi')}>
+        {t('common.vietnamese')}
+      </button>
+    </div>
+  );
+};
+```
+
+---
+
 ## 🧑‍💻 Development
 
 ### Stub Credentials (for auth testing)
