@@ -113,6 +113,8 @@
     "suggestion3": "Có cảnh báo dịch bệnh nào tôi cần biết không?",
     "errorMessage": "Không thể kết nối đến trợ lý AI. Vui lòng kiểm tra kết nối của bạn."
   },
+  "quickActions": {
+    "recordVoiceNote": "Ghi âm giọng nói",
     "analyzePhoto": "Phân tích ảnh",
     "contactVetSOS": "Liên hệ bác sĩ thú y ngay (SOS)"
   },

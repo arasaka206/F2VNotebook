@@ -113,6 +113,8 @@
     "suggestion3": "Any disease alerts I should know about?",
     "errorMessage": "Unable to reach AI assistant. Please check your connection."
   },
+  "quickActions": {
+    "recordVoiceNote": "Record Voice Note",
     "analyzePhoto": "Analyze Photo",
     "contactVetSOS": "Contact Vet Now (SOS)"
   },
