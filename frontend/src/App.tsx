@@ -8,6 +8,7 @@ import PublicDashboard from './pages/PublicDashboard';
 import QuizPage from './pages/QuizPage';
 import NotebookPage from './pages/NotebookPage';
 import ProfilePage from './pages/ProfilePage';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ function App() {
     'vet-connect': t('app.vetConnect'),
     quizzes: t('app.quizzes'),
     'public-dashboard': t('app.publicDashboard'),
+    chat: t('app.chat'),
     inventory: t('app.inventory'),
     reports: t('app.reports'),
     profile: 'Farmer Profile',
@@ -38,6 +40,8 @@ function App() {
         return <QuizPage />;
       case 'public-dashboard':
         return <PublicDashboard />;
+      case 'chat':
+        return <ChatPage />;
       case 'profile':
         return <ProfilePage />;
       default:

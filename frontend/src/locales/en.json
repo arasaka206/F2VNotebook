@@ -8,6 +8,7 @@
     "vetConnect": "Veterinary Connect",
     "quizzes": "Disease Awareness Quizzes",
     "publicDashboard": "Community Forum",
+    "chat": "AI Chat",
     "inventory": "Inventory & Supplies",
     "reports": "Reports & Analytics",
     "comingSoon": "This section is coming soon."
@@ -100,6 +101,17 @@
     "severityCritical": "critical",
     "severityWarning": "warning",
     "severityInfo": "info"
+  },
+  "chat": {
+    "title": "AI Assistant",
+    "online": "Online",
+    "clearHistory": "Clear history",
+    "placeholder": "Ask about your herd...",
+    "welcome": "Hello! I'm your Farm2Vets AI assistant. Ask me about your herd health, treatment plans, or disease alerts.",
+    "suggestion1": "What is the current herd health score?",
+    "suggestion2": "Show me active treatment cases.",
+    "suggestion3": "Any disease alerts I should know about?",
+    "errorMessage": "Unable to reach AI assistant. Please check your connection."
   },
   "quickActions": {
     "recordVoiceNote": "Record Voice Note",

@@ -8,6 +8,7 @@
     "vetConnect": "Kết nối Thú y",
     "quizzes": "Bài kiểm tra Nhận thức Bệnh tật",
     "publicDashboard": "Diễn đàn Cộng đồng",
+    "chat": "Trợ lý AI",
     "inventory": "Kho hàng & Vật tư",
     "reports": "Báo cáo & Phân tích",
     "comingSoon": "Phần này sẽ có sớm."
@@ -100,6 +101,17 @@
     "severityCritical": "nguy hiểm",
     "severityWarning": "cảnh báo",
     "severityInfo": "thông tin"
+  },
+  "chat": {
+    "title": "Trợ lý AI",
+    "online": "Trực tuyến",
+    "clearHistory": "Xóa lịch sử",
+    "placeholder": "Hỏi về đàn gia súc của bạn...",
+    "welcome": "Xin chào! Tôi là trợ lý AI Farm2Vets của bạn. Hỏi tôi về sức khỏe đàn gia súc, kế hoạch điều trị hoặc cảnh báo dịch bệnh.",
+    "suggestion1": "Điểm sức khỏe đàn hiện tại là bao nhiêu?",
+    "suggestion2": "Hiển thị các ca điều trị đang hoạt động.",
+    "suggestion3": "Có cảnh báo dịch bệnh nào tôi cần biết không?",
+    "errorMessage": "Không thể kết nối đến trợ lý AI. Vui lòng kiểm tra kết nối của bạn."
   },
   "quickActions": {
     "recordVoiceNote": "Ghi âm giọng nói",

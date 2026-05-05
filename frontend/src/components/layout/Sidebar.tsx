@@ -15,6 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
   const getTranslatedLabel = (id: string) => {
     const labelMap: Record<string, string> = {
       dashboard: t('app.dashboard'),
+      chat: t('app.chat'),
       notebook: t('app.notebook'),
       livestock: t('app.livestock'),
       'disease-map': t('app.diseaseMap'),
