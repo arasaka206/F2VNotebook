@@ -1,7 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ChatMessage } from '../../types';
-import { sendChatMessage } from '../../services/farm2vets';
+import {
+  sendChatMessage,
+  fetchLatestSensor,
+  fetchSensorAggregate,
+  fetchLivestock,
+  fetchAlerts,
+} from '../../services/farm2vets';
 
 const STORAGE_KEY = 'f2v_chat_history';
 
@@ -63,7 +69,35 @@ const FullChatPanel: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const res = await sendChatMessage(content, sessionId, i18n.language);
+      // Fetch contextual data in parallel; ignore individual failures
+      const [sensorResult, aggregateResult, livestockResult, alertsResult] =
+        await Promise.allSettled([
+          fetchLatestSensor(),
+          fetchSensorAggregate('barn-1', 24),
+          fetchLivestock(),
+          fetchAlerts(10),
+        ]);
+
+      const contextParts: string[] = [];
+
+      if (sensorResult.status === 'fulfilled' && sensorResult.value && typeof sensorResult.value === 'object') {
+        contextParts.push(`Latest sensor reading: ${JSON.stringify(sensorResult.value)}`);
+      }
+      if (aggregateResult.status === 'fulfilled' && aggregateResult.value && typeof aggregateResult.value === 'object') {
+        contextParts.push(`Sensor aggregate (barn-1, last 24h): ${JSON.stringify(aggregateResult.value)}`);
+      }
+      if (livestockResult.status === 'fulfilled' && Array.isArray(livestockResult.value) && livestockResult.value.length > 0) {
+        contextParts.push(`Livestock (${livestockResult.value.length} animals): ${JSON.stringify(livestockResult.value)}`);
+      }
+      if (alertsResult.status === 'fulfilled' && Array.isArray(alertsResult.value) && alertsResult.value.length > 0) {
+        contextParts.push(`Recent alerts (up to 10): ${JSON.stringify(alertsResult.value)}`);
+      }
+
+      const context = contextParts.length > 0
+        ? contextParts.join('\n\n').slice(0, 8000)
+        : undefined;
+
+      const res = await sendChatMessage(content, sessionId, i18n.language, context);
       setSessionId(res.session_id);
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
