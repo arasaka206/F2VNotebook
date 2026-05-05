@@ -82,13 +82,20 @@ export const submitConsultRequest = async (req: ConsultRequest): Promise<Consult
   return data;
 };
 
+// ── Alerts ────────────────────────────────────────────────────────────────
+export const fetchAlerts = async (limit: number = 10): Promise<any[]> => {
+  const { data } = await api.get('/alerts/', { params: { limit } });
+  return data;
+};
+
 // ── AI Chat ───────────────────────────────────────────────────────────────
 export const sendChatMessage = async (
   message: string,
   sessionId?: string,
   language?: string,
+  context?: string,
 ): Promise<{ reply: string; session_id: string }> => {
-  const { data } = await api.post('/ai/chat', { message, session_id: sessionId, language });
+  const { data } = await api.post('/ai/chat', { message, session_id: sessionId, language, context });
   return data;
 };
 
