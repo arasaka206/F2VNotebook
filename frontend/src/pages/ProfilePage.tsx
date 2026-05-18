@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { UserAwarenessScore } from '../types';
 
 const ProfilePage: React.FC = () => {
-  const { t } = useTranslation();
   const [awarenessScore, setAwarenessScore] = useState<UserAwarenessScore | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
