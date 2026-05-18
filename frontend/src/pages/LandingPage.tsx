@@ -116,16 +116,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   </span>
                 </div>
 
+
                 <div className="aspect-[16/9] overflow-hidden rounded-[28px] border border-white/10 bg-[#07101c] shadow-inner shadow-black/50">
-                  <div className="flex h-full flex-col items-center justify-center gap-4 text-center px-6">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-600/20 text-4xl text-primary-300 shadow-lg shadow-primary-500/20">
-                      ▶️
-                    </div>
-                    <div>
-                      <p className="text-lg font-semibold text-white">{t('landing.walkthroughTitle')}</p>
-                      <p className="mt-2 text-sm text-gray-400">{t('landing.walkthroughSubtitle')}</p>
-                    </div>
-                  </div>
+                  <video 
+                    src="Farm2VetNotebookIntroduction.mp4" 
+                    controls
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="h-full w-full object-cover"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
