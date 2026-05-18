@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import Dashboard from './pages/Dashboard';
@@ -10,10 +11,36 @@ import QuizPage from './pages/QuizPage';
 import NotebookPage from './pages/NotebookPage';
 import ProfilePage from './pages/ProfilePage';
 import ChatPage from './pages/ChatPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 
-function App() {
+function AppContent() {
   const { t } = useTranslation();
+  const { user, loading } = useAuth();
   const [activePage, setActivePage] = useState('landing');
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-farm-bg">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-farm-accent mx-auto mb-4"></div>
+          <p className="text-farm-text/60">{t('auth.loading') || 'Loading...'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is not logged in, show landing, login, or signup pages
+  if (!user) {
+    if (activePage === 'login') {
+      return <LoginPage onNavigate={setActivePage} onLoginSuccess={() => setActivePage('dashboard')} />;
+    }
+    if (activePage === 'signup') {
+      return <SignupPage onNavigate={setActivePage} onSignupSuccess={() => setActivePage('dashboard')} />;
+    }
+    return <LandingPage onNavigate={setActivePage} />;
+  }
 
   const PAGE_TITLES: Record<string, string> = {
     landing: 'Home',
@@ -69,12 +96,20 @@ function App() {
     <div className="flex h-screen overflow-hidden bg-farm-bg">
       <Sidebar activeItem={activePage} onNavigate={setActivePage} />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <TopBar title={PAGE_TITLES[activePage] ?? 'Farm2Vets'} />
+        <TopBar title={PAGE_TITLES[activePage] ?? 'Farm2Vets'} onNavigate={setActivePage} />
         <main className="flex flex-1 overflow-hidden">
           {renderPage()}
         </main>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

@@ -70,16 +70,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
               <div className="flex flex-col gap-4 sm:flex-row">
                 <button
-                  onClick={() => onNavigate('notebook')}
+                  onClick={() => onNavigate('signup')}
                   className="inline-flex items-center justify-center rounded-full bg-primary-600 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-primary-500/20 transition hover:bg-primary-500"
                 >
-                  {t('landing.launchNotebook')}
+                  {t('auth.signUp')}
                 </button>
                 <button
-                  onClick={() => onNavigate('dashboard')}
+                  onClick={() => onNavigate('login')}
                   className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-8 py-4 text-base font-semibold text-white transition hover:border-primary-400 hover:text-primary-300"
                 >
-                  {t('landing.explorePlatform')}
+                  {t('auth.login')}
                 </button>
               </div>
 
