@@ -1,13 +1,25 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import GeoHeatmapChart from '../components/dashboard/GeoHeatmapChart';
 import HeatmapChart from '../components/dashboard/HeatmapChart';
 
 const HeatDiseaseMapPage: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="flex-1 overflow-y-auto p-6">
       <div className="space-y-6">
+        <section className="card">
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400">
+              {t('dashboard.diseaseMapPageLabel')}
+            </p>
+            <h2 className="text-2xl font-semibold text-white">{t('dashboard.diseaseMapPageTitle')}</h2>
+            <p className="max-w-4xl text-sm text-gray-400">{t('dashboard.diseaseMapPageSubtitle')}</p>
+          </div>
+        </section>
         <GeoHeatmapChart />
-        <HeatmapChart barnId="barn-1" dataType="health" width="100%" height={340} />
+        <HeatmapChart barnId="BARN_ZONE_A" dataType="health" width="100%" height={420} />
       </div>
     </div>
   );

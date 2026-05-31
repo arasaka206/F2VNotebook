@@ -9,6 +9,10 @@ import type {
   TokenResponse,
   HeatmapData,
   HeatmapSummary,
+  SensorReading,
+  SensorAggregate,
+  BarnSensorOverview,
+  DiseaseFeedResponse,
   ForumPost,
   ForumPostCreate,
   ForumPostDetail,
@@ -45,17 +49,26 @@ export const fetchActiveTreatments = async (): Promise<Treatment[]> => {
 };
 
 // ── Sensors ───────────────────────────────────────────────────────────────
-export const fetchLatestSensor = async (): Promise<any> => {
-  const { data } = await api.get('/sensors/latest');
+export const fetchLatestSensor = async (): Promise<SensorReading> => {
+  const { data } = await api.get<SensorReading>('/sensors/latest');
   return data;
 };
 
 export const fetchSensorAggregate = async (
   barn_id: string,
   window_hours: number = 24
-): Promise<any> => {
-  const { data } = await api.get('/sensors/aggregate', {
+): Promise<SensorAggregate> => {
+  const { data } = await api.get<SensorAggregate>('/sensors/aggregate', {
     params: { barn_id, window_hours }
+  });
+  return data;
+};
+
+export const fetchBarnSensorOverview = async (
+  window_hours: number = 24
+): Promise<BarnSensorOverview[]> => {
+  const { data } = await api.get<BarnSensorOverview[]>('/sensors/barns/overview', {
+    params: { window_hours }
   });
   return data;
 };
@@ -117,6 +130,11 @@ export const fetchHeatmapSummary = async (barnId: string): Promise<HeatmapSummar
 
 export const generateHeatmapFromSensors = async (barnId: string): Promise<{ message: string; points_created: number }> => {
   const { data } = await api.post<{ message: string; points_created: number }>(`/heatmap/from-sensors/${barnId}`);
+  return data;
+};
+
+export const fetchDiseaseSpreadFeed = async (): Promise<DiseaseFeedResponse> => {
+  const { data } = await api.get<DiseaseFeedResponse>('/heatmap/disease-feed');
   return data;
 };
 

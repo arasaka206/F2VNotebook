@@ -34,7 +34,7 @@ const Dashboard: React.FC = () => {
       const latest = await fetchLatestSensor();
       setSensorData(latest);
 
-      const stats = await fetchSensorAggregate('barn-1', 24);
+      const stats = await fetchSensorAggregate(latest.barn_id || 'barn-1', 24);
       setSensorStats(stats);
     } catch (err) {
       console.error('Failed to load sensor data:', err);

@@ -119,7 +119,9 @@ Frontend will be available at http://localhost:5173
 | `POST` | `/api/treatments/` | Create treatment |
 | `GET` | `/api/sensors/latest` | Latest sensor reading |
 | `GET` | `/api/sensors/aggregate` | Statistical aggregates (24h, custom window) |
+| `GET` | `/api/sensors/barns/overview` | Latest reading + 24h overview for each barn |
 | `POST` | `/api/sensors/ingest` | Ingest sensor data |
+| `GET` | `/api/heatmap/disease-feed` | Public disease bulletin feed for the disease spread map |
 | `GET` | `/api/consults/vets` | Available vets |
 | `GET` | `/api/consults/` | List consult requests |
 | `POST` | `/api/consults/` | Create consult request |
@@ -133,6 +135,21 @@ Full interactive docs: http://localhost:8000/docs
 ## 📡 IoT Sensor Data Flow
 
 This section explains how sensor data from IoT devices flows from collection to frontend display.
+
+### 🗺️ Disease Spread & Farm Layout Map Update
+
+Farm2Vets now includes two map experiences in the same feature area:
+
+- **Disease Spread Map**: Replaces the older epidemic geo-heatmap with a public-outbreak awareness map focused on **Vietnam**, **Hanoi**, and **Saigon / Ho Chi Minh City**. It combines curated outbreak zones, surveillance zones, and a live public bulletin feed with graceful fallback data if a source is unavailable.
+- **Farm Sensor Layout**: Replaces the old empty local heatmap with a simple farm-layout view where each monitored barn is rendered as a building block and filled with the latest **temperature** and **humidity** values already flowing from the IoT sensor pipeline.
+
+### 🔎 Disease Spread Map Highlights
+
+- Region switching for **Whole Vietnam**, **Hanoi**, and **Saigon / Ho Chi Minh City**
+- Color-coded outbreak and surveillance zones for faster operational scanning
+- Public disease bulletins pulled through `GET /api/heatmap/disease-feed`
+- Built for bilingual UI and both dark/light themes
+- Designed as an operational awareness layer rather than an official government case-count dashboard
 
 ### 🏗️ Architecture Overview
 
@@ -188,6 +205,7 @@ if ammonia_ppm > 25.0:
 **Available Endpoints:**
 - `GET /api/sensors/latest` - Most recent reading across all barns
 - `GET /api/sensors/aggregate?barn_id=X&window_hours=Y` - Statistical aggregates
+- `GET /api/sensors/barns/overview?window_hours=24` - Latest reading plus rolling averages for each barn, used by the farm-layout map
 
 ### 3. 📊 Frontend Display
 
@@ -198,6 +216,7 @@ if ammonia_ppm > 25.0:
 
 **Components:**
 - **SensorCard**: Real-time temperature, humidity, ammonia with progress bars
+- **Farm Sensor Layout Map**: Draws each monitored barn as a building and injects the latest temperature and humidity into the layout
 - **StatCards**: 24h aggregates (avg temp, humidity, ammonia, data points)
 - **Status Colors**: 
   - 🟢 Green: "ok" (normal conditions)
@@ -263,8 +282,10 @@ curl "http://localhost:8000/api/sensors/aggregate?barn_id=barn-1&window_hours=24
 ## 🎨 UI Features
 
 - **Dark-mode dashboard** with notebook-style UX
-- **Left sidebar** navigation: Dashboard, AI Herd Notebook, Livestock Profiles, Disease Risk Map, Vet Connect, Inventory, Reports
+- **Left sidebar** navigation: Dashboard, AI Herd Notebook, Livestock Profiles, Disease Spread & Farm Map, Vet Connect, Inventory, Reports
 - **Dashboard cards**: Herd Health Score, Active Treatments, IoT Sensor readings, Disease Alert Level
+- **Disease Spread Map**: Vietnam, Hanoi, and Saigon/HCMC views with color-coded outbreak/surveillance zones and live public bulletins
+- **Farm Sensor Layout**: Real-time farm map that places live barn temperature and humidity inside simple building shapes
 - **Herd Growth Chart** (SVG placeholder, ready for Recharts)
 - **AI Activity Stream** with event types (ai_note, treatment, consult, sensor)
 - **Right panel**: Quick Actions (Voice Note, Photo Analysis, SOS), AI Chatbot, Vet Status + Consult Request
@@ -296,8 +317,8 @@ Farm2Vets supports **bilingual interface** with automatic language detection and
 - ✅ **Dashboard Page**: All KPI cards, titles, status labels
 - ✅ **Alarming Notifications**: Alert titles, severity badges, timestamps
 - ✅ **Veterinary Connect**: Vet status (online/busy/offline), consult buttons
-- ✅ **Heatmap-Health Block**: All controls, labels, intensity ranges, error messages
-- ✅ **Geo-Heatmap (Disease Risk Map)**: Region selector, risk levels, descriptions
+- ✅ **Disease Spread Map**: Region selector, legends, bulletin states, source labels, descriptions
+- ✅ **Farm Sensor Layout**: Building labels, live temperature/humidity labels, status badges, refresh states
 - ✅ **IoT Sensors**: Temperature, Humidity, Ammonia labels
 - ✅ **Regional Disease Alerts**: Risk level labels (Low/Medium/High/Critical) and descriptions
 - ✅ **Activity Stream**: Component titles
@@ -378,5 +399,5 @@ const MyComponent = () => {
 - [ ] JWT authentication middleware
 - [ ] Real-time sensor WebSocket feed
 - [ ] LLM integration for AI assistant (OpenAI / local model)
-- [ ] Disease Risk Map (Leaflet.js / MapLibre)
+- [ ] Official real-time animal disease feed integration for Vietnam if a stable public source becomes available
 - [ ] Mobile app (React Native)

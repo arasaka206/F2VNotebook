@@ -116,3 +116,65 @@ def get_sensor_aggregate(
         data_points=data_points,
         window_hours=window_hours
     )
+
+
+@router.get("/barns/overview")
+def get_barn_sensor_overview(
+    window_hours: int = Query(24, description="Time window in hours"),
+    db: Session = Depends(get_db)
+):
+    time_threshold = datetime.utcnow() - timedelta(hours=window_hours)
+
+    latest_per_barn = db.query(
+        SensorReading.barn_id.label("barn_id"),
+        func.max(SensorReading.timestamp).label("latest_timestamp")
+    ).group_by(SensorReading.barn_id).subquery()
+
+    latest_readings = db.query(SensorReading).join(
+        latest_per_barn,
+        (SensorReading.barn_id == latest_per_barn.c.barn_id) &
+        (SensorReading.timestamp == latest_per_barn.c.latest_timestamp)
+    ).order_by(SensorReading.timestamp.desc()).all()
+
+    if not latest_readings:
+        return []
+
+    barn_ids = [reading.barn_id for reading in latest_readings]
+
+    aggregates = db.query(
+        SensorReading.barn_id.label("barn_id"),
+        func.avg(SensorReading.temperature_c).label("avg_temperature_c"),
+        func.avg(SensorReading.humidity_pct).label("avg_humidity_pct"),
+        func.avg(SensorReading.ammonia_ppm).label("avg_ammonia_ppm"),
+        func.count(SensorReading.id).label("data_points"),
+        func.max(SensorReading.timestamp).label("last_seen")
+    ).filter(
+        SensorReading.barn_id.in_(barn_ids),
+        SensorReading.timestamp >= time_threshold
+    ).group_by(SensorReading.barn_id).all()
+
+    aggregate_map = {row.barn_id: row for row in aggregates}
+
+    overview = []
+    for reading in latest_readings:
+        stats = aggregate_map.get(reading.barn_id)
+        overview.append({
+            "barn_id": reading.barn_id,
+            "latest_reading": {
+                "id": reading.id,
+                "barn_id": reading.barn_id,
+                "temperature_c": reading.temperature_c,
+                "humidity_pct": reading.humidity_pct,
+                "ammonia_ppm": reading.ammonia_ppm,
+                "status": reading.status,
+                "timestamp": reading.timestamp,
+            },
+            "avg_temperature_c": round(stats.avg_temperature_c, 2) if stats and stats.avg_temperature_c is not None else None,
+            "avg_humidity_pct": round(stats.avg_humidity_pct, 2) if stats and stats.avg_humidity_pct is not None else None,
+            "avg_ammonia_ppm": round(stats.avg_ammonia_ppm, 2) if stats and stats.avg_ammonia_ppm is not None else None,
+            "data_points": int(stats.data_points) if stats and stats.data_points is not None else 0,
+            "last_seen": stats.last_seen.isoformat() if stats and stats.last_seen else reading.timestamp.isoformat(),
+            "window_hours": window_hours,
+        })
+
+    return overview
