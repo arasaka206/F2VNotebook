@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { useTranslation } from 'react-i18next';
+import ThemeToggle from '../components/layout/ThemeToggle';
 
 interface SignupPageProps {
   onNavigate: (page: string) => void;
@@ -22,12 +23,12 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, onSignupSucc
 
     // Validation
     if (password !== confirmPassword) {
-      setError(t('auth.passwordMismatch') || 'Passwords do not match');
+      setError(t('auth.passwordMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError(t('auth.passwordTooShort') || 'Password must be at least 6 characters');
+      setError(t('auth.passwordTooShort'));
       return;
     }
 
@@ -38,14 +39,14 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, onSignupSucc
       onSignupSuccess();
     } catch (err: any) {
       const errorCode = err.code || '';
-      let errorMessage = t('auth.signupError') || 'Failed to create account';
+      let errorMessage = t('auth.signupError');
 
       if (errorCode === 'auth/email-already-in-use') {
-        errorMessage = t('auth.emailAlreadyInUse') || 'This email is already registered';
+        errorMessage = t('auth.emailAlreadyInUse');
       } else if (errorCode === 'auth/invalid-email') {
-        errorMessage = t('auth.invalidEmail') || 'Invalid email address';
+        errorMessage = t('auth.invalidEmail');
       } else if (errorCode === 'auth/weak-password') {
-        errorMessage = t('auth.weakPassword') || 'Password is too weak. Use 6+ characters';
+        errorMessage = t('auth.weakPassword');
       }
 
       setError(errorMessage);
@@ -56,6 +57,9 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, onSignupSucc
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-farm-bg to-farm-card flex items-center justify-center px-4">
+      <div className="absolute right-4 top-4 z-20">
+        <ThemeToggle />
+      </div>
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 -left-40 w-80 h-80 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -66,8 +70,8 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, onSignupSucc
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">{t('auth.createAccount') || 'Create Account'}</h1>
-          <p className="text-farm-text/60">{t('auth.signupDescription') || 'Join Farm2Vets and manage your farm smarter'}</p>
+          <h1 className="text-4xl font-bold text-white mb-2">{t('auth.createAccount')}</h1>
+          <p className="text-farm-text/60">{t('auth.signupDescription')}</p>
         </div>
 
         {/* Card */}
@@ -76,14 +80,14 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, onSignupSucc
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                {t('auth.email') || 'Email'}
+                {t('auth.email')}
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('auth.emailPlaceholder') || 'you@example.com'}
+                placeholder={t('auth.emailPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-farm-border focus:border-farm-accent focus:outline-none focus:ring-2 focus:ring-farm-accent/30 text-white placeholder-white/40 transition"
                 required
               />
@@ -92,31 +96,31 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, onSignupSucc
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
-                {t('auth.password') || 'Password'}
+                {t('auth.password')}
               </label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('auth.passwordPlaceholder') || '••••••••'}
+                placeholder={t('auth.passwordPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-farm-border focus:border-farm-accent focus:outline-none focus:ring-2 focus:ring-farm-accent/30 text-white placeholder-white/40 transition"
                 required
               />
-              <p className="text-xs text-farm-text/50 mt-1">{t('auth.passwordHint') || 'At least 6 characters'}</p>
+              <p className="text-xs text-farm-text/50 mt-1">{t('auth.passwordHint')}</p>
             </div>
 
             {/* Confirm Password Field */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-2">
-                {t('auth.confirmPassword') || 'Confirm Password'}
+                {t('auth.confirmPassword')}
               </label>
               <input
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder={t('auth.passwordPlaceholder') || '••••••••'}
+                placeholder={t('auth.passwordPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-farm-border focus:border-farm-accent focus:outline-none focus:ring-2 focus:ring-farm-accent/30 text-white placeholder-white/40 transition"
                 required
               />
@@ -135,26 +139,26 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, onSignupSucc
               disabled={loading}
               className="w-full py-3 rounded-lg bg-gradient-to-r from-farm-accent to-green-500 text-farm-bg font-semibold hover:from-green-400 hover:to-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (t('auth.creatingAccount') || 'Creating account...') : (t('auth.signUp') || 'Sign up')}
+              {loading ? t('auth.creatingAccount') : t('auth.signUp')}
             </button>
           </form>
 
           {/* Divider */}
           <div className="my-6 flex items-center">
             <div className="flex-1 h-px bg-farm-border"></div>
-            <span className="px-3 text-farm-text/50 text-sm">{t('auth.or') || 'or'}</span>
+            <span className="px-3 text-farm-text/50 text-sm">{t('auth.or')}</span>
             <div className="flex-1 h-px bg-farm-border"></div>
           </div>
 
           {/* Login Link */}
           <p className="text-center text-farm-text/60">
-            {t('auth.alreadyHaveAccount') || 'Already have an account?'}
+            {t('auth.alreadyHaveAccount')}
             {' '}
             <button
               onClick={() => onNavigate('login')}
               className="text-farm-accent hover:text-green-400 font-semibold transition"
             >
-              {t('auth.login') || 'Login'}
+              {t('auth.login')}
             </button>
           </p>
         </div>
@@ -165,7 +169,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate, onSignupSucc
             onClick={() => onNavigate('landing')}
             className="text-farm-text/60 hover:text-farm-text transition"
           >
-            ← {t('auth.backToHome') || 'Back to home'}
+            ← {t('auth.backToHome')}
           </button>
         </div>
       </div>

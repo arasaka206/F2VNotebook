@@ -5,12 +5,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    env_file:
+      - ./backend/.env
     environment:
       - APP_NAME=Farm2Vets API
       - DEBUG=true
       - CORS_ORIGINS=http://localhost:5173 http://localhost:3000
       - SECRET_KEY=change-me-in-production
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
     volumes:
       - ./backend:/app
     restart: unless-stopped

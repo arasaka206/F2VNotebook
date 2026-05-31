@@ -65,13 +65,14 @@ def get_latest_sensor(db: Session = Depends(get_db)):
     if latest:
         return latest
     # Return default reading if no data exists
-    default_reading = SensorReading(
+    default_reading = SensorReadingResponse(
         id="default",
         barn_id="barn-1",
         temperature_c=0,
         humidity_pct=0,
         ammonia_ppm=0,
-        status="ok"
+        status="ok",
+        timestamp=datetime.utcnow(),
     )
     return default_reading
 

@@ -40,7 +40,7 @@ const VetPanel: React.FC<VetPanelProps> = ({ vets, isLoading }) => {
   return (
     <div className="card space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-white">{t('dashboard.veterinaryConnect')}</p>
+        <p className="text-sm font-semibold text-white">{t('vetConnect.panelTitle')}</p>
         <span className="text-xl">🩺</span>
       </div>
 
@@ -52,6 +52,11 @@ const VetPanel: React.FC<VetPanelProps> = ({ vets, isLoading }) => {
         </div>
       ) : (
         <div className="space-y-2">
+          {vets.length === 0 && (
+            <p className="rounded-lg border border-farm-border bg-farm-border/20 p-3 text-xs text-gray-400">
+              {t('vetConnect.noVets')}
+            </p>
+          )}
           {vets.map((vet) => (
             <div key={vet.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-farm-border/30 transition-colors">
               <div className="flex items-center gap-2">
@@ -65,7 +70,7 @@ const VetPanel: React.FC<VetPanelProps> = ({ vets, isLoading }) => {
               </div>
               <span className={`flex items-center gap-1 text-[10px] text-gray-400`}>
                 <span className={statusBadge[vet.status] ?? 'badge-offline'} />
-                {t(`dashboard.${vet.status}`)}
+                {t(`vetConnect.status.${vet.status}`)}
               </span>
             </div>
           ))}
@@ -81,7 +86,7 @@ const VetPanel: React.FC<VetPanelProps> = ({ vets, isLoading }) => {
             : 'bg-primary-600 hover:bg-primary-500 disabled:opacity-60 text-white'
         }`}
       >
-        {success ? t('dashboard.consultRequested') : submitting ? t('dashboard.sending') : t('dashboard.requestConsult')}
+        {success ? t('vetConnect.consultRequested') : submitting ? t('vetConnect.sending') : t('vetConnect.requestConsult')}
       </button>
     </div>
   );

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ThemeToggle from '../components/layout/ThemeToggle';
 
 interface LandingPageProps {
   onNavigate: (id: string) => void;
@@ -28,35 +29,41 @@ const FEATURES = [
   },
 ];
 
+const INTRO_VIDEO_SRC = '/Farm2VetNotebookIntroduction.mp4';
+
 const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   const { t, i18n } = useTranslation();
+  const [hasIntroVideo, setHasIntroVideo] = useState(true);
   const currentLang = i18n.language?.startsWith('vi') ? 'vi' : 'en';
   const faqs = t('landing.faqs', { returnObjects: true }) as Array<{ question: string; answer: string }>;
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_right,_rgba(34,197,94,0.12),_transparent_35%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.12),_transparent_35%),#0b1520] text-white">
+    <div className="min-h-screen overflow-hidden bg-farm-bg text-farm-text">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm uppercase tracking-[0.3em] text-farm-accent">{t('landing.heroTagline')}</p>
-          <div className="inline-flex overflow-hidden rounded-full border border-white/10 bg-white/5 text-sm font-semibold shadow-sm shadow-black/20">
-            <button
-              type="button"
-              onClick={() => i18n.changeLanguage('en')}
-              className={`px-4 py-2 transition ${currentLang === 'en' ? 'bg-white text-slate-950' : 'text-gray-300 hover:bg-white/10'}`}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => i18n.changeLanguage('vi')}
-              className={`px-4 py-2 transition ${currentLang === 'vi' ? 'bg-white text-slate-950' : 'text-gray-300 hover:bg-white/10'}`}
-            >
-              VI
-            </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle compact />
+            <div className="inline-flex overflow-hidden rounded-full border border-white/10 bg-white/5 text-sm font-semibold shadow-sm shadow-black/20">
+              <button
+                type="button"
+                onClick={() => i18n.changeLanguage('en')}
+                className={`px-4 py-2 transition ${currentLang === 'en' ? 'bg-white text-slate-950' : 'text-gray-300 hover:bg-white/10'}`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => i18n.changeLanguage('vi')}
+                className={`px-4 py-2 transition ${currentLang === 'vi' ? 'bg-white text-slate-950' : 'text-gray-300 hover:bg-white/10'}`}
+              >
+                VI
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="rounded-[40px] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl">
+        <div className="rounded-[40px] border border-farm-border bg-farm-card p-8 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-center">
             <div className="lg:w-7/12 space-y-8">
               <div className="inline-flex items-center gap-3 rounded-full bg-white/5 px-5 py-2 text-xs uppercase tracking-[0.24em] text-farm-accent font-semibold shadow-sm shadow-farm-accent/10">
@@ -104,7 +111,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             </div>
 
             <div className="lg:w-5/12">
-              <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#0c1724] p-6 shadow-2xl shadow-black/50">
+              <div className="relative overflow-hidden rounded-[32px] border border-farm-border bg-farm-bg p-6 shadow-2xl shadow-black/30">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-400 via-farm-accent to-primary-600" />
                 <div className="mb-7 flex items-center justify-between">
                   <div>
@@ -118,25 +125,38 @@ const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
 
                 <div className="aspect-[16/9] overflow-hidden rounded-[28px] border border-white/10 bg-[#07101c] shadow-inner shadow-black/50">
-                  <video 
-                    src="Farm2VetNotebookIntroduction.mp4" 
-                    controls
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="h-full w-full object-cover"
-                  >
-                    Your browser does not support the video tag.
-                  </video>
+                  {hasIntroVideo ? (
+                    <video
+                      src={INTRO_VIDEO_SRC}
+                      controls
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="h-full w-full object-cover"
+                      onError={() => setHasIntroVideo(false)}
+                    >
+                      {t('landing.videoUnsupported')}
+                    </video>
+                  ) : (
+                    <div className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-600/20 text-4xl text-primary-300 shadow-lg shadow-primary-500/20">
+                        ▶️
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-white">{t('landing.walkthroughTitle')}</p>
+                        <p className="mt-2 text-sm text-gray-400">{t('landing.walkthroughSubtitle')}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-3xl border border-white/10 bg-[#081522] p-4">
+                  <div className="rounded-3xl border border-farm-border bg-farm-card p-4">
                     <p className="text-sm font-semibold text-white">{t('landing.smartSummaries')}</p>
                     <p className="mt-2 text-sm text-gray-400">{t('landing.smartSummariesDescription')}</p>
                   </div>
-                  <div className="rounded-3xl border border-white/10 bg-[#081522] p-4">
+                  <div className="rounded-3xl border border-farm-border bg-farm-card p-4">
                     <p className="text-sm font-semibold text-white">{t('landing.actionReadyAlerts')}</p>
                     <p className="mt-2 text-sm text-gray-400">{t('landing.actionReadyAlertsDescription')}</p>
                   </div>
@@ -158,7 +178,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           ))}
         </div>
 
-        <section className="mt-12 rounded-[32px] border border-white/10 bg-[#0c1726] p-8 shadow-2xl shadow-black/40">
+        <section className="mt-12 rounded-[32px] border border-farm-border bg-farm-card p-8 shadow-2xl shadow-black/20">
           <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-3xl font-semibold text-white">{t('landing.faqTitle')}</h2>
@@ -175,7 +195,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           </div>
         </section>
 
-        <div className="mt-10 rounded-[32px] border border-white/10 bg-[#0c1726] p-8 shadow-2xl shadow-black/40">
+        <div className="mt-10 rounded-[32px] border border-farm-border bg-farm-card p-8 shadow-2xl shadow-black/20">
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
             <div>
               <p className="text-sm uppercase tracking-[0.3em] text-farm-accent">{t('landing.whySectionLabel')}</p>

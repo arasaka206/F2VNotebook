@@ -1,10 +1,11 @@
 {
   "app": {
     "title": "Farm2Vets · AI-Powered Livestock Management",
+    "home": "Home",
     "dashboard": "Dashboard",
     "notebook": "AI Herd Notebook",
     "livestock": "Livestock Profiles",
-    "diseaseMap": "Disease Risk Map",
+    "diseaseMap": "Heat & Disease Map",
     "vetConnect": "Veterinary Connect",
     "quizzes": "Disease Awareness Quizzes",
     "publicDashboard": "Community Forum",
@@ -12,6 +13,7 @@
     "inventory": "Inventory & Supplies",
     "reports": "Reports & Analytics",
     "profile": "Profile",
+    "farmerProfile": "Farmer Profile",
     "comingSoon": "This section is coming soon."
   },
   "auth": {
@@ -47,7 +49,19 @@
     "logout": "Logout"
   },
   "topbar": {
-    "subtitle": "Farm2Vets · AI-Powered Livestock Management"
+    "subtitle": "Farm2Vets · AI-Powered Livestock Management",
+    "switchLanguage": "Switch language"
+  },
+  "sidebar": {
+    "productSubtitle": "AI Herd Notebook",
+    "farmerMeta": "Farmer · {{farm}}",
+    "farmCode": "Farm-{{id}}",
+    "badges": {
+      "good": "Proficient Farmer",
+      "needsImprovement": "Growing Farmer",
+      "restricted": "Lagged Farmer",
+      "default": "Farmer"
+    }
   },
   "dashboard": {
     "welcome": "Welcome to Farm2Vets",
@@ -124,6 +138,9 @@
     "daNang": "Da Nang",
     "myLocation": "My Location",
     "loadingData": "Loading data from system...",
+    "loadingMapData": "Loading map data...",
+    "geolocationUnsupported": "Geolocation is not supported by your browser.",
+    "geolocationFailed": "Unable to retrieve your location.",
     "connectionError": "Cannot connect to server. Please check Backend.",
     "noDataAvailable": "No data available. Please check Backend.",
     "lowRisk": "Low Risk",
@@ -135,9 +152,88 @@
     "severityWarning": "warning",
     "severityInfo": "info"
   },
+  "vetConnect": {
+    "title": "Veterinary Connect",
+    "subtitle": "Available veterinarians and consultation requests.",
+    "panelTitle": "Veterinary Connect",
+    "loadError": "Unable to load veterinarians right now.",
+    "noVets": "No veterinarians are available.",
+    "sending": "Sending...",
+    "requestConsult": "Request Consult",
+    "consultRequested": "Consult Requested",
+    "status": {
+      "online": "online",
+      "busy": "busy",
+      "offline": "offline"
+    }
+  },
+  "quiz": {
+    "loading": "Loading quizzes...",
+    "awarenessScore": "Your Awareness Score",
+    "statusLabel": "Status",
+    "awarenessStatuses": {
+      "good": "Good",
+      "needs_improvement": "Needs improvement",
+      "restricted": "Restricted"
+    },
+    "accessRestricted": "Access Restricted",
+    "restrictedMessage": "Your awareness score is low. Complete more quizzes to improve your score and regain full access to features.",
+    "passingScore": "Passing score",
+    "type": "Type",
+    "notebookBased": "Notebook-based",
+    "generalKnowledge": "General knowledge",
+    "correct": "Correct",
+    "incorrect": "Incorrect",
+    "certificateEarned": "Certificate Earned",
+    "reviewAndRetry": "Review and Retry",
+    "passedMessage": "You scored {{score}}% and earned a certificate for this quiz.",
+    "failedMessage": "You scored {{score}}%. Review the notebook note and try again later to earn the certificate.",
+    "passed": "Passed",
+    "failed": "Failed",
+    "retryAdvice": "If the score is below passing, consider reviewing the notebook note and taking a new quiz later.",
+    "continueNext": "Continue to next quiz",
+    "submit": "Submit Quiz",
+    "completed": "Quiz completed! Check your results above.",
+    "backToQuizzes": "Back to Quizzes",
+    "noQuizzes": "No quizzes are available yet.",
+    "noQuizzesMessage": "Please check back after the system seeds the quiz content.",
+    "notebookBasedQuiz": "Notebook-based quiz",
+    "topicLabel": "Topic: {{topic}}",
+    "difficultyLabel": "Difficulty: {{difficulty}}",
+    "minutes": "{{count}} min",
+    "noTimeLimit": "No time limit",
+    "start": "Start Quiz",
+    "recentAttempts": "Recent Quiz Attempts",
+    "attemptCompleted": "Quiz completed",
+    "attemptStatuses": {
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  },
+  "profile": {
+    "subtitle": "View your achievement and certification status",
+    "loading": "Loading profile...",
+    "loadError": "Failed to load awareness score",
+    "genericError": "An error occurred",
+    "awarenessScore": "Awareness Score",
+    "farmerStatus": "Farmer Status",
+    "quizzesCompleted": "Quizzes Completed",
+    "quizzesPassed": "Quizzes Passed",
+    "lastUpdated": "Last Updated",
+    "congratulations": "Congratulations!",
+    "perfectScore": "You have achieved 100% Awareness Score",
+    "certificateAlt": "Farm2Vets Certificate of Excellence",
+    "certificateDescription": "Your certificate recognizes your exceptional commitment to herd health and farm management.",
+    "downloadCertificate": "Download Certificate",
+    "keepLearning": "Keep Learning!",
+    "keepLearningMessage": "Complete more quizzes and improve your awareness score to unlock your certificate. Currently at {{score}}% - you're {{remaining}}% away from certification!",
+    "takeMoreQuizzes": "Take More Quizzes"
+  },
   "chat": {
     "title": "AI Assistant",
     "online": "Online",
+    "maximize": "Maximize",
+    "minimize": "Minimize",
     "clearHistory": "Clear history",
     "placeholder": "Ask about your herd...",
     "welcome": "Hello! I'm your Farm2Vets AI assistant. Ask me about your herd health, treatment plans, or disease alerts.",
@@ -145,6 +241,153 @@
     "suggestion2": "Show me active treatment cases.",
     "suggestion3": "Any disease alerts I should know about?",
     "errorMessage": "Unable to reach AI assistant. Please check your connection."
+  },
+  "theme": {
+    "dark": "Dark",
+    "light": "Light",
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode"
+  },
+  "forum": {
+    "title": "Community Forum",
+    "subtitle": "Share local livestock updates, health observations, and practical advice with nearby farmers.",
+    "sortLabel": "Sort",
+    "sort": {
+      "newest": "Newest",
+      "trending": "Trending",
+      "oldest": "Oldest"
+    },
+    "searchingFor": "Searching for \"{{query}}\"",
+    "clearSearch": "Clear search",
+    "loadingPosts": "Loading posts...",
+    "noPosts": "No forum posts yet.",
+    "backToPosts": "Back to posts",
+    "regionalSearchTitle": "Regional Search Trends",
+    "regionalSearchSubtitle": "Demo suggestions based on the most searched topics in your region.",
+    "searchPlaceholder": "Search regional topics...",
+    "trendingTopics": "Trending Topics",
+    "noTrendingTopics": "No trending topics yet.",
+    "tipsTitle": "Forum Tips",
+    "tips": {
+      "useHashtags": "Use hashtags so nearby farmers can find your topic.",
+      "reactHelpful": "React to helpful updates to raise urgent posts.",
+      "shareExperience": "Share what worked on your farm, including dates and symptoms.",
+      "askAdvice": "Ask for advice early when symptoms change quickly."
+    },
+    "reportPrompt": "Why are you reporting this post?",
+    "reportSuccess": "Report submitted.",
+    "reportError": "Unable to submit report.",
+    "report": "Report",
+    "anonymousFarmer": "Anonymous Farmer",
+    "shareExperiencePlaceholder": "Share your field experience with the community...",
+    "postTitlePlaceholder": "Post title",
+    "postContentPlaceholder": "Describe what happened, what you observed, or what advice you need...",
+    "hashtagPlaceholder": "hashtags, separated by commas",
+    "validation": {
+      "titleContentRequired": "Please enter a title and content."
+    },
+    "createPostError": "Unable to create post.",
+    "posting": "Posting...",
+    "post": "Post",
+    "byAuthor": "By {{author}}",
+    "time": {
+      "justNow": "Just now",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    },
+    "detail": {
+      "loadError": "Unable to load this post.",
+      "addCommentError": "Unable to add comment.",
+      "deleteCommentError": "Unable to delete comment.",
+      "reactError": "Unable to update reaction.",
+      "loadingPost": "Loading post...",
+      "postNotFound": "Post not found.",
+      "comments": "Comments",
+      "commentPlaceholder": "Write a comment...",
+      "comment": "Comment",
+      "noComments": "No comments yet."
+    },
+    "regionalSuggestions": {
+      "asf": {
+        "query": "African Swine Fever (Hung Yen)",
+        "description": "Farmers are checking outbreak risk and biosecurity steps.",
+        "count": "2.4k searches"
+      },
+      "lamDong": {
+        "query": "1000 pigs disposed of (Lam Dong)",
+        "description": "High regional interest after a reported disposal event.",
+        "count": "1.8k searches"
+      },
+      "avianFlu": {
+        "query": "Avian flu vaccine schedule (Dong Nai)",
+        "description": "Poultry farms are comparing prevention schedules.",
+        "count": "1.2k searches"
+      },
+      "vaccine": {
+        "query": "Lumpy skin disease symptoms (Bac Giang)",
+        "description": "Cattle owners are searching symptom photos and vet advice.",
+        "count": "960 searches"
+      }
+    }
+  },
+  "livestock": {
+    "loading": "Loading livestock...",
+    "subtitle": "Manage animal profiles and basic herd records.",
+    "speciesLabel": "Species",
+    "tagLabel": "Tag ID",
+    "weightLabel": "Weight (kg)",
+    "tagPlaceholder": "e.g. COW-104",
+    "optional": "Optional",
+    "adding": "Adding...",
+    "addLivestock": "Add Livestock",
+    "addError": "Failed to add livestock.",
+    "empty": "No livestock records yet.",
+    "weight": "Weight",
+    "entryDate": "Entry Date",
+    "validation": {
+      "tagRequired": "Please enter a tag ID."
+    },
+    "species": {
+      "cattle": "Cattle",
+      "swine": "Swine",
+      "poultry": "Poultry"
+    },
+    "health": {
+      "healthy": "Healthy",
+      "sick": "Sick",
+      "warning": "Warning",
+      "critical": "Critical"
+    }
+  },
+  "notebook": {
+    "title": "AI Herd Notebook",
+    "description": "Record field notes and let AI turn critical observations into practical next steps.",
+    "addNoteTitle": "Add Herd Note",
+    "addNoteSubtitle": "Save a normal note or analyze it with AI for urgency, tags, and recommendations.",
+    "notePlaceholder": "Describe symptoms, behavior changes, barn conditions, treatment notes, or anything important...",
+    "saveNormal": "Save Normal Note",
+    "processing": "Processing...",
+    "analyzeAndSave": "Analyze & Save",
+    "historyTitle": "Notebook History",
+    "noNotes": "No notes yet.",
+    "urgency": "Urgency",
+    "urgencies": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "diagnosis": "AI Diagnosis",
+    "recommendations": "Recommendations",
+    "generatingQuiz": "Generating quiz...",
+    "generateQuiz": "Generate Quiz",
+    "quizCreatedHint": "Critical notes can generate awareness quizzes for follow-up learning.",
+    "saveError": "Unable to save note.",
+    "criticalQuizGenerated": "Critical note saved and a follow-up quiz was generated.",
+    "criticalQuizFailed": "Critical note saved, but quiz generation failed.",
+    "aiSaveError": "Unable to analyze and save note.",
+    "quizGenerated": "Quiz generated from this note.",
+    "quizGenerateError": "Unable to generate quiz from this note."
   },
   "quickActions": {
     "recordVoiceNote": "Record Voice Note",
@@ -157,7 +400,9 @@
     "delete": "Delete",
     "edit": "Edit",
     "view": "View",
-    "close": "Close"
+    "close": "Close",
+    "previous": "Previous",
+    "next": "Next"
   },
   "landing": {
     "heroTagline": "AI notebook for healthier herds",
@@ -172,6 +417,7 @@
     "walkthroughLabel": "Notebook walkthrough",
     "walkthroughTitle": "Onboarding video",
     "walkthroughSubtitle": "A polished guide to start using the AI Herd Notebook instantly.",
+    "videoUnsupported": "Your browser does not support the video tag.",
     "previewTag": "Preview",
     "smartSummaries": "Smart summaries",
     "smartSummariesDescription": "Instantly surface the top health signals and animal alerts.",

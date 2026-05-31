@@ -7,69 +7,55 @@ import AlarmingNotifications from '../components/dashboard/AlarmingNotifications
 import ActivityStream from '../components/dashboard/ActivityStream';
 import HerdGrowthChart from '../components/dashboard/HerdGrowthChart';
 import QuickActions from '../components/dashboard/QuickActions';
-import ChatPanel from '../components/chat/ChatPanel';
-import VetPanel from '../components/consult/VetPanel';
-import HeatmapChart from '../components/dashboard/HeatmapChart';
-import GeoHeatmapChart from '../components/dashboard/GeoHeatmapChart';
-import { fetchDashboardSummary, fetchVets, fetchLatestSensor, fetchSensorAggregate } from '../services/farm2vets';
-import type { DashboardSummary, Vet, SensorReading, SensorAggregate } from '../types';
+import { fetchDashboardSummary, fetchLatestSensor, fetchSensorAggregate } from '../services/farm2vets';
+import type { DashboardSummary, SensorReading, SensorAggregate } from '../types';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
-  // 1. Khởi tạo state an toàn
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [vets, setVets] = useState<Vet[]>([]);
   const [sensorData, setSensorData] = useState<SensorReading | null>(null);
   const [sensorStats, setSensorStats] = useState<SensorAggregate | undefined>(undefined);
   const [loading, setLoading] = useState(true);
-  const [vetsLoading, setVetsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 2. Hàm tải dữ liệu dashboard
   const loadDashboardData = async () => {
     try {
       setError(null);
       const summaryData = await fetchDashboardSummary();
       setSummary(summaryData);
     } catch (err) {
-      console.error("Lỗi khi tải dashboard:", err);
+      console.error('Failed to load dashboard:', err);
       setError(t('dashboard.connectionError'));
     }
   };
 
-  // 3. Hàm tải dữ liệu cảm biến
   const loadSensorData = async () => {
     try {
       const latest = await fetchLatestSensor();
       setSensorData(latest);
-      
-      // Fetch 24h aggregates
+
       const stats = await fetchSensorAggregate('barn-1', 24);
       setSensorStats(stats);
     } catch (err) {
-      console.error("Lỗi khi tải dữ liệu cảm biến:", err);
+      console.error('Failed to load sensor data:', err);
     }
   };
 
-  // 4. Gọi API lấy dữ liệu thật một lần khi component mount
   useEffect(() => {
     setError(null);
 
     Promise.all([
       fetchDashboardSummary().then(setSummary),
-      fetchVets().then(setVets),
-      loadSensorData()
+      loadSensorData(),
     ])
-    .catch((err) => {
-      console.error("Lỗi khi tải dữ liệu thật:", err);
-      setError(t('dashboard.connectionError'));
-    })
-    .finally(() => {
-      setLoading(false);
-      setVetsLoading(false);
-    });
+      .catch((err) => {
+        console.error('Failed to load dashboard data:', err);
+        setError(t('dashboard.connectionError'));
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-    // 5. Thiết lập auto-refresh mỗi 10 giây
     const interval = setInterval(() => {
       loadDashboardData();
       loadSensorData();
@@ -78,41 +64,35 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // 6. CHẶN LỖI NULL: Nếu đang tải, trả về màn hình Loading ngay lập tức
-  if (loading || vetsLoading) {
+  if (loading) {
     return (
-      <div className="flex-1 p-6 flex justify-center items-center text-gray-400">
+      <div className="flex flex-1 items-center justify-center p-6 text-gray-400">
         <span className="animate-pulse">{t('dashboard.loadingData')}</span>
       </div>
     );
   }
 
-  // 7. CHẶN LỖI NULL: Nếu có lỗi hoặc không có summary, dừng lại và báo lỗi
   if (error || !summary) {
     return (
-      <div className="flex-1 p-6 flex flex-col justify-center items-center text-red-400">
-        <span className="text-4xl mb-4">⚠️</span>
+      <div className="flex flex-1 flex-col items-center justify-center p-6 text-red-400">
+        <span className="mb-4 text-4xl">⚠️</span>
         <p>{error || t('dashboard.noDataAvailable')}</p>
       </div>
     );
   }
 
-  // 8. LÚC NÀY `summary` CHẮC CHẮN ĐÃ CÓ DATA: Thoải mái tính toán mà không sợ crash
   const healthScoreColor =
     summary.herd_health_score >= 80
       ? 'text-green-400'
       : summary.herd_health_score >= 60
-      ? 'text-yellow-400'
-      : 'text-red-400';
+        ? 'text-yellow-400'
+        : 'text-red-400';
 
   return (
-    <div className="flex flex-1 gap-6 p-6 overflow-hidden">
-      {/* ── Main content ── */}
-      <div className="flex-1 overflow-y-auto space-y-6 min-w-0">
-        {/* Top stat cards - Bento Grid Hierarchy */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Primary KPI - Larger */}
-          <div className="lg:col-span-2">
+    <div className="flex flex-1 overflow-hidden">
+      <div className="min-w-0 flex-1 space-y-6 overflow-y-auto p-6">
+        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+          <div className="space-y-4">
             <StatCard
               title={t('dashboard.herdHealthScore')}
               value={`${summary.herd_health_score}`}
@@ -122,9 +102,10 @@ const Dashboard: React.FC = () => {
               trend={{ value: '+3 pts', positive: true }}
               size="large"
             />
+            <QuickActions />
           </div>
-          {/* Secondary chips - Smaller */}
-          <div className="space-y-2">
+
+          <div className="grid gap-2 sm:grid-cols-3 xl:grid-cols-1">
             <StatCard
               title={t('dashboard.activeTreatmentCases')}
               value={summary.active_treatment_cases}
@@ -153,41 +134,17 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Sensor + Alert */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SensorCard
-            sensor={sensorData || summary.latest_sensor}
-            sensorStats={sensorStats}
-          />
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <SensorCard sensor={sensorData || summary.latest_sensor} sensorStats={sensorStats} />
           <AlertCard level={summary.disease_alert_level} />
         </div>
 
-
-
-        {/* Alarming Notifications */}
         <AlarmingNotifications />
 
-        {/* GeoHeatmap */}
-        <div className="mt-6">
-          <GeoHeatmapChart />
-        </div>
-
-        {/* Heatmap */}
-        <HeatmapChart barnId="barn-1" dataType="health" width={400} height={300} />
-
-        {/* Chart + Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <HerdGrowthChart />
           <ActivityStream events={summary.activity_stream} isLoading={false} />
         </div>
-      </div>
-
-      {/* ── Right panel ── */}
-      <div className="w-72 xl:w-80 flex-shrink-0 overflow-y-auto space-y-4">
-        <QuickActions />
-        <ChatPanel />
-        <VetPanel vets={vets} isLoading={false} />
-        
       </div>
     </div>
   );

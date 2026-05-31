@@ -1,15 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import type { ChatMessage } from '../../types';
 import { sendChatMessage } from '../../services/farm2vets';
 
+function getChatErrorMessage(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    const detail = error.response?.data?.detail;
+    if (typeof detail === 'string' && detail.trim()) {
+      return detail;
+    }
+  }
+  return fallback;
+}
+
 const ChatPanel: React.FC = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'init',
       role: 'assistant',
-      content: "Hello! I'm your Farm2Vets AI assistant. Ask me about your herd health, treatment plans, or disease alerts.",
+      content: t('chat.welcome'),
       timestamp: new Date(),
     },
   ]);
@@ -22,6 +33,14 @@ const ChatPanel: React.FC = () => {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    setMessages((prev) =>
+      prev.length === 1 && prev[0]?.id === 'init'
+        ? [{ ...prev[0], content: t('chat.welcome') }]
+        : prev
+    );
+  }, [i18n.language, t]);
 
   const handleSend = async () => {
     const text = input.trim();
@@ -47,13 +66,13 @@ const ChatPanel: React.FC = () => {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMsg]);
-    } catch {
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content: 'Unable to reach AI assistant. Please check your connection.',
+          content: getChatErrorMessage(error, t('chat.errorMessage')),
           timestamp: new Date(),
         },
       ]);
@@ -68,16 +87,16 @@ const ChatPanel: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="text-xl">🤖</span>
           <div>
-            <p className="text-sm font-semibold text-white">AI Assistant</p>
+            <p className="text-sm font-semibold text-white">{t('chat.title')}</p>
             <p className="text-[10px] text-green-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block" /> Online
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block" /> {t('chat.online')}
             </p>
           </div>
         </div>
         <button
           onClick={() => setIsMaximized(!isMaximized)}
           className="text-gray-400 hover:text-white text-lg"
-          title={isMaximized ? 'Minimize' : 'Maximize'}
+          title={isMaximized ? t('chat.minimize') : t('chat.maximize')}
         >
           {isMaximized ? '🪟' : '⛶'}
         </button>
@@ -126,7 +145,7 @@ const ChatPanel: React.FC = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Ask about your herd..."
+          placeholder={t('chat.placeholder')}
           className="flex-1 bg-farm-border text-sm text-white placeholder-gray-500 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-primary-500"
         />
         <button

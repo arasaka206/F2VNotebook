@@ -25,6 +25,9 @@ F2VNotebook/
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 
+# Add your Gemini key to backend/.env for AI chat and notebook features
+# GEMINI_API_KEY=your_google_ai_studio_key
+
 # Build and start all services
 docker compose up --build
 ```
@@ -89,6 +92,7 @@ Frontend will be available at http://localhost:5173
 | `CORS_ORIGINS` | `http://localhost:5173 http://localhost:3000` | Allowed CORS origins (space-separated) |
 | `SECRET_KEY` | `change-me-in-production` | JWT signing key |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `60` | JWT expiry |
+| `GEMINI_API_KEY` | empty | Google Gemini API key used by AI chat, AI notebook analysis, and notebook quiz generation |
 
 ### Frontend (`frontend/.env`)
 

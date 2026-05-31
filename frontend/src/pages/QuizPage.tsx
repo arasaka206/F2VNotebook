@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import type { Quiz, QuizWithQuestions, UserQuizAttempt, UserAwarenessScore } from '../types';
 
 const QuizPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [selectedQuiz, setSelectedQuiz] = useState<QuizWithQuestions | null>(null);
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
@@ -11,11 +13,12 @@ const QuizPage: React.FC = () => {
   const [awarenessScore, setAwarenessScore] = useState<UserAwarenessScore | null>(null);
   const [attempts, setAttempts] = useState<UserQuizAttempt[]>([]);
   const [lastAttempt, setLastAttempt] = useState<UserQuizAttempt | null>(null);
+  const quizLanguage = i18n.language?.startsWith('vi') ? 'vi' : 'en';
 
   useEffect(() => {
     loadQuizzes();
     loadUserData();
-  }, []);
+  }, [quizLanguage]);
 
   useEffect(() => {
     const pendingQuizId = window.localStorage.getItem('notebookGeneratedQuizId');
@@ -27,7 +30,7 @@ const QuizPage: React.FC = () => {
 
   const loadQuizzes = async () => {
     try {
-      const response = await api.get('/quizzes');
+      const response = await api.get('/quizzes', { params: { language: quizLanguage } });
       setQuizzes(response.data);
     } catch (error) {
       console.error('Failed to load quizzes:', error);
@@ -54,7 +57,7 @@ const QuizPage: React.FC = () => {
 
   const startQuiz = async (quizId: string) => {
     try {
-      const response = await api.get(`/quizzes/${quizId}`);
+      const response = await api.get(`/quizzes/${quizId}`, { params: { language: quizLanguage } });
       setSelectedQuiz(response.data);
       setUserAnswers(new Array(response.data.questions.length).fill(-1));
       setShowResults(false);
@@ -106,75 +109,82 @@ const QuizPage: React.FC = () => {
     }
   };
 
+  const formatAwarenessStatus = (status: string) =>
+    t(`quiz.awarenessStatuses.${status}`, { defaultValue: status.replace('_', ' ') });
+
+  const formatAttemptStatus = (status: string) =>
+    t(`quiz.attemptStatuses.${status}`, { defaultValue: status });
+
+  const formatDate = (value: string) =>
+    new Date(value).toLocaleDateString(i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US');
+
   if (loading) {
     return (
       <div className="flex-1 p-6 flex justify-center items-center text-gray-400">
-        <span className="animate-pulse">Loading quizzes...</span>
+        <span className="animate-pulse">{t('quiz.loading')}</span>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 p-6 overflow-y-auto">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-white">Disease Awareness Quizzes</h1>
+    <div className="w-full flex-1 p-6 overflow-y-auto text-left">
+      <div className="w-full max-w-6xl space-y-6">
+        <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <h1 className="text-left text-2xl font-bold text-white">{t('app.quizzes')}</h1>
           {awarenessScore && (
-            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-              <div className="text-sm text-gray-400">Your Awareness Score</div>
+            <div className="w-full rounded-lg border border-gray-700 bg-gray-800 p-4 text-left sm:w-auto sm:min-w-56">
+              <div className="text-sm text-gray-400">{t('quiz.awarenessScore')}</div>
               <div className={`text-2xl font-bold ${getScoreColor(awarenessScore.overall_score)}`}>
                 {awarenessScore.overall_score.toFixed(1)}%
               </div>
               <div className={`text-xs ${getStatusColor(awarenessScore.status)}`}>
-                Status: {awarenessScore.status.replace('_', ' ').toUpperCase()}
+                {t('quiz.statusLabel')}: {formatAwarenessStatus(awarenessScore.status)}
               </div>
             </div>
           )}
         </div>
 
-        {/* Awareness Status Warning */}
         {awarenessScore?.status === 'restricted' && (
-          <div className="bg-red-900/50 border border-red-600 rounded-lg p-4">
+          <div className="rounded-lg border border-red-600 bg-red-900/50 p-4 text-left">
             <div className="flex items-center gap-2 text-red-400">
-              <span>⚠️</span>
-              <span className="font-semibold">Access Restricted</span>
+              <span className="font-semibold">!</span>
+              <span className="font-semibold">{t('quiz.accessRestricted')}</span>
             </div>
-            <p className="text-red-300 text-sm mt-2">
-              Your awareness score is low. Complete more quizzes to improve your score and regain full access to features.
+            <p className="mt-2 text-sm text-red-300">
+              {t('quiz.restrictedMessage')}
             </p>
           </div>
         )}
 
         {selectedQuiz ? (
-          /* Quiz Taking Interface */
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-            <div className="flex items-center justify-between mb-6">
+          <div className="rounded-lg border border-gray-700 bg-gray-800 p-6">
+            <div className="mb-6 flex items-start justify-between gap-4">
               <h2 className="text-xl font-semibold text-white">{selectedQuiz.title}</h2>
               <button
                 onClick={() => setSelectedQuiz(null)}
                 className="text-gray-400 hover:text-white"
+                aria-label={t('common.close')}
               >
-                ✕
+                X
               </button>
             </div>
 
             {selectedQuiz.description && (
-              <p className="text-gray-300 mb-2">{selectedQuiz.description}</p>
+              <p className="mb-2 text-gray-300">{selectedQuiz.description}</p>
             )}
-            <p className="text-xs text-gray-500 mb-6">
-              Passing score: {selectedQuiz.passing_score}% · Type: {selectedQuiz.topic === 'notebook' ? 'Notebook-based' : 'General knowledge'}
+            <p className="mb-6 text-xs text-gray-500">
+              {t('quiz.passingScore')}: {selectedQuiz.passing_score}% · {t('quiz.type')}: {selectedQuiz.topic === 'notebook' ? t('quiz.notebookBased') : t('quiz.generalKnowledge')}
             </p>
 
             <div className="space-y-6">
               {selectedQuiz.questions.map((question, qIndex) => (
                 <div key={question.id} className="border-b border-gray-700 pb-6 last:border-b-0">
-                  <h3 className="text-lg font-medium text-white mb-4">
+                  <h3 className="mb-4 text-lg font-medium text-white">
                     {qIndex + 1}. {question.question}
                   </h3>
                   <div className="space-y-2">
                     {question.options.map((option, oIndex) => (
-                      <label key={oIndex} className="flex items-center gap-3 cursor-pointer">
+                      <label key={oIndex} className="flex cursor-pointer items-center gap-3">
                         <input
                           type="radio"
                           name={`question-${qIndex}`}
@@ -192,12 +202,12 @@ const QuizPage: React.FC = () => {
                     ))}
                   </div>
                   {showResults && (
-                    <div className="mt-4 p-3 bg-gray-700 rounded">
+                    <div className="mt-4 rounded bg-gray-700 p-3">
                       <div className={`text-sm ${userAnswers[qIndex] === question.correct_answer ? 'text-green-400' : 'text-red-400'}`}>
-                        {userAnswers[qIndex] === question.correct_answer ? '✓ Correct' : '✗ Incorrect'}
+                        {userAnswers[qIndex] === question.correct_answer ? t('quiz.correct') : t('quiz.incorrect')}
                       </div>
                       {question.explanation && (
-                        <p className="text-xs text-gray-400 mt-1">{question.explanation}</p>
+                        <p className="mt-1 text-xs text-gray-400">{question.explanation}</p>
                       )}
                     </div>
                   )}
@@ -206,22 +216,24 @@ const QuizPage: React.FC = () => {
             </div>
 
             {showResults && lastAttempt && (
-              <div className="mt-6 p-4 rounded-lg border border-gray-700 bg-gray-900/80">
+              <div className="mt-6 rounded-lg border border-gray-700 bg-gray-900/80 p-4">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-white">{lastAttempt.status === 'completed' ? 'Certificate Earned' : 'Review and Retry'}</h3>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <h3 className="text-lg font-semibold text-white">
+                      {lastAttempt.status === 'completed' ? t('quiz.certificateEarned') : t('quiz.reviewAndRetry')}
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-400">
                       {lastAttempt.status === 'completed'
-                        ? `You scored ${lastAttempt.score.toFixed(1)}% and earned a certificate for this quiz.`
-                        : `You scored ${lastAttempt.score.toFixed(1)}%. Review the notebook note and try again later to earn the certificate.`}
+                        ? t('quiz.passedMessage', { score: lastAttempt.score.toFixed(1) })
+                        : t('quiz.failedMessage', { score: lastAttempt.score.toFixed(1) })}
                     </p>
                   </div>
-                  <span className={`px-2 py-1 rounded text-xs ${lastAttempt.status === 'completed' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
-                    {lastAttempt.status === 'completed' ? 'Passed' : 'Failed'}
+                  <span className={`rounded px-2 py-1 text-xs ${lastAttempt.status === 'completed' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
+                    {lastAttempt.status === 'completed' ? t('quiz.passed') : t('quiz.failed')}
                   </span>
                 </div>
                 {lastAttempt.status !== 'completed' && (
-                  <p className="text-xs text-gray-500 mt-3">If the score is below passing, consider reviewing the notebook note and taking a new quiz later.</p>
+                  <p className="mt-3 text-xs text-gray-500">{t('quiz.retryAdvice')}</p>
                 )}
                 {lastAttempt.status === 'completed' && getNextQuiz() && (
                   <button
@@ -229,66 +241,65 @@ const QuizPage: React.FC = () => {
                       const nextQuiz = getNextQuiz();
                       if (nextQuiz) startQuiz(nextQuiz.id);
                     }}
-                    className="mt-4 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-white text-sm"
+                    className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-500"
                   >
-                    Continue to next quiz
+                    {t('quiz.continueNext')}
                   </button>
                 )}
               </div>
             )}
 
             {!showResults ? (
-              <div className="flex justify-end mt-6">
+              <div className="mt-6 flex justify-end">
                 <button
                   onClick={submitQuiz}
                   disabled={userAnswers.includes(-1)}
-                  className="bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-2 rounded-lg text-white font-medium"
+                  className="rounded-lg bg-green-600 px-6 py-2 font-medium text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Submit Quiz
+                  {t('quiz.submit')}
                 </button>
               </div>
             ) : (
-              <div className="flex justify-between items-center mt-6">
+              <div className="mt-6 flex items-center justify-between">
                 <div className="text-gray-300">
-                  Quiz completed! Check your results above.
+                  {t('quiz.completed')}
                 </div>
                 <button
                   onClick={() => setSelectedQuiz(null)}
-                  className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg text-white font-medium"
+                  className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-500"
                 >
-                  Back to Quizzes
+                  {t('quiz.backToQuizzes')}
                 </button>
               </div>
             )}
           </div>
         ) : (
-          /* Quiz List */
           quizzes.length === 0 ? (
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-10 text-center text-gray-400">
-              <p className="text-lg font-semibold text-white mb-2">No quizzes are available yet.</p>
-              <p className="text-sm">Please check back after the system seeds the quiz content.</p>
+            <div className="rounded-lg border border-gray-700 bg-gray-800 p-10 text-left text-gray-400">
+              <p className="mb-2 text-lg font-semibold text-white">{t('quiz.noQuizzes')}</p>
+              <p className="text-sm">{t('quiz.noQuizzesMessage')}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {quizzes.map((quiz) => (
-                <div key={quiz.id} className="bg-gray-800 rounded-lg border border-gray-700 p-6 hover:border-green-500 transition">
-                  <h3 className="text-lg font-semibold text-white mb-2">{quiz.title}</h3>
+                <div key={quiz.id} className="rounded-lg border border-gray-700 bg-gray-800 p-6 transition hover:border-green-500">
+                  <h3 className="mb-2 text-lg font-semibold text-white">{quiz.title}</h3>
                   {quiz.description && (
-                    <p className="text-gray-300 text-sm mb-4 line-clamp-2">{quiz.description}</p>
+                    <p className="mb-4 line-clamp-2 text-sm text-gray-300">{quiz.description}</p>
                   )}
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
-                    <span>{quiz.topic === 'notebook' ? 'Notebook-based quiz' : `Topic: ${quiz.topic}`}</span>
-                    <span>Difficulty: {quiz.difficulty}</span>
+                  <div className="mb-4 flex items-center justify-between gap-4 text-xs text-gray-400">
+                    <span>{quiz.topic === 'notebook' ? t('quiz.notebookBasedQuiz') : t('quiz.topicLabel', { topic: quiz.topic })}</span>
+                    <span>{t('quiz.difficultyLabel', { difficulty: quiz.difficulty })}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">
-                      {quiz.time_limit ? `${quiz.time_limit} min` : 'No time limit'}
+                      {quiz.time_limit ? t('quiz.minutes', { count: quiz.time_limit }) : t('quiz.noTimeLimit')}
                     </span>
                     <button
                       onClick={() => startQuiz(quiz.id)}
-                      className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded text-sm text-white font-medium"
+                      className="rounded bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500"
                     >
-                      Start Quiz
+                      {t('quiz.start')}
                     </button>
                   </div>
                 </div>
@@ -297,29 +308,28 @@ const QuizPage: React.FC = () => {
           )
         )}
 
-        {/* Recent Attempts */}
         {attempts.length > 0 && (
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Recent Quiz Attempts</h3>
+          <div className="rounded-lg border border-gray-700 bg-gray-800 p-6">
+            <h3 className="mb-4 text-lg font-semibold text-white">{t('quiz.recentAttempts')}</h3>
             <div className="space-y-3">
               {attempts.slice(0, 5).map((attempt) => (
-                <div key={attempt.id} className="flex items-center justify-between py-2 border-b border-gray-700 last:border-b-0">
+                <div key={attempt.id} className="flex items-center justify-between border-b border-gray-700 py-2 last:border-b-0">
                   <div>
-                    <span className="text-gray-300">Quiz completed</span>
-                    <span className="text-xs text-gray-500 ml-2">
-                      {new Date(attempt.created_at).toLocaleDateString()}
+                    <span className="text-gray-300">{t('quiz.attemptCompleted')}</span>
+                    <span className="ml-2 text-xs text-gray-500">
+                      {formatDate(attempt.created_at)}
                     </span>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className={`font-semibold ${getScoreColor(attempt.score)}`}>
                       {attempt.score.toFixed(1)}%
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded ${
+                    <span className={`rounded px-2 py-1 text-xs ${
                       attempt.status === 'completed'
                         ? 'bg-green-900 text-green-400'
                         : 'bg-red-900 text-red-400'
                     }`}>
-                      {attempt.status}
+                      {formatAttemptStatus(attempt.status)}
                     </span>
                   </div>
                 </div>

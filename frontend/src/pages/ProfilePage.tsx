@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { UserAwarenessScore } from '../types';
 
 const ProfilePage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [awarenessScore, setAwarenessScore] = useState<UserAwarenessScore | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,11 +15,11 @@ const ProfilePage: React.FC = () => {
         setLoading(true);
         const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
         const response = await fetch(`${apiUrl}/api/quizzes/user/${userId}/awareness`);
-        if (!response.ok) throw new Error('Failed to load awareness score');
+        if (!response.ok) throw new Error(t('profile.loadError'));
         const data = await response.json();
         setAwarenessScore(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : t('profile.genericError'));
       } finally {
         setLoading(false);
       }
@@ -42,13 +44,13 @@ const ProfilePage: React.FC = () => {
   const getStatusBadge = (status: string | undefined): string => {
     switch (status) {
       case 'good':
-        return 'Proficient Farmer';
+        return t('sidebar.badges.good');
       case 'needs_improvement':
-        return 'Growing Farmer';
+        return t('sidebar.badges.needsImprovement');
       case 'restricted':
-        return 'Lagged Farmer';
+        return t('sidebar.badges.restricted');
       default:
-        return 'Farmer';
+        return t('sidebar.badges.default');
     }
   };
 
@@ -60,14 +62,14 @@ const ProfilePage: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Farmer Profile</h1>
-            <p className="text-gray-400">View your achievement and certification status</p>
+            <h1 className="text-3xl font-bold text-white mb-2">{t('app.farmerProfile')}</h1>
+            <p className="text-gray-400">{t('profile.subtitle')}</p>
           </div>
         </div>
 
         {loading && (
           <div className="bg-farm-card border border-farm-border rounded-lg p-8 text-center">
-            <div className="text-gray-400">Loading profile...</div>
+            <div className="text-gray-400">{t('profile.loading')}</div>
           </div>
         )}
 
@@ -81,7 +83,7 @@ const ProfilePage: React.FC = () => {
           <div className="space-y-6">
             {/* Awareness Score Card */}
             <div className="bg-farm-card border border-farm-border rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-white mb-6">Awareness Score</h2>
+              <h2 className="text-xl font-semibold text-white mb-6">{t('profile.awarenessScore')}</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Score Display */}
@@ -100,7 +102,7 @@ const ProfilePage: React.FC = () => {
                 {/* Statistics */}
                 <div className="space-y-4">
                   <div>
-                    <p className="text-gray-400 text-sm mb-2">Farmer Status</p>
+                    <p className="text-gray-400 text-sm mb-2">{t('profile.farmerStatus')}</p>
                     <div className={`inline-block px-4 py-2 rounded-full border ${getStatusColor(awarenessScore.status)}`}>
                       {getStatusBadge(awarenessScore.status)}
                     </div>
@@ -108,19 +110,19 @@ const ProfilePage: React.FC = () => {
 
                   <div className="space-y-3">
                     <div>
-                      <p className="text-gray-400 text-sm mb-1">Quizzes Completed</p>
+                      <p className="text-gray-400 text-sm mb-1">{t('profile.quizzesCompleted')}</p>
                       <p className="text-2xl font-bold text-white">{awarenessScore.quizzes_completed}</p>
                     </div>
 
                     <div>
-                      <p className="text-gray-400 text-sm mb-1">Quizzes Passed</p>
+                      <p className="text-gray-400 text-sm mb-1">{t('profile.quizzesPassed')}</p>
                       <p className="text-2xl font-bold text-green-400">{awarenessScore.quizzes_passed}</p>
                     </div>
 
                     <div>
-                      <p className="text-gray-400 text-sm mb-1">Last Updated</p>
+                      <p className="text-gray-400 text-sm mb-1">{t('profile.lastUpdated')}</p>
                       <p className="text-sm text-gray-300">
-                        {new Date(awarenessScore.last_updated).toLocaleDateString()}
+                        {new Date(awarenessScore.last_updated).toLocaleDateString(i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US')}
                       </p>
                     </div>
                   </div>
@@ -134,25 +136,25 @@ const ProfilePage: React.FC = () => {
                 <div className="flex items-center gap-4 mb-6">
                   <span className="text-4xl">🏆</span>
                   <div>
-                    <h2 className="text-2xl font-bold text-yellow-300">Congratulations!</h2>
-                    <p className="text-gray-300">You have achieved 100% Awareness Score</p>
+                    <h2 className="text-2xl font-bold text-yellow-300">{t('profile.congratulations')}</h2>
+                    <p className="text-gray-300">{t('profile.perfectScore')}</p>
                   </div>
                 </div>
 
                 <div className="bg-black/30 rounded-lg p-6">
                   <img
                     src="/images/certificate.png"
-                    alt="Farm2Vets Certificate of Excellence"
+                    alt={t('profile.certificateAlt')}
                     className="w-full max-w-2xl mx-auto rounded-lg shadow-lg"
                   />
                 </div>
 
                 <div className="mt-6 text-center">
                   <p className="text-gray-300 mb-4">
-                    Your certificate recognizes your exceptional commitment to herd health and farm management.
+                    {t('profile.certificateDescription')}
                   </p>
                   <button className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                    Download Certificate
+                    {t('profile.downloadCertificate')}
                   </button>
                 </div>
               </div>
@@ -163,13 +165,15 @@ const ProfilePage: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <span className="text-4xl">📚</span>
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Keep Learning!</h3>
+                    <h3 className="text-lg font-semibold text-white mb-2">{t('profile.keepLearning')}</h3>
                     <p className="text-gray-400">
-                      Complete more quizzes and improve your awareness score to unlock your certificate.
-                      Currently at {awarenessScore.overall_score}% - you're {100 - awarenessScore.overall_score}% away from certification!
+                      {t('profile.keepLearningMessage', {
+                        score: awarenessScore.overall_score,
+                        remaining: 100 - awarenessScore.overall_score,
+                      })}
                     </p>
                     <button className="mt-4 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                      Take More Quizzes
+                      {t('profile.takeMoreQuizzes')}
                     </button>
                   </div>
                 </div>

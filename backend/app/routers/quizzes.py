@@ -23,6 +23,140 @@ else:
     quiz_model = None
 
 
+SEEDED_QUIZ_TRANSLATIONS = {
+    "vi": {
+        "quiz": {
+            "Biosecurity Basics for Smallholder Farmers": {
+                "title": "Kiến thức Cơ bản về An toàn Sinh học cho Nông hộ",
+                "description": "Tìm hiểu các thực hành an toàn sinh học cốt lõi giúp bảo vệ đàn và ngăn bệnh lây lan.",
+                "topic": "an toàn sinh học",
+            },
+            "Breeding and Reproduction Practices": {
+                "title": "Thực hành Phối giống và Sinh sản",
+                "description": "Hiểu các dấu hiệu phối giống và thời điểm quan trọng để cải thiện hiệu quả sinh sản của đàn.",
+                "topic": "sinh sản",
+            },
+            "Nutrition and Herd Health": {
+                "title": "Dinh dưỡng và Sức khỏe Đàn",
+                "description": "Ôn lại các kiến thức thiết yếu về thức ăn, khoáng chất và quản lý nước cho vật nuôi khỏe mạnh.",
+                "topic": "dinh dưỡng",
+            },
+        },
+        "questions": {
+            "What is the most important first step to prevent the spread of disease when new animals arrive on the farm?": "Bước đầu tiên quan trọng nhất để ngăn bệnh lây lan khi có vật nuôi mới vào trang trại là gì?",
+            "How often should shared tools and equipment be cleaned and disinfected?": "Dụng cụ và thiết bị dùng chung nên được làm sạch và khử trùng bao lâu một lần?",
+            "Which practice helps reduce respiratory disease transmission in poultry housing?": "Thực hành nào giúp giảm lây truyền bệnh hô hấp trong chuồng gia cầm?",
+            "What is the ideal breeding interval for a dairy cow after she has calved?": "Khoảng thời gian phối giống lý tưởng cho bò sữa sau khi đẻ là bao lâu?",
+            "Why is heat detection important in livestock breeding?": "Vì sao phát hiện động dục quan trọng trong phối giống vật nuôi?",
+            "Which sign usually means a sow is ready to mate?": "Dấu hiệu nào thường cho thấy lợn nái đã sẵn sàng phối giống?",
+            "Which nutrient is most important for building muscle and producing milk?": "Chất dinh dưỡng nào quan trọng nhất để phát triển cơ và tạo sữa?",
+            "What is a common sign of mineral deficiency in cattle?": "Dấu hiệu thường gặp của thiếu khoáng ở bò là gì?",
+            "During hot weather, livestock need:": "Trong thời tiết nóng, vật nuôi cần:",
+        },
+        "options": {
+            "Isolate new animals for a quarantine period": "Cách ly vật nuôi mới trong một thời gian kiểm dịch",
+            "Feed them with extra supplements immediately": "Cho ăn bổ sung ngay lập tức",
+            "Allow new animals to mingle with the herd right away": "Cho vật nuôi mới nhập đàn ngay",
+            "Change their feed daily": "Thay đổi thức ăn hằng ngày",
+            "Once a year": "Mỗi năm một lần",
+            "After every use": "Sau mỗi lần sử dụng",
+            "Only when animals appear sick": "Chỉ khi vật nuôi có vẻ bị bệnh",
+            "Every month": "Mỗi tháng",
+            "Keeping birds overcrowded": "Nuôi gia cầm quá đông",
+            "Separating sick birds from the flock": "Tách gia cầm bệnh khỏi đàn",
+            "Shutting down ventilation": "Tắt hệ thống thông gió",
+            "Using only one feed trough": "Chỉ dùng một máng ăn",
+            "30 days": "30 ngày",
+            "60-90 days": "60-90 ngày",
+            "150 days": "150 ngày",
+            "One year": "Một năm",
+            "To know when animals are hungry": "Để biết khi nào vật nuôi đói",
+            "To improve pasture use": "Để cải thiện sử dụng đồng cỏ",
+            "To identify the best time for insemination": "Để xác định thời điểm thụ tinh tốt nhất",
+            "To reduce water consumption": "Để giảm lượng nước tiêu thụ",
+            "Restlessness and swollen vulva": "Bồn chồn và âm hộ sưng",
+            "Decreased appetite": "Giảm ăn",
+            "Rough coat": "Lông xơ xác",
+            "Low milk production": "Sản lượng sữa thấp",
+            "Carbohydrates": "Carbohydrate",
+            "Proteins": "Protein",
+            "Fats": "Chất béo",
+            "Vitamins": "Vitamin",
+            "Bright, alert eyes": "Mắt sáng và tỉnh táo",
+            "Poor coat and weak bones": "Lông xấu và xương yếu",
+            "Rapid weight gain": "Tăng cân nhanh",
+            "Increased fertility": "Tăng khả năng sinh sản",
+            "Less water": "Ít nước hơn",
+            "The same ration only": "Chỉ giữ khẩu phần như cũ",
+            "More water and plenty of shade": "Nhiều nước hơn và đủ bóng râm",
+            "More concentrate feed only": "Chỉ tăng thức ăn tinh",
+        },
+        "explanations": {
+            "Quarantine new animals before they join the herd to reduce the risk of introducing infections.": "Cách ly vật nuôi mới trước khi nhập đàn giúp giảm nguy cơ đưa mầm bệnh vào trang trại.",
+            "Cleaning and disinfecting tools after each use helps stop germs from moving between animals and barns.": "Làm sạch và khử trùng dụng cụ sau mỗi lần sử dụng giúp ngăn mầm bệnh di chuyển giữa vật nuôi và chuồng trại.",
+            "Separating sick birds limits exposure and reduces the spread of respiratory infections.": "Tách gia cầm bệnh giúp hạn chế tiếp xúc và giảm lây lan bệnh hô hấp.",
+            "Breeding cows 60-90 days after calving allows time for recovery while maintaining productivity.": "Phối giống bò sau khi đẻ 60-90 ngày giúp bò hồi phục nhưng vẫn duy trì năng suất.",
+            "Detecting heat ensures breeding occurs when the female is most fertile for better conception rates.": "Phát hiện động dục giúp phối giống vào thời điểm con cái có khả năng thụ thai cao nhất.",
+            "Restlessness and swelling around the vulva are common signs of estrus in sows.": "Bồn chồn và sưng quanh âm hộ là dấu hiệu động dục thường gặp ở lợn nái.",
+            "Proteins are essential for growth, muscle repair, and milk production in livestock.": "Protein cần thiết cho tăng trưởng, phục hồi cơ và sản xuất sữa ở vật nuôi.",
+            "Poor coat quality and weak bones often point to mineral deficiencies such as calcium or phosphorus.": "Lông kém chất lượng và xương yếu thường liên quan đến thiếu khoáng như canxi hoặc phốt pho.",
+            "Hot weather increases the need for water and shade to keep animals healthy and reduce heat stress.": "Thời tiết nóng làm tăng nhu cầu nước và bóng râm để giữ vật nuôi khỏe mạnh và giảm stress nhiệt.",
+        },
+    }
+}
+
+
+def _translate_seeded_value(value: str | None, language: str, section: str) -> str | None:
+    if value is None or language != "vi":
+        return value
+    return SEEDED_QUIZ_TRANSLATIONS.get(language, {}).get(section, {}).get(value, value)
+
+
+def _translate_seeded_quiz(quiz: Quiz, language: str) -> dict:
+    quiz_map = SEEDED_QUIZ_TRANSLATIONS.get(language, {}).get("quiz", {}).get(quiz.title, {})
+    if quiz.created_by != "system" or language != "vi":
+        quiz_map = {}
+
+    return {
+        "id": quiz.id,
+        "title": quiz_map.get("title", quiz.title),
+        "description": quiz_map.get("description", quiz.description),
+        "topic": quiz_map.get("topic", quiz.topic),
+        "difficulty": quiz.difficulty,
+        "time_limit": quiz.time_limit,
+        "passing_score": quiz.passing_score,
+        "is_active": quiz.is_active,
+        "created_by": quiz.created_by,
+        "created_at": quiz.created_at,
+        "updated_at": quiz.updated_at,
+    }
+
+
+def _translate_seeded_question(question: QuizQuestion, options: list[str], language: str, is_seeded: bool) -> dict:
+    if not is_seeded or language != "vi":
+        translated_question = question.question
+        translated_options = options
+        translated_explanation = question.explanation
+    else:
+        translated_question = _translate_seeded_value(question.question, language, "questions")
+        translated_options = [
+            _translate_seeded_value(option, language, "options") or option
+            for option in options
+        ]
+        translated_explanation = _translate_seeded_value(question.explanation, language, "explanations")
+
+    return {
+        "id": question.id,
+        "quiz_id": question.quiz_id,
+        "question": translated_question,
+        "options": translated_options,
+        "correct_answer": question.correct_answer,
+        "explanation": translated_explanation,
+        "order": question.order,
+        "created_at": question.created_at,
+    }
+
+
 def _clean_ai_json(text: str) -> str:
     text = text.strip()
     for marker in ['```json', '```', 'json']:
@@ -199,6 +333,7 @@ def get_quizzes(
     topic: str = Query(None),
     difficulty: str = Query(None),
     is_active: bool = Query(True),
+    language: str = Query("en", pattern="^(en|vi)$"),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
@@ -211,12 +346,13 @@ def get_quizzes(
         query = query.filter(Quiz.difficulty == difficulty)
 
     quizzes = query.order_by(desc(Quiz.created_at)).limit(limit).all()
-    return quizzes
+    return [_translate_seeded_quiz(quiz, language) for quiz in quizzes]
 
 
 @router.get("/{quiz_id}", response_model=QuizWithQuestions)
 def get_quiz_with_questions(
     quiz_id: str,
+    language: str = Query("en", pattern="^(en|vi)$"),
     db: Session = Depends(get_db)
 ):
     """Get a quiz with all its questions."""
@@ -229,33 +365,12 @@ def get_quiz_with_questions(
     ).order_by(QuizQuestion.order).all()
 
     questions_out = []
+    is_seeded = quiz.created_by == "system"
     for q in questions:
         options = json.loads(q.options) if q.options else []
-        questions_out.append(QuizQuestionOut(
-            id=q.id,
-            quiz_id=q.quiz_id,
-            question=q.question,
-            options=options,
-            correct_answer=q.correct_answer,
-            explanation=q.explanation,
-            order=q.order,
-            created_at=q.created_at
-        ))
+        questions_out.append(QuizQuestionOut(**_translate_seeded_question(q, options, language, is_seeded)))
 
-    return QuizWithQuestions(
-        id=quiz.id,
-        title=quiz.title,
-        description=quiz.description,
-        topic=quiz.topic,
-        difficulty=quiz.difficulty,
-        time_limit=quiz.time_limit,
-        passing_score=quiz.passing_score,
-        is_active=quiz.is_active,
-        created_by=quiz.created_by,
-        created_at=quiz.created_at,
-        updated_at=quiz.updated_at,
-        questions=questions_out
-    )
+    return QuizWithQuestions(**_translate_seeded_quiz(quiz, language), questions=questions_out)
 
 
 @router.post("/", response_model=QuizOut)

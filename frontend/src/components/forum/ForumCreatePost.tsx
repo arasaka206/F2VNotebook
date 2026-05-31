@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createForumPost } from '../../services/farm2vets';
 import type { ForumPost, ForumPostCreate } from '../../types';
 
@@ -7,6 +8,7 @@ interface ForumCreatePostProps {
 }
 
 const ForumCreatePost: React.FC<ForumCreatePostProps> = ({ onPostCreated }) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -17,7 +19,7 @@ const ForumCreatePost: React.FC<ForumCreatePostProps> = ({ onPostCreated }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
-      setError('Title and content are required');
+      setError(t('forum.validation.titleContentRequired'));
       return;
     }
 
@@ -25,7 +27,6 @@ const ForumCreatePost: React.FC<ForumCreatePostProps> = ({ onPostCreated }) => {
       setLoading(true);
       setError(null);
 
-      // Parse hashtags
       const tagArray = hashtags
         .split(' ')
         .map((tag) => tag.trim().toLowerCase())
@@ -38,64 +39,62 @@ const ForumCreatePost: React.FC<ForumCreatePostProps> = ({ onPostCreated }) => {
         hashtags: tagArray,
       };
 
-      // Get author info (in a real app, this would come from auth)
       const authorId = localStorage.getItem('user_id') || 'anonymous';
-      const authorName = localStorage.getItem('user_name') || 'Anonymous Farmer';
+      const authorName = localStorage.getItem('user_name') || t('forum.anonymousFarmer');
 
       const newPost = await createForumPost(postData, authorId, authorName);
       onPostCreated?.(newPost);
 
-      // Reset form
       setTitle('');
       setContent('');
       setHashtags('');
       setIsExpanded(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create post');
+      setError(err instanceof Error ? err.message : t('forum.createPostError'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+    <div className="mb-6 rounded-lg border border-gray-700 bg-gray-800 p-6">
       <div className="space-y-4">
         {!isExpanded ? (
           <button
             onClick={() => setIsExpanded(true)}
-            className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 text-left transition"
+            className="w-full rounded bg-gray-700 px-4 py-3 text-left text-gray-300 transition hover:bg-gray-600"
           >
-            Share your farming experience...
+            {t('forum.shareExperiencePlaceholder')}
           </button>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
-              placeholder="Post title..."
+              placeholder={t('forum.postTitlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-700 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full rounded bg-gray-700 px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <textarea
-              placeholder="Share your thoughts, questions, or experiences..."
+              placeholder={t('forum.postContentPlaceholder')}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={4}
-              className="w-full px-4 py-2 bg-gray-700 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+              className="w-full resize-none rounded bg-gray-700 px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
             <input
               type="text"
-              placeholder="Add hashtags (e.g., #livestock #disease #tips)"
+              placeholder={t('forum.hashtagPlaceholder')}
               value={hashtags}
               onChange={(e) => setHashtags(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-700 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full rounded bg-gray-700 px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
 
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && <p className="text-sm text-red-400">{error}</p>}
 
-            <div className="flex gap-2 justify-end">
+            <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -105,16 +104,16 @@ const ForumCreatePost: React.FC<ForumCreatePostProps> = ({ onPostCreated }) => {
                   setHashtags('');
                   setError(null);
                 }}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
+                className="rounded bg-gray-700 px-4 py-2 text-gray-300 transition hover:bg-gray-600"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition disabled:opacity-50"
+                className="rounded bg-green-600 px-4 py-2 text-white transition hover:bg-green-700 disabled:opacity-50"
               >
-                {loading ? 'Posting...' : 'Post'}
+                {loading ? t('forum.posting') : t('forum.post')}
               </button>
             </div>
           </form>

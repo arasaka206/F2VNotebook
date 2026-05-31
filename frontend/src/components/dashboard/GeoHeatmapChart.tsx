@@ -55,7 +55,7 @@ const GeoHeatmapChart: React.FC = () => {
 
   const handleMyLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
+      alert(t('dashboard.geolocationUnsupported'));
       return;
     }
     navigator.geolocation.getCurrentPosition((position) => {
@@ -63,7 +63,7 @@ const GeoHeatmapChart: React.FC = () => {
       setMapCenter([latitude, longitude]);
       setMapZoom(13); // Zoom gần hơn khi là vị trí cá nhân
     }, () => {
-      alert('Unable to retrieve your location');
+      alert(t('dashboard.geolocationFailed'));
     });
   };
 
@@ -102,7 +102,7 @@ const GeoHeatmapChart: React.FC = () => {
       <div className="rounded-lg overflow-hidden border border-gray-700 relative z-0" style={{ height: '400px' }}>
         {loading && (
            <div className="absolute inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-70">
-             <span className="text-white animate-pulse">Loading Map Data...</span>
+             <span className="text-white animate-pulse">{t('dashboard.loadingMapData')}</span>
            </div>
         )}
         <MapContainer 

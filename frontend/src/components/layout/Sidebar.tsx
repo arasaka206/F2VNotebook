@@ -14,7 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
 
   const getTranslatedLabel = (id: string) => {
     const labelMap: Record<string, string> = {
-      landing: 'Home',
+      landing: t('app.home'),
       dashboard: t('app.dashboard'),
       chat: t('app.chat'),
       notebook: t('app.notebook'),
@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
       'public-dashboard': t('app.publicDashboard'),
       inventory: t('app.inventory'),
       reports: t('app.reports'),
-      profile: 'Farmer Profile',
+      profile: t('app.farmerProfile'),
     };
     return labelMap[id] || id;
   };
@@ -51,10 +51,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
 
   const getBadgeText = (status: string | undefined) => {
     switch (status) {
-      case 'good': return 'Proficient Farmer';
-      case 'needs_improvement': return 'Growing Farmer';
-      case 'restricted': return 'Lagged Farmer';
-      default: return 'Farmer';
+      case 'good': return t('sidebar.badges.good');
+      case 'needs_improvement': return t('sidebar.badges.needsImprovement');
+      case 'restricted': return t('sidebar.badges.restricted');
+      default: return t('sidebar.badges.default');
     }
   };
 
@@ -76,7 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
         </div>
         <div>
           <div className="text-white font-bold text-base leading-tight">Farm2Vets</div>
-          <div className="text-xs text-gray-400">AI Herd Notebook</div>
+          <div className="text-xs text-gray-400">{t('sidebar.productSubtitle')}</div>
         </div>
       </div>
 
@@ -106,7 +106,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-medium text-white truncate">Nguyen Van An</div>
-            <div className="text-xs text-gray-400">Farmer · Farm-001</div>
+            <div className="text-xs text-gray-400">
+              {t('sidebar.farmerMeta', { farm: t('sidebar.farmCode', { id: '001' }) })}
+            </div>
           </div>
         </div>
         {awarenessScore && (
