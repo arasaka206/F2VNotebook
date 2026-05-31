@@ -86,14 +86,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
           <button
             key={item.id}
             onClick={() => onNavigate(item.id)}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`w-full flex items-start justify-start gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors ${
               activeItem === item.id
                 ? 'bg-primary-600 text-white'
                 : 'text-gray-300 hover:bg-farm-border hover:text-white'
             }`}
           >
-            <span className="text-base">{item.icon}</span>
-            <span>{getTranslatedLabel(item.id)}</span>
+            <span className="pt-0.5 text-base">{item.icon}</span>
+            <span className="flex-1 leading-snug">{getTranslatedLabel(item.id)}</span>
           </button>
         ))}
       </nav>

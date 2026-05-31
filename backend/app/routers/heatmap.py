@@ -1,12 +1,96 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
+from email.utils import parsedate_to_datetime
+from html import unescape
+from urllib.parse import quote_plus
+from xml.etree import ElementTree
 from app.database import get_db
 from app.models import HeatmapData, Livestock, SensorReading
 from app.schemas.heatmap import HeatmapDataOut, HeatmapGridOut
 from sqlalchemy import func
+import httpx
+import re
 
 router = APIRouter(prefix="/heatmap", tags=["heatmap"])
+
+GOOGLE_NEWS_QUERIES = [
+    "Vietnam livestock disease outbreak African swine fever avian influenza",
+    "Vietnam animal disease rabies poultry swine outbreak",
+]
+
+FALLBACK_DISEASE_BULLETINS = [
+    {
+        "title": "Authorities order mass livestock vaccination after 38,000 animal deaths",
+        "url": "https://english.vov.vn/en/society/authorities-order-mass-livestock-vaccination-after-38000-animal-deaths-post1271650.vov",
+        "source": "VOV",
+        "published_at": "2026-02-27T12:34:00+07:00",
+        "summary": "Nationwide public bulletin covering African swine fever, H5N1, lumpy skin disease and rabies surveillance in outbreak-hit areas.",
+    },
+    {
+        "title": "Ha Tinh province destroys nearly 1,000 poultry infected with H5N1 avian influenza",
+        "url": "https://www.vietnam.vn/en/ha-tinh-tieu-huy-gan-1-000-gia-cam-nhiem-cum-h5n1-siet-chat-ngan-lay-sang-nguoi",
+        "source": "Vietnam.vn",
+        "published_at": "2026-02-10T09:32:00+07:00",
+        "summary": "Public report of an H5N1 poultry outbreak in Cam Xuyen commune, Ha Tinh province.",
+    },
+    {
+        "title": "Hanoi has discovered two outbreaks of rabies in dogs",
+        "url": "https://www.vietnam.vn/en/ha-noi-phat-hien-2-o-dich-cho-dai",
+        "source": "Vietnam.vn",
+        "published_at": "2026-03-05T00:00:00+07:00",
+        "summary": "Public update on dog-rabies outbreaks in Hoa Lac and Ha Bang communes, Hanoi.",
+    },
+    {
+        "title": "African swine fever outbreaks prompt culling of over 100 pigs in Can Tho",
+        "url": "https://english.vov.vn/en/society/african-swine-fever-outbreaks-prompt-culling-of-over-100-pigs-in-can-tho-post1283801.vov",
+        "source": "VOV",
+        "published_at": "2026-04-14T11:14:00+07:00",
+        "summary": "Public outbreak bulletin for African swine fever in multiple households across Can Tho.",
+    },
+    {
+        "title": "Lam Dong culls more than 9,500 pigs infected with African swine fever",
+        "url": "https://dtinews.dantri.com.vn/vietnam-today/lam-dong-culls-more-than-9500-pigs-infected-with-african-swine-fever-20260511140205007.htm",
+        "source": "DTiNews",
+        "published_at": "2026-05-11T14:13:00+07:00",
+        "summary": "Large-scale African swine fever event in Lam Dong with intensified local monitoring and transport checks.",
+    },
+]
+
+
+def _strip_html(value: str) -> str:
+    return re.sub(r"<[^>]+>", "", unescape(value or "")).strip()
+
+
+def _parse_rss_items(xml_text: str):
+    root = ElementTree.fromstring(xml_text)
+    parsed_items = []
+
+    for item in root.findall(".//item"):
+        title = (item.findtext("title") or "").strip()
+        link = (item.findtext("link") or "").strip()
+        pub_date = (item.findtext("pubDate") or "").strip()
+        source_element = item.find("source")
+        source = source_element.text.strip() if source_element is not None and source_element.text else "Google News"
+        summary = _strip_html(item.findtext("description") or "")
+
+        if not title or not link:
+            continue
+
+        try:
+            published_at = parsedate_to_datetime(pub_date).isoformat() if pub_date else None
+        except (TypeError, ValueError):
+            published_at = None
+
+        parsed_items.append({
+            "title": title,
+            "url": link,
+            "source": source,
+            "published_at": published_at,
+            "summary": summary,
+        })
+
+    return parsed_items
 
 @router.get("/geo-data")
 def get_geo_heatmap_data(
@@ -39,6 +123,51 @@ def get_geo_heatmap_data(
         "data_type": data_type,
         "points": grid_data,
         "timestamp": datetime.utcnow()
+    }
+
+
+@router.get("/disease-feed")
+async def get_disease_feed(limit: int = Query(6, ge=1, le=12)):
+    feed_items = []
+
+    try:
+        async with httpx.AsyncClient(
+            follow_redirects=True,
+            timeout=10.0,
+            headers={"User-Agent": "Farm2Vets/1.0"}
+        ) as client:
+            for query in GOOGLE_NEWS_QUERIES:
+                url = (
+                    "https://news.google.com/rss/search?"
+                    f"q={quote_plus(query)}&hl=en-US&gl=US&ceid=US:en"
+                )
+                response = await client.get(url)
+                response.raise_for_status()
+                feed_items.extend(_parse_rss_items(response.text))
+    except Exception:
+        return {
+            "fetched_at": datetime.utcnow().isoformat(),
+            "fallback": True,
+            "items": FALLBACK_DISEASE_BULLETINS[:limit],
+        }
+
+    seen = set()
+    deduped_items = []
+    for item in sorted(
+        feed_items,
+        key=lambda entry: entry.get("published_at") or "",
+        reverse=True
+    ):
+        dedupe_key = item["url"]
+        if dedupe_key in seen:
+            continue
+        seen.add(dedupe_key)
+        deduped_items.append(item)
+
+    return {
+        "fetched_at": datetime.utcnow().isoformat(),
+        "fallback": False,
+        "items": deduped_items[:limit] if deduped_items else FALLBACK_DISEASE_BULLETINS[:limit],
     }
 
 

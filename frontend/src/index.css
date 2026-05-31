@@ -13,12 +13,12 @@
   }
 
   :root[data-theme='light'] {
-    --farm-bg: 210 33% 96%;
+    --farm-bg: 42 38% 96%;
     --farm-card: 0 0% 100%;
-    --farm-border: 214 32% 86%;
-    --farm-text: 222 47% 11%;
-    --farm-muted: 215 16% 47%;
-    --farm-accent: 142 71% 35%;
+    --farm-border: 38 24% 82%;
+    --farm-text: 222 47% 13%;
+    --farm-muted: 215 16% 37%;
+    --farm-accent: 152 61% 30%;
   }
 
   body {
@@ -38,6 +38,7 @@
 @layer components {
   .card {
     @apply bg-farm-card border border-farm-border rounded-xl p-4 text-farm-text;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
   }
   .badge-online {
     @apply inline-block w-2 h-2 rounded-full bg-farm-accent;
@@ -47,6 +48,26 @@
   }
   .badge-offline {
     @apply inline-block w-2 h-2 rounded-full bg-gray-500;
+  }
+  .surface-panel {
+    background: hsl(var(--farm-card) / 0.9);
+    border: 1px solid hsl(var(--farm-border) / 0.95);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.1);
+  }
+  .surface-panel-soft {
+    background: linear-gradient(180deg, hsl(var(--farm-bg) / 0.72), hsl(var(--farm-card) / 0.88));
+    border: 1px solid hsl(var(--farm-border) / 0.95);
+  }
+  .surface-overlay {
+    background: hsl(var(--farm-card) / 0.88);
+    border: 1px solid hsl(var(--farm-border) / 0.95);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(14px);
+  }
+  .surface-image-frame {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.98));
+    border: 1px solid hsl(var(--farm-border) / 0.95);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
   }
 }
 
@@ -104,4 +125,8 @@
 :root[data-theme='light'] input::placeholder,
 :root[data-theme='light'] textarea::placeholder {
   color: hsl(215 16% 57%);
+}
+
+:root[data-theme='light'] .surface-image-frame {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 247, 240, 1));
 }

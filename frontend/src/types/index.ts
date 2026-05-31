@@ -5,13 +5,16 @@ export type AlertLevel = 'low' | 'medium' | 'high' | 'critical';
 export type VetStatus = 'online' | 'busy' | 'offline';
 export type ConsultPriority = 'low' | 'normal' | 'high' | 'emergency';
 export type ConsultStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
-export type SensorStatus = 'normal' | 'warning' | 'critical';
+export type SensorStatus = 'ok' | 'warning' | 'danger' | 'normal' | 'critical';
 
 export interface SensorReading {
+  id?: string;
+  barn_id?: string;
   temperature_c: number;
   humidity_pct: number;
   ammonia_ppm: number;
   status: SensorStatus;
+  timestamp?: string;
 }
 
 export interface SensorAggregate {
@@ -122,6 +125,61 @@ export interface HeatmapSummary {
   max_intensity: number;
   avg_intensity: number;
   data_points: number;
+}
+
+export interface BilingualText {
+  en: string;
+  vi: string;
+}
+
+export type DiseaseRegionId = 'Vietnam' | 'Hanoi' | 'HCMC';
+export type DiseaseZoneSeverity = 'low' | 'watch' | 'high' | 'critical';
+export type DiseaseZoneScope = 'outbreak' | 'surveillance';
+
+export interface DiseaseMapZone {
+  id: string;
+  name: BilingualText;
+  center: [number, number];
+  radius_km: number;
+  severity: DiseaseZoneSeverity;
+  scope: DiseaseZoneScope;
+  diseases: BilingualText[];
+  summary: BilingualText;
+  updated_at: string;
+  source_label: string;
+  source_url: string;
+}
+
+export interface DiseaseMapRegion {
+  id: DiseaseRegionId;
+  center: [number, number];
+  zoom: number;
+  zones: DiseaseMapZone[];
+}
+
+export interface DiseaseBulletin {
+  title: string;
+  url: string;
+  source: string;
+  published_at: string | null;
+  summary: string;
+}
+
+export interface DiseaseFeedResponse {
+  fetched_at: string;
+  fallback: boolean;
+  items: DiseaseBulletin[];
+}
+
+export interface BarnSensorOverview {
+  barn_id: string;
+  latest_reading: SensorReading;
+  avg_temperature_c: number | null;
+  avg_humidity_pct: number | null;
+  avg_ammonia_ppm: number | null;
+  data_points: number;
+  last_seen: string;
+  window_hours: number;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════

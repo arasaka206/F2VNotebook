@@ -7,31 +7,40 @@ interface SensorCardProps {
   sensorStats?: SensorAggregate;
 }
 
-// ĐÃ SỬA: Đồng bộ lại danh sách trạng thái cho khớp chính xác với Backend
-const statusColors: Record<string, string> = {
+const statusColors: Record<'normal' | 'warning' | 'critical', string> = {
   normal: 'text-green-400',
   warning: 'text-yellow-400',
   critical: 'text-red-400',
 };
 
+const normalizeSensorStatus = (status?: string): 'normal' | 'warning' | 'critical' => {
+  if (status === 'danger' || status === 'critical') {
+    return 'critical';
+  }
+  if (status === 'warning') {
+    return 'warning';
+  }
+  return 'normal';
+};
+
 const SensorCard: React.FC<SensorCardProps> = ({ sensor, sensorStats }) => {
   const { t } = useTranslation();
-  // Lớp bảo vệ: Nếu Backend trả về null (lúc DB chưa có dữ liệu cảm biến nào)
   const safeSensor = sensor || {
     temperature_c: 0,
     humidity_pct: 0,
     ammonia_ppm: 0,
-    status: 'normal'
+    status: 'ok'
   };
 
-  const statusClass = statusColors[safeSensor.status] ?? 'text-gray-400';
+  const normalizedStatus = normalizeSensorStatus(safeSensor.status);
+  const statusClass = statusColors[normalizedStatus];
 
   return (
     <div className="card">
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{t('dashboard.iotFarmSensors')}</p>
-          <p className="text-sm font-semibold text-white mt-0.5">{t('dashboard.barnARealtime')}</p>
+          <p className="text-sm font-semibold text-white mt-0.5">{safeSensor.barn_id || t('dashboard.barnARealtime')}</p>
         </div>
         <span className="text-2xl">📡</span>
       </div>
@@ -67,11 +76,10 @@ const SensorCard: React.FC<SensorCardProps> = ({ sensor, sensorStats }) => {
       </div>
 
       <div className={`mt-3 text-xs font-semibold ${statusClass} flex items-center gap-1`}>
-        {/* ĐÃ SỬA: Đồng bộ logic dấu chấm hiển thị trạng thái */}
         <span className={`inline-block w-2 h-2 rounded-full ${
-          safeSensor.status === 'normal' ? 'bg-green-400' : safeSensor.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+          normalizedStatus === 'normal' ? 'bg-green-400' : normalizedStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
         }`} />
-        {t('dashboard.status')}: {safeSensor.status === 'normal' ? t('dashboard.normal') : safeSensor.status === 'warning' ? t('dashboard.warning') : t('dashboard.critical')}
+        {t('dashboard.status')}: {normalizedStatus === 'normal' ? t('dashboard.normal') : normalizedStatus === 'warning' ? t('dashboard.warning') : t('dashboard.critical')}
       </div>
     </div>
   );
