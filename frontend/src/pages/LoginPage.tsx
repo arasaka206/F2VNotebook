@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { useTranslation } from 'react-i18next';
+import ThemeToggle from '../components/layout/ThemeToggle';
 
 interface LoginPageProps {
   onNavigate: (page: string) => void;
@@ -25,16 +26,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate, onLoginSuccess
       onLoginSuccess();
     } catch (err: any) {
       const errorCode = err.code || '';
-      let errorMessage = t('auth.loginError') || 'Failed to login';
+      let errorMessage = t('auth.loginError');
 
       if (errorCode === 'auth/user-not-found') {
-        errorMessage = t('auth.userNotFound') || 'User not found';
+        errorMessage = t('auth.userNotFound');
       } else if (errorCode === 'auth/wrong-password') {
-        errorMessage = t('auth.wrongPassword') || 'Wrong password';
+        errorMessage = t('auth.wrongPassword');
       } else if (errorCode === 'auth/invalid-email') {
-        errorMessage = t('auth.invalidEmail') || 'Invalid email';
+        errorMessage = t('auth.invalidEmail');
       } else if (errorCode === 'auth/too-many-requests') {
-        errorMessage = t('auth.tooManyAttempts') || 'Too many login attempts. Please try again later.';
+        errorMessage = t('auth.tooManyAttempts');
       }
 
       setError(errorMessage);
@@ -45,6 +46,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate, onLoginSuccess
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-farm-bg to-farm-card flex items-center justify-center px-4">
+      <div className="absolute right-4 top-4 z-20">
+        <ThemeToggle />
+      </div>
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 -left-40 w-80 h-80 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -55,8 +59,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate, onLoginSuccess
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">{t('auth.welcomeBack') || 'Welcome Back'}</h1>
-          <p className="text-farm-text/60">{t('auth.loginDescription') || 'Sign in to your Farm2Vets account'}</p>
+          <h1 className="text-4xl font-bold text-white mb-2">{t('auth.welcomeBack')}</h1>
+          <p className="text-farm-text/60">{t('auth.loginDescription')}</p>
         </div>
 
         {/* Card */}
@@ -65,14 +69,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate, onLoginSuccess
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                {t('auth.email') || 'Email'}
+                {t('auth.email')}
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('auth.emailPlaceholder') || 'you@example.com'}
+                placeholder={t('auth.emailPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-farm-border focus:border-farm-accent focus:outline-none focus:ring-2 focus:ring-farm-accent/30 text-white placeholder-white/40 transition"
                 required
               />
@@ -81,14 +85,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate, onLoginSuccess
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
-                {t('auth.password') || 'Password'}
+                {t('auth.password')}
               </label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('auth.passwordPlaceholder') || '••••••••'}
+                placeholder={t('auth.passwordPlaceholder')}
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-farm-border focus:border-farm-accent focus:outline-none focus:ring-2 focus:ring-farm-accent/30 text-white placeholder-white/40 transition"
                 required
               />
@@ -107,26 +111,26 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate, onLoginSuccess
               disabled={loading}
               className="w-full py-3 rounded-lg bg-gradient-to-r from-farm-accent to-green-500 text-farm-bg font-semibold hover:from-green-400 hover:to-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (t('auth.loggingIn') || 'Logging in...') : (t('auth.login') || 'Login')}
+              {loading ? t('auth.loggingIn') : t('auth.login')}
             </button>
           </form>
 
           {/* Divider */}
           <div className="my-6 flex items-center">
             <div className="flex-1 h-px bg-farm-border"></div>
-            <span className="px-3 text-farm-text/50 text-sm">{t('auth.or') || 'or'}</span>
+            <span className="px-3 text-farm-text/50 text-sm">{t('auth.or')}</span>
             <div className="flex-1 h-px bg-farm-border"></div>
           </div>
 
           {/* Sign Up Link */}
           <p className="text-center text-farm-text/60">
-            {t('auth.noAccount') || "Don't have an account?"}
+            {t('auth.noAccount')}
             {' '}
             <button
               onClick={() => onNavigate('signup')}
               className="text-farm-accent hover:text-green-400 font-semibold transition"
             >
-              {t('auth.signUp') || 'Sign up'}
+              {t('auth.signUp')}
             </button>
           </p>
         </div>
@@ -137,7 +141,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate, onLoginSuccess
             onClick={() => onNavigate('landing')}
             className="text-farm-text/60 hover:text-farm-text transition"
           >
-            ← {t('auth.backToHome') || 'Back to home'}
+            ← {t('auth.backToHome')}
           </button>
         </div>
       </div>

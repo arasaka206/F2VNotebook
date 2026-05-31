@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import type { ChatMessage } from '../../types';
 import {
@@ -29,6 +30,16 @@ function saveHistory(messages: ChatMessage[]) {
   } catch {
     // Ignore storage errors
   }
+}
+
+function getChatErrorMessage(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    const detail = error.response?.data?.detail;
+    if (typeof detail === 'string' && detail.trim()) {
+      return detail;
+    }
+  }
+  return fallback;
 }
 
 const FullChatPanel: React.FC = () => {
@@ -106,13 +117,13 @@ const FullChatPanel: React.FC = () => {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMsg]);
-    } catch {
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content: t('chat.errorMessage'),
+          content: getChatErrorMessage(error, t('chat.errorMessage')),
           timestamp: new Date(),
         },
       ]);

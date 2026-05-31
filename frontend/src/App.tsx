@@ -11,6 +11,8 @@ import QuizPage from './pages/QuizPage';
 import NotebookPage from './pages/NotebookPage';
 import ProfilePage from './pages/ProfilePage';
 import ChatPage from './pages/ChatPage';
+import HeatDiseaseMapPage from './pages/HeatDiseaseMapPage';
+import VetConnectPage from './pages/VetConnectPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 
@@ -25,7 +27,7 @@ function AppContent() {
       <div className="flex items-center justify-center min-h-screen bg-farm-bg">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-farm-accent mx-auto mb-4"></div>
-          <p className="text-farm-text/60">{t('auth.loading') || 'Loading...'}</p>
+          <p className="text-farm-text/60">{t('auth.loading')}</p>
         </div>
       </div>
     );
@@ -43,7 +45,7 @@ function AppContent() {
   }
 
   const PAGE_TITLES: Record<string, string> = {
-    landing: 'Home',
+    landing: t('app.home'),
     dashboard: t('app.dashboard'),
     notebook: t('app.notebook'),
     livestock: t('app.livestock'),
@@ -54,7 +56,7 @@ function AppContent() {
     chat: t('app.chat'),
     inventory: t('app.inventory'),
     reports: t('app.reports'),
-    profile: 'Farmer Profile',
+    profile: t('app.farmerProfile'),
   };
 
   const renderPage = () => {
@@ -67,6 +69,10 @@ function AppContent() {
         return <NotebookPage />;
       case 'livestock':
         return <LivestockPage />;
+      case 'disease-map':
+        return <HeatDiseaseMapPage />;
+      case 'vet-connect':
+        return <VetConnectPage />;
       case 'quizzes':
         return <QuizPage />;
       case 'public-dashboard':

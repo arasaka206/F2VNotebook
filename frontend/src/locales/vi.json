@@ -1,10 +1,11 @@
 {
   "app": {
     "title": "Farm2Vets · Quản lý Gia súc bằng AI",
+    "home": "Trang chủ",
     "dashboard": "Bảng điều khiển",
     "notebook": "Sổ tay đàn gia súc AI",
     "livestock": "Hồ sơ Gia súc",
-    "diseaseMap": "Bản đồ Rủi ro Bệnh tật",
+    "diseaseMap": "Bản đồ Nhiệt & Dịch bệnh",
     "vetConnect": "Kết nối Thú y",
     "quizzes": "Bài kiểm tra Nhận thức Bệnh tật",
     "publicDashboard": "Diễn đàn Cộng đồng",
@@ -12,6 +13,7 @@
     "inventory": "Kho hàng & Vật tư",
     "reports": "Báo cáo & Phân tích",
     "profile": "Hồ sơ",
+    "farmerProfile": "Hồ sơ Nông dân",
     "comingSoon": "Phần này sẽ có sớm."
   },
   "auth": {
@@ -47,7 +49,19 @@
     "logout": "Đăng xuất"
   },
   "topbar": {
-    "subtitle": "Farm2Vets · Quản lý Gia súc bằng AI"
+    "subtitle": "Farm2Vets · Quản lý Gia súc bằng AI",
+    "switchLanguage": "Chuyển ngôn ngữ"
+  },
+  "sidebar": {
+    "productSubtitle": "Sổ tay Đàn gia súc AI",
+    "farmerMeta": "Nông dân · {{farm}}",
+    "farmCode": "Trang trại-{{id}}",
+    "badges": {
+      "good": "Nông dân Thành thạo",
+      "needsImprovement": "Nông dân Đang tiến bộ",
+      "restricted": "Nông dân Cần cải thiện",
+      "default": "Nông dân"
+    }
   },
   "dashboard": {
     "welcome": "Chào mừng đến với Farm2Vets",
@@ -124,6 +138,9 @@
     "daNang": "Đà Nẵng",
     "myLocation": "Vị trí của tôi",
     "loadingData": "Đang tải dữ liệu từ hệ thống...",
+    "loadingMapData": "Đang tải dữ liệu bản đồ...",
+    "geolocationUnsupported": "Trình duyệt của bạn không hỗ trợ định vị.",
+    "geolocationFailed": "Không thể lấy vị trí của bạn.",
     "connectionError": "Không thể kết nối đến máy chủ. Vui lòng kiểm tra Backend.",
     "noDataAvailable": "Không có dữ liệu. Vui lòng kiểm tra Backend.",
     "lowRisk": "Rủi ro Thấp",
@@ -135,9 +152,88 @@
     "severityWarning": "cảnh báo",
     "severityInfo": "thông tin"
   },
+  "vetConnect": {
+    "title": "Kết nối Thú y",
+    "subtitle": "Danh sách bác sĩ thú y hiện có và yêu cầu tư vấn.",
+    "panelTitle": "Kết nối Thú y",
+    "loadError": "Hiện không thể tải danh sách bác sĩ thú y.",
+    "noVets": "Chưa có bác sĩ thú y khả dụng.",
+    "sending": "Đang gửi...",
+    "requestConsult": "Yêu cầu Tư vấn",
+    "consultRequested": "Đã yêu cầu Tư vấn",
+    "status": {
+      "online": "trực tuyến",
+      "busy": "bận",
+      "offline": "ngoại tuyến"
+    }
+  },
+  "quiz": {
+    "loading": "Đang tải bài kiểm tra...",
+    "awarenessScore": "Điểm Nhận thức của bạn",
+    "statusLabel": "Trạng thái",
+    "awarenessStatuses": {
+      "good": "Tốt",
+      "needs_improvement": "Cần cải thiện",
+      "restricted": "Bị hạn chế"
+    },
+    "accessRestricted": "Quyền truy cập bị hạn chế",
+    "restrictedMessage": "Điểm nhận thức của bạn đang thấp. Hãy hoàn thành thêm bài kiểm tra để cải thiện điểm và khôi phục đầy đủ tính năng.",
+    "passingScore": "Điểm đạt",
+    "type": "Loại",
+    "notebookBased": "Dựa trên sổ tay",
+    "generalKnowledge": "Kiến thức chung",
+    "correct": "Đúng",
+    "incorrect": "Sai",
+    "certificateEarned": "Đã đạt Chứng nhận",
+    "reviewAndRetry": "Ôn lại và Thử lại",
+    "passedMessage": "Bạn đạt {{score}}% và đã nhận chứng nhận cho bài kiểm tra này.",
+    "failedMessage": "Bạn đạt {{score}}%. Hãy ôn lại ghi chú trong sổ tay và thử lại sau để nhận chứng nhận.",
+    "passed": "Đạt",
+    "failed": "Chưa đạt",
+    "retryAdvice": "Nếu điểm thấp hơn mức đạt, hãy ôn lại ghi chú trong sổ tay và làm bài kiểm tra mới sau.",
+    "continueNext": "Tiếp tục bài tiếp theo",
+    "submit": "Nộp bài",
+    "completed": "Đã hoàn thành bài kiểm tra. Xem kết quả ở trên.",
+    "backToQuizzes": "Quay lại Bài kiểm tra",
+    "noQuizzes": "Chưa có bài kiểm tra nào.",
+    "noQuizzesMessage": "Vui lòng quay lại sau khi hệ thống tạo nội dung bài kiểm tra.",
+    "notebookBasedQuiz": "Bài kiểm tra dựa trên sổ tay",
+    "topicLabel": "Chủ đề: {{topic}}",
+    "difficultyLabel": "Độ khó: {{difficulty}}",
+    "minutes": "{{count}} phút",
+    "noTimeLimit": "Không giới hạn thời gian",
+    "start": "Bắt đầu",
+    "recentAttempts": "Lần làm bài gần đây",
+    "attemptCompleted": "Đã hoàn thành bài kiểm tra",
+    "attemptStatuses": {
+      "completed": "Đã hoàn thành",
+      "failed": "Chưa đạt"
+    }
+  },
+  "profile": {
+    "subtitle": "Xem thành tích và trạng thái chứng nhận của bạn",
+    "loading": "Đang tải hồ sơ...",
+    "loadError": "Không thể tải điểm nhận thức",
+    "genericError": "Đã xảy ra lỗi",
+    "awarenessScore": "Điểm Nhận thức",
+    "farmerStatus": "Trạng thái Nông dân",
+    "quizzesCompleted": "Bài kiểm tra đã hoàn thành",
+    "quizzesPassed": "Bài kiểm tra đã đạt",
+    "lastUpdated": "Cập nhật lần cuối",
+    "congratulations": "Xin chúc mừng!",
+    "perfectScore": "Bạn đã đạt 100% Điểm Nhận thức",
+    "certificateAlt": "Chứng nhận Xuất sắc Farm2Vets",
+    "certificateDescription": "Chứng nhận ghi nhận cam kết nổi bật của bạn với sức khỏe đàn gia súc và quản lý trang trại.",
+    "downloadCertificate": "Tải Chứng nhận",
+    "keepLearning": "Tiếp tục học!",
+    "keepLearningMessage": "Hoàn thành thêm bài kiểm tra và cải thiện điểm nhận thức để mở khóa chứng nhận. Hiện tại bạn đạt {{score}}% - còn {{remaining}}% nữa để được chứng nhận!",
+    "takeMoreQuizzes": "Làm thêm Bài kiểm tra"
+  },
   "chat": {
     "title": "Trợ lý AI",
     "online": "Trực tuyến",
+    "maximize": "Phóng to",
+    "minimize": "Thu nhỏ",
     "clearHistory": "Xóa lịch sử",
     "placeholder": "Hỏi về đàn gia súc của bạn...",
     "welcome": "Xin chào! Tôi là trợ lý AI Farm2Vets của bạn. Hỏi tôi về sức khỏe đàn gia súc, kế hoạch điều trị hoặc cảnh báo dịch bệnh.",
@@ -145,6 +241,153 @@
     "suggestion2": "Hiển thị các ca điều trị đang hoạt động.",
     "suggestion3": "Có cảnh báo dịch bệnh nào tôi cần biết không?",
     "errorMessage": "Không thể kết nối đến trợ lý AI. Vui lòng kiểm tra kết nối của bạn."
+  },
+  "theme": {
+    "dark": "Tối",
+    "light": "Sáng",
+    "switchToDark": "Chuyển sang chế độ tối",
+    "switchToLight": "Chuyển sang chế độ sáng"
+  },
+  "forum": {
+    "title": "Diễn đàn Cộng đồng",
+    "subtitle": "Chia sẻ cập nhật chăn nuôi địa phương, quan sát sức khỏe và kinh nghiệm thực tế với nông dân gần bạn.",
+    "sortLabel": "Sắp xếp",
+    "sort": {
+      "newest": "Mới nhất",
+      "trending": "Xu hướng",
+      "oldest": "Cũ nhất"
+    },
+    "searchingFor": "Đang tìm \"{{query}}\"",
+    "clearSearch": "Xóa tìm kiếm",
+    "loadingPosts": "Đang tải bài viết...",
+    "noPosts": "Chưa có bài viết nào.",
+    "backToPosts": "Quay lại bài viết",
+    "regionalSearchTitle": "Xu hướng Tìm kiếm Khu vực",
+    "regionalSearchSubtitle": "Gợi ý demo dựa trên các chủ đề được tìm kiếm nhiều nhất trong khu vực của bạn.",
+    "searchPlaceholder": "Tìm chủ đề khu vực...",
+    "trendingTopics": "Chủ đề Xu hướng",
+    "noTrendingTopics": "Chưa có chủ đề xu hướng.",
+    "tipsTitle": "Mẹo Diễn đàn",
+    "tips": {
+      "useHashtags": "Dùng hashtag để nông dân gần bạn dễ tìm thấy chủ đề.",
+      "reactHelpful": "Thả phản ứng cho cập nhật hữu ích để đẩy bài quan trọng lên cao.",
+      "shareExperience": "Chia sẻ điều hiệu quả ở trang trại của bạn, gồm ngày tháng và triệu chứng.",
+      "askAdvice": "Hỏi ý kiến sớm khi triệu chứng thay đổi nhanh."
+    },
+    "reportPrompt": "Vì sao bạn muốn báo cáo bài viết này?",
+    "reportSuccess": "Đã gửi báo cáo.",
+    "reportError": "Không thể gửi báo cáo.",
+    "report": "Báo cáo",
+    "anonymousFarmer": "Nông dân ẩn danh",
+    "shareExperiencePlaceholder": "Chia sẻ kinh nghiệm thực tế của bạn với cộng đồng...",
+    "postTitlePlaceholder": "Tiêu đề bài viết",
+    "postContentPlaceholder": "Mô tả điều đã xảy ra, điều bạn quan sát được hoặc lời khuyên bạn cần...",
+    "hashtagPlaceholder": "hashtag, phân tách bằng dấu phẩy",
+    "validation": {
+      "titleContentRequired": "Vui lòng nhập tiêu đề và nội dung."
+    },
+    "createPostError": "Không thể tạo bài viết.",
+    "posting": "Đang đăng...",
+    "post": "Đăng",
+    "byAuthor": "Bởi {{author}}",
+    "time": {
+      "justNow": "Vừa xong",
+      "hoursAgo": "{{count}} giờ trước",
+      "daysAgo": "{{count}} ngày trước"
+    },
+    "detail": {
+      "loadError": "Không thể tải bài viết này.",
+      "addCommentError": "Không thể thêm bình luận.",
+      "deleteCommentError": "Không thể xóa bình luận.",
+      "reactError": "Không thể cập nhật phản ứng.",
+      "loadingPost": "Đang tải bài viết...",
+      "postNotFound": "Không tìm thấy bài viết.",
+      "comments": "Bình luận",
+      "commentPlaceholder": "Viết bình luận...",
+      "comment": "Bình luận",
+      "noComments": "Chưa có bình luận."
+    },
+    "regionalSuggestions": {
+      "asf": {
+        "query": "Dịch tả lợn châu Phi (Hưng Yên)",
+        "description": "Nông dân đang kiểm tra rủi ro bùng phát và biện pháp an toàn sinh học.",
+        "count": "2,4 nghìn lượt tìm"
+      },
+      "lamDong": {
+        "query": "Tiêu hủy 1000 con lợn (Lâm Đồng)",
+        "description": "Mức quan tâm khu vực tăng cao sau sự kiện tiêu hủy được báo cáo.",
+        "count": "1,8 nghìn lượt tìm"
+      },
+      "avianFlu": {
+        "query": "Lịch tiêm vaccine cúm gia cầm (Đồng Nai)",
+        "description": "Các trại gia cầm đang so sánh lịch phòng bệnh.",
+        "count": "1,2 nghìn lượt tìm"
+      },
+      "vaccine": {
+        "query": "Triệu chứng viêm da nổi cục (Bắc Giang)",
+        "description": "Chủ nuôi bò đang tìm hình ảnh triệu chứng và tư vấn thú y.",
+        "count": "960 lượt tìm"
+      }
+    }
+  },
+  "livestock": {
+    "loading": "Đang tải gia súc...",
+    "subtitle": "Quản lý hồ sơ vật nuôi và dữ liệu đàn cơ bản.",
+    "speciesLabel": "Loài",
+    "tagLabel": "Mã thẻ",
+    "weightLabel": "Cân nặng (kg)",
+    "tagPlaceholder": "ví dụ: BO-104",
+    "optional": "Không bắt buộc",
+    "adding": "Đang thêm...",
+    "addLivestock": "Thêm Gia súc",
+    "addError": "Không thể thêm gia súc.",
+    "empty": "Chưa có hồ sơ gia súc.",
+    "weight": "Cân nặng",
+    "entryDate": "Ngày nhập",
+    "validation": {
+      "tagRequired": "Vui lòng nhập mã thẻ."
+    },
+    "species": {
+      "cattle": "Bò",
+      "swine": "Lợn",
+      "poultry": "Gia cầm"
+    },
+    "health": {
+      "healthy": "Khỏe mạnh",
+      "sick": "Bị bệnh",
+      "warning": "Cảnh báo",
+      "critical": "Nguy hiểm"
+    }
+  },
+  "notebook": {
+    "title": "Sổ tay Đàn gia súc AI",
+    "description": "Ghi chú thực địa và để AI chuyển các quan sát quan trọng thành bước xử lý thực tế.",
+    "addNoteTitle": "Thêm Ghi chú Đàn",
+    "addNoteSubtitle": "Lưu ghi chú thường hoặc phân tích bằng AI để xác định mức khẩn cấp, thẻ và khuyến nghị.",
+    "notePlaceholder": "Mô tả triệu chứng, thay đổi hành vi, điều kiện chuồng, ghi chú điều trị hoặc thông tin quan trọng...",
+    "saveNormal": "Lưu Ghi chú Thường",
+    "processing": "Đang xử lý...",
+    "analyzeAndSave": "Phân tích & Lưu",
+    "historyTitle": "Lịch sử Sổ tay",
+    "noNotes": "Chưa có ghi chú.",
+    "urgency": "Mức khẩn cấp",
+    "urgencies": {
+      "Low": "Thấp",
+      "Medium": "Trung bình",
+      "High": "Cao",
+      "Critical": "Nguy hiểm"
+    },
+    "diagnosis": "Chẩn đoán AI",
+    "recommendations": "Khuyến nghị",
+    "generatingQuiz": "Đang tạo bài kiểm tra...",
+    "generateQuiz": "Tạo Bài kiểm tra",
+    "quizCreatedHint": "Ghi chú nguy hiểm có thể tạo bài kiểm tra nhận thức để theo dõi học tập.",
+    "saveError": "Không thể lưu ghi chú.",
+    "criticalQuizGenerated": "Đã lưu ghi chú nguy hiểm và tạo bài kiểm tra theo dõi.",
+    "criticalQuizFailed": "Đã lưu ghi chú nguy hiểm, nhưng không thể tạo bài kiểm tra.",
+    "aiSaveError": "Không thể phân tích và lưu ghi chú.",
+    "quizGenerated": "Đã tạo bài kiểm tra từ ghi chú này.",
+    "quizGenerateError": "Không thể tạo bài kiểm tra từ ghi chú này."
   },
   "quickActions": {
     "recordVoiceNote": "Ghi âm giọng nói",
@@ -157,7 +400,9 @@
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
     "view": "Xem",
-    "close": "Đóng"
+    "close": "Đóng",
+    "previous": "Trước",
+    "next": "Tiếp"
   },
   "landing": {
     "heroTagline": "Sổ tay AI cho đàn khỏe mạnh hơn",
@@ -172,6 +417,7 @@
     "walkthroughLabel": "Hướng dẫn sổ tay",
     "walkthroughTitle": "Video khởi động",
     "walkthroughSubtitle": "Hướng dẫn nâng cao để bắt đầu sử dụng Sổ tay đàn gia súc AI ngay lập tức.",
+    "videoUnsupported": "Trình duyệt của bạn không hỗ trợ thẻ video.",
     "previewTag": "Xem trước",
     "smartSummaries": "Tóm tắt thông minh",
     "smartSummariesDescription": "Nổi bật ngay các tín hiệu sức khỏe và cảnh báo quan trọng.",

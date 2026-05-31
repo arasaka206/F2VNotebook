@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fetchForumPostDetail, addForumComment, reactToForumPost, deleteForumComment } from '../../services/farm2vets';
 import type { ForumPostDetail } from '../../types';
 
@@ -7,6 +8,7 @@ interface ForumPostDetailProps {
 }
 
 const ForumPostDetailView: React.FC<ForumPostDetailProps> = ({ postId }) => {
+  const { t, i18n } = useTranslation();
   const [post, setPost] = useState<ForumPostDetail | null>(null);
   const [commentContent, setCommentContent] = useState('');
   const [loading, setLoading] = useState(true);
@@ -20,14 +22,14 @@ const ForumPostDetailView: React.FC<ForumPostDetailProps> = ({ postId }) => {
         const data = await fetchForumPostDetail(postId);
         setPost(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load post');
+        setError(err instanceof Error ? err.message : t('forum.detail.loadError'));
       } finally {
         setLoading(false);
       }
     };
 
     loadPost();
-  }, [postId]);
+  }, [postId, t]);
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ const ForumPostDetailView: React.FC<ForumPostDetailProps> = ({ postId }) => {
     try {
       setSubmittingComment(true);
       const authorId = localStorage.getItem('user_id') || 'anonymous';
-      const authorName = localStorage.getItem('user_name') || 'Anonymous Farmer';
+      const authorName = localStorage.getItem('user_name') || t('forum.anonymousFarmer');
 
       const newComment = await addForumComment(post.id, commentContent, authorId, authorName);
 
@@ -47,7 +49,7 @@ const ForumPostDetailView: React.FC<ForumPostDetailProps> = ({ postId }) => {
       });
       setCommentContent('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add comment');
+      setError(err instanceof Error ? err.message : t('forum.detail.addCommentError'));
     } finally {
       setSubmittingComment(false);
     }
@@ -63,7 +65,7 @@ const ForumPostDetailView: React.FC<ForumPostDetailProps> = ({ postId }) => {
         comment_count: Math.max(0, post.comment_count - 1),
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete comment');
+      setError(err instanceof Error ? err.message : t('forum.detail.deleteCommentError'));
     }
   };
 
@@ -77,57 +79,53 @@ const ForumPostDetailView: React.FC<ForumPostDetailProps> = ({ postId }) => {
         reaction_count: result.reaction_count,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to react');
+      setError(err instanceof Error ? err.message : t('forum.detail.reactError'));
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleString(i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US');
 
   if (loading) {
     return (
       <div className="flex justify-center py-8">
-        <span className="text-gray-400 animate-pulse">Loading post...</span>
+        <span className="animate-pulse text-gray-400">{t('forum.detail.loadingPost')}</span>
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="bg-gray-800 rounded-lg p-8 text-center text-gray-400">
-        <p>Post not found</p>
+      <div className="rounded-lg bg-gray-800 p-8 text-center text-gray-400">
+        <p>{t('forum.detail.postNotFound')}</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Post */}
-      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-100 mb-2">{post.title}</h1>
-        <p className="text-sm text-gray-500 mb-4">
-          by <span className="text-green-400">{post.author_name}</span> • {formatDate(post.created_at)}
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div className="rounded-lg border border-gray-700 bg-gray-800 p-6">
+        <h1 className="mb-2 text-2xl font-bold text-gray-100">{post.title}</h1>
+        <p className="mb-4 text-sm text-gray-500">
+          {t('forum.byAuthor', { author: post.author_name })} · {formatDate(post.created_at)}
         </p>
 
-        <p className="text-gray-300 mb-6 whitespace-pre-wrap">{post.content}</p>
+        <p className="mb-6 whitespace-pre-wrap text-gray-300">{post.content}</p>
 
-        {/* Hashtags */}
         {post.hashtags && post.hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="mb-6 flex flex-wrap gap-2">
             {post.hashtags.map((tag) => (
-              <span key={tag} className="inline-block px-3 py-1 bg-gray-700 text-green-400 text-sm rounded">
+              <span key={tag} className="inline-block rounded bg-gray-700 px-3 py-1 text-sm text-green-400">
                 #{tag}
               </span>
             ))}
           </div>
         )}
 
-        {/* Engagement Stats */}
-        <div className="flex gap-6 pt-4 border-t border-gray-700">
+        <div className="flex gap-6 border-t border-gray-700 pt-4">
           <button
             onClick={handleReact}
-            className="flex items-center gap-2 text-gray-400 hover:text-green-400 transition"
+            className="flex items-center gap-2 text-gray-400 transition hover:text-green-400"
           >
             <span>👍</span>
             <span>{post.reaction_count}</span>
@@ -139,54 +137,53 @@ const ForumPostDetailView: React.FC<ForumPostDetailProps> = ({ postId }) => {
         </div>
       </div>
 
-      {/* Comments Section */}
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-gray-200">{post.comments.length} Comments</h2>
+        <h2 className="text-xl font-semibold text-gray-200">
+          {t('forum.detail.comments', { count: post.comments.length })}
+        </h2>
 
-        {/* Comment Form */}
-        <form onSubmit={handleAddComment} className="bg-gray-800 rounded-lg p-6 border border-gray-700 space-y-4">
+        <form onSubmit={handleAddComment} className="space-y-4 rounded-lg border border-gray-700 bg-gray-800 p-6">
           <textarea
-            placeholder="Share your thoughts..."
+            placeholder={t('forum.detail.commentPlaceholder')}
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
             rows={3}
-            className="w-full px-4 py-2 bg-gray-700 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+            className="w-full resize-none rounded bg-gray-700 px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
           />
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={submittingComment || !commentContent.trim()}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition disabled:opacity-50"
+              className="rounded bg-green-600 px-4 py-2 text-white transition hover:bg-green-700 disabled:opacity-50"
             >
-              {submittingComment ? 'Posting...' : 'Comment'}
+              {submittingComment ? t('forum.posting') : t('forum.detail.comment')}
             </button>
           </div>
         </form>
 
-        {/* Comments List */}
         {post.comments.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No comments yet. Be the first to comment!</p>
+          <p className="py-8 text-center text-gray-500">{t('forum.detail.noComments')}</p>
         ) : (
           <div className="space-y-4">
             {post.comments.map((comment) => (
-              <div key={comment.id} className="bg-gray-850 rounded-lg p-4 border border-gray-700">
-                <div className="flex items-start justify-between mb-2">
+              <div key={comment.id} className="rounded-lg border border-gray-700 bg-gray-800 p-4">
+                <div className="mb-2 flex items-start justify-between">
                   <div>
                     <p className="font-semibold text-gray-200">{comment.author_name}</p>
                     <p className="text-xs text-gray-500">{formatDate(comment.created_at)}</p>
                   </div>
                   <button
                     onClick={() => handleDeleteComment(comment.id)}
-                    className="text-red-400 hover:text-red-300 text-sm"
+                    className="text-sm text-red-400 hover:text-red-300"
                   >
-                    Delete
+                    {t('common.delete')}
                   </button>
                 </div>
 
-                <p className="text-gray-300 mb-3 whitespace-pre-wrap">{comment.content}</p>
+                <p className="mb-3 whitespace-pre-wrap text-gray-300">{comment.content}</p>
 
-                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <div className="flex items-center gap-2 text-sm text-gray-400">
                   <span>👍 {comment.reaction_count}</span>
                 </div>
               </div>

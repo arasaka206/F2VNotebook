@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import { fetchForumPosts, searchForumPosts, fetchTrendingHashtags } from '../services/farm2vets';
 import type { ForumPost, ForumHashtagTrend } from '../types';
@@ -6,7 +7,31 @@ import ForumPostCard from '../components/forum/ForumPostCard';
 import ForumCreatePost from '../components/forum/ForumCreatePost';
 import ForumPostDetailComponent from '../components/forum/ForumPostDetail';
 
+const REGIONAL_SEARCH_SUGGESTIONS = [
+  {
+    queryKey: 'forum.regionalSuggestions.asf.query',
+    descriptionKey: 'forum.regionalSuggestions.asf.description',
+    countKey: 'forum.regionalSuggestions.asf.count',
+  },
+  {
+    queryKey: 'forum.regionalSuggestions.lamDong.query',
+    descriptionKey: 'forum.regionalSuggestions.lamDong.description',
+    countKey: 'forum.regionalSuggestions.lamDong.count',
+  },
+  {
+    queryKey: 'forum.regionalSuggestions.avianFlu.query',
+    descriptionKey: 'forum.regionalSuggestions.avianFlu.description',
+    countKey: 'forum.regionalSuggestions.avianFlu.count',
+  },
+  {
+    queryKey: 'forum.regionalSuggestions.vaccine.query',
+    descriptionKey: 'forum.regionalSuggestions.vaccine.description',
+    countKey: 'forum.regionalSuggestions.vaccine.count',
+  },
+];
+
 const PublicDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [trendingTags, setTrendingTags] = useState<ForumHashtagTrend[]>([]);
   const [selectedPost, setSelectedPost] = useState<string | null>(null);
@@ -15,36 +40,35 @@ const PublicDashboard: React.FC = () => {
   const [sortBy, setSortBy] = useState<'newest' | 'trending' | 'oldest'>('newest');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 10;
 
   const handleReport = async (postId: string) => {
-    // Simple report dialog - in real app this would be a modal
-    const reason = prompt('Please provide a reason for reporting this post:');
+    const reason = window.prompt(t('forum.reportPrompt'));
     if (!reason) return;
 
     try {
       await api.post('/public-dashboard/reports', {
         target_type: 'post',
         target_id: postId,
-        reporter_id: 'user-123', // Mock user ID
+        reporter_id: 'user-123',
         reason: 'Inappropriate content',
         description: reason
       });
-      alert('Report submitted successfully. Thank you for helping keep our community safe.');
+      window.alert(t('forum.reportSuccess'));
     } catch (error) {
       console.error('Failed to submit report:', error);
-      alert('Failed to submit report. Please try again.');
+      window.alert(t('forum.reportError'));
     }
   };
 
-  // Load posts when page or sort changes
   useEffect(() => {
     const loadPosts = async () => {
       try {
         setLoading(true);
-        if (isSearching && searchQuery) {
-          const result = await searchForumPosts(searchQuery, page, pageSize);
+        if (isSearching && searchQuery.trim()) {
+          const result = await searchForumPosts(searchQuery.trim(), page, pageSize);
           setPosts(result.posts);
           setTotalCount(result.total_count);
         } else {
@@ -62,7 +86,6 @@ const PublicDashboard: React.FC = () => {
     loadPosts();
   }, [page, sortBy, searchQuery, isSearching]);
 
-  // Load trending hashtags
   useEffect(() => {
     const loadTrendingTags = async () => {
       try {
@@ -79,7 +102,7 @@ const PublicDashboard: React.FC = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setPage(1);
-    setIsSearching(query.length > 0);
+    setIsSearching(query.trim().length > 0);
   };
 
   const handlePostCreated = (newPost: ForumPost) => {
@@ -91,14 +114,19 @@ const PublicDashboard: React.FC = () => {
     handleSearch(`#${tag}`);
   };
 
+  const handleSuggestionClick = (query: string) => {
+    handleSearch(query);
+    setShowSuggestions(false);
+  };
+
   if (selectedPost) {
     return (
       <div className="flex-1 overflow-y-auto p-6">
         <button
           onClick={() => setSelectedPost(null)}
-          className="mb-4 px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white text-sm"
+          className="mb-4 rounded bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700"
         >
-          ← Back to Posts
+          {t('forum.backToPosts')}
         </button>
         <ForumPostDetailComponent postId={selectedPost} />
       </div>
@@ -110,72 +138,74 @@ const PublicDashboard: React.FC = () => {
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="flex gap-6 p-6">
-        {/* Main Content */}
-        <div className="flex-1 min-w-0">
-          {/* Search and Sort */}
-          <div className="bg-gray-800 rounded-lg p-6 mb-6 space-y-4">
-            <h1 className="text-2xl font-bold text-gray-100">Community Forum</h1>
-            <p className="text-gray-400">Share experiences, ask questions, and connect with farmers</p>
+        <div className="min-w-0 flex-1">
+          <div className="mb-6 space-y-4 rounded-lg bg-gray-800 p-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-100">{t('forum.title')}</h1>
+              <p className="text-gray-400">{t('forum.subtitle')}</p>
+            </div>
 
-            <div className="flex gap-4">
-              <input
-                type="text"
-                placeholder="Search posts or #hashtags..."
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
+            <div className="flex justify-end">
               <select
                 value={sortBy}
                 onChange={(e) => {
                   setSortBy(e.target.value as 'newest' | 'trending' | 'oldest');
                   setPage(1);
                 }}
-                className="px-4 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="rounded bg-gray-700 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                aria-label={t('forum.sortLabel')}
               >
-                <option value="newest">Newest</option>
-                <option value="trending">Trending</option>
-                <option value="oldest">Oldest</option>
+                <option value="newest">{t('forum.sort.newest')}</option>
+                <option value="trending">{t('forum.sort.trending')}</option>
+                <option value="oldest">{t('forum.sort.oldest')}</option>
               </select>
             </div>
           </div>
 
-          {/* Create Post Form */}
+          {isSearching && (
+            <div className="mb-6 flex items-center justify-between rounded-lg border border-farm-border bg-farm-card p-4 text-sm">
+              <span className="text-farm-text">{t('forum.searchingFor', { query: searchQuery })}</span>
+              <button
+                type="button"
+                onClick={() => handleSearch('')}
+                className="font-semibold text-green-400 hover:text-green-300"
+              >
+                {t('forum.clearSearch')}
+              </button>
+            </div>
+          )}
+
           <ForumCreatePost onPostCreated={handlePostCreated} />
 
-          {/* Posts List */}
           <div className="space-y-4">
             {loading ? (
               <div className="flex justify-center py-8">
-                <span className="text-gray-400 animate-pulse">Loading posts...</span>
+                <span className="animate-pulse text-gray-400">{t('forum.loadingPosts')}</span>
               </div>
             ) : posts.length === 0 ? (
-              <div className="bg-gray-800 rounded-lg p-8 text-center text-gray-400">
-                <p>No posts found. Be the first to share!</p>
+              <div className="rounded-lg bg-gray-800 p-8 text-center text-gray-400">
+                <p>{t('forum.noPosts')}</p>
               </div>
             ) : (
-              <>
-                {posts.map((post) => (
-                  <ForumPostCard
-                    key={post.id}
-                    post={post}
-                    onViewDetails={() => setSelectedPost(post.id)}
-                    onReport={handleReport}
-                  />
-                ))}
-              </>
+              posts.map((post) => (
+                <ForumPostCard
+                  key={post.id}
+                  post={post}
+                  onViewDetails={() => setSelectedPost(post.id)}
+                  onReport={handleReport}
+                />
+              ))
             )}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-8 pb-6">
+            <div className="mt-8 flex justify-center gap-2 pb-6">
               <button
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 bg-gray-700 text-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+                className="rounded bg-gray-700 px-4 py-2 text-gray-300 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Previous
+                {t('common.previous')}
               </button>
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 const pageNum = Math.max(1, page - 2) + i;
@@ -184,7 +214,7 @@ const PublicDashboard: React.FC = () => {
                   <button
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
-                    className={`px-4 py-2 rounded ${
+                    className={`rounded px-4 py-2 ${
                       pageNum === page
                         ? 'bg-green-600 text-white'
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -197,28 +227,64 @@ const PublicDashboard: React.FC = () => {
               <button
                 onClick={() => setPage(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 bg-gray-700 text-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+                className="rounded bg-gray-700 px-4 py-2 text-gray-300 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Next
+                {t('common.next')}
               </button>
             </div>
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="w-64 space-y-6">
-          {/* Trending Hashtags */}
-          <div className="bg-gray-800 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-200 mb-4">Trending Topics</h3>
+        <aside className="w-72 flex-shrink-0 space-y-6">
+          <div className="rounded-lg bg-gray-800 p-4">
+            <h3 className="mb-2 text-lg font-semibold text-gray-200">{t('forum.regionalSearchTitle')}</h3>
+            <p className="mb-4 text-xs text-gray-400">{t('forum.regionalSearchSubtitle')}</p>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={t('forum.searchPlaceholder')}
+                value={searchQuery}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => window.setTimeout(() => setShowSuggestions(false), 160)}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full rounded bg-gray-700 px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              {showSuggestions && (
+                <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-lg border border-farm-border bg-farm-card shadow-xl">
+                  {REGIONAL_SEARCH_SUGGESTIONS.map((suggestion) => {
+                    const query = t(suggestion.queryKey);
+                    return (
+                      <button
+                        key={suggestion.queryKey}
+                        type="button"
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => handleSuggestionClick(query)}
+                        className="w-full border-b border-farm-border px-4 py-3 text-left last:border-b-0 hover:bg-farm-border/30"
+                      >
+                        <div className="text-sm font-semibold text-farm-text">{query}</div>
+                        <div className="mt-1 text-xs text-gray-400">{t(suggestion.descriptionKey)}</div>
+                        <div className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-green-400">
+                          {t(suggestion.countKey)}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-gray-800 p-4">
+            <h3 className="mb-4 text-lg font-semibold text-gray-200">{t('forum.trendingTopics')}</h3>
             <div className="space-y-2">
               {trendingTags.length === 0 ? (
-                <p className="text-gray-500 text-sm">No trending topics yet</p>
+                <p className="text-sm text-gray-500">{t('forum.noTrendingTopics')}</p>
               ) : (
                 trendingTags.map((tag) => (
                   <button
                     key={tag.tag}
                     onClick={() => handleHashtagClick(tag.tag)}
-                    className="w-full text-left px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded transition text-gray-300 text-sm flex justify-between"
+                    className="flex w-full justify-between rounded bg-gray-700 px-3 py-2 text-left text-sm text-gray-300 transition hover:bg-gray-600"
                   >
                     <span>#{tag.tag}</span>
                     <span className="text-gray-500">{tag.count}</span>
@@ -228,17 +294,16 @@ const PublicDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Tips */}
-          <div className="bg-gray-800 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-200 mb-3">💡 Tips</h3>
+          <div className="rounded-lg bg-gray-800 p-4">
+            <h3 className="mb-3 text-lg font-semibold text-gray-200">{t('forum.tipsTitle')}</h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>• Use #hashtags to organize topics</li>
-              <li>• React to posts you find helpful</li>
-              <li>• Share your farming experiences</li>
-              <li>• Ask for advice from the community</li>
+              <li>{t('forum.tips.useHashtags')}</li>
+              <li>{t('forum.tips.reactHelpful')}</li>
+              <li>{t('forum.tips.shareExperience')}</li>
+              <li>{t('forum.tips.askAdvice')}</li>
             </ul>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

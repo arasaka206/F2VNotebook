@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
+import ThemeToggle from './ThemeToggle';
 
 interface TopBarProps {
   title: string;
@@ -37,9 +38,12 @@ const TopBar: React.FC<TopBarProps> = ({ title, onNavigate }) => {
         <button
           onClick={toggleLanguage}
           className="px-2 py-1 text-xs bg-farm-border rounded hover:bg-farm-border/80 transition-colors font-medium"
+          aria-label={t('topbar.switchLanguage')}
+          title={t('topbar.switchLanguage')}
         >
           {i18n.language === 'en' ? 'EN' : 'VN'}
         </button>
+        <ThemeToggle compact />
         <div className="relative">
           <button className="w-9 h-9 bg-farm-border rounded-full flex items-center justify-center hover:bg-farm-border/80 transition-colors">
             <span className="text-lg">🔔</span>
@@ -74,13 +78,13 @@ const TopBar: React.FC<TopBarProps> = ({ title, onNavigate }) => {
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-farm-border/50 transition-colors"
               >
-                👤 {t('app.profile') || 'Profile'}
+                👤 {t('app.profile')}
               </button>
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-farm-border/50 transition-colors border-t border-farm-border"
               >
-                🚪 {t('auth.logout') || 'Logout'}
+                🚪 {t('auth.logout')}
               </button>
             </div>
           )}
