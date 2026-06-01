@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
+import DashboardTour, { type DashboardTourStep } from './components/dashboard/DashboardTour';
 import Dashboard from './pages/Dashboard';
 import LandingPage from './pages/LandingPage';
 import LivestockPage from './pages/LivestocksPage';
@@ -18,10 +19,46 @@ import SignupPage from './pages/SignupPage';
 import InventoryPage from './pages/InventoryPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 
+const APP_TOUR_STORAGE_KEY = 'f2v.guidedTourStatus.v2';
+
+type AppTourStatus = 'unseen' | 'skipped' | 'completed';
+
+const readAppTourStatus = (): AppTourStatus => {
+  if (typeof window === 'undefined') {
+    return 'unseen';
+  }
+
+  const storedStatus = window.localStorage.getItem(APP_TOUR_STORAGE_KEY);
+  if (storedStatus === 'skipped' || storedStatus === 'completed') {
+    return storedStatus;
+  }
+
+  return 'unseen';
+};
+
 function AppContent() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [activePage, setActivePage] = useState('landing');
+  const [tourStatus, setTourStatus] = useState<AppTourStatus>(() => readAppTourStatus());
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const sidebarNavigationRef = useRef<HTMLElement | null>(null);
+  const diseaseMapNavRef = useRef<HTMLButtonElement | null>(null);
+  const dashboardOverviewRef = useRef<HTMLDivElement | null>(null);
+  const dashboardQuickActionsRef = useRef<HTMLDivElement | null>(null);
+  const dashboardSensorsRef = useRef<HTMLDivElement | null>(null);
+  const dashboardAlertsRef = useRef<HTMLDivElement | null>(null);
+  const dashboardNotificationsRef = useRef<HTMLDivElement | null>(null);
+  const dashboardActivityRef = useRef<HTMLDivElement | null>(null);
+  const diseaseMapIntroRef = useRef<HTMLDivElement | null>(null);
+  const diseaseMapSpreadRef = useRef<HTMLDivElement | null>(null);
+  const diseaseMapFarmRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (tourStatus === 'unseen' && activePage === 'dashboard') {
+      setIsTourOpen(true);
+    }
+  }, [activePage, tourStatus]);
 
   // Show loading spinner while checking authentication
   if (loading) {
@@ -61,18 +98,129 @@ function AppContent() {
     profile: t('app.farmerProfile'),
   };
 
+  const openTour = () => {
+    setIsTourOpen(true);
+  };
+
+  const closeTour = (status: Exclude<AppTourStatus, 'unseen'>) => {
+    setIsTourOpen(false);
+    setTourStatus(status);
+    window.localStorage.setItem(APP_TOUR_STORAGE_KEY, status);
+  };
+
+  const tourLabel = tourStatus === 'unseen' ? t('dashboard.tour.start') : t('dashboard.tour.replay');
+
+  const appTourSteps: DashboardTourStep[] = [
+    {
+      id: 'navigation',
+      page: 'dashboard',
+      title: t('dashboard.tour.steps.navigation.title'),
+      description: t('dashboard.tour.steps.navigation.description'),
+      targetRef: sidebarNavigationRef,
+    },
+    {
+      id: 'overview',
+      page: 'dashboard',
+      title: t('dashboard.tour.steps.overview.title'),
+      description: t('dashboard.tour.steps.overview.description'),
+      targetRef: dashboardOverviewRef,
+    },
+    {
+      id: 'quick-actions',
+      page: 'dashboard',
+      title: t('dashboard.tour.steps.quickActions.title'),
+      description: t('dashboard.tour.steps.quickActions.description'),
+      targetRef: dashboardQuickActionsRef,
+    },
+    {
+      id: 'sensors',
+      page: 'dashboard',
+      title: t('dashboard.tour.steps.sensors.title'),
+      description: t('dashboard.tour.steps.sensors.description'),
+      targetRef: dashboardSensorsRef,
+    },
+    {
+      id: 'alerts',
+      page: 'dashboard',
+      title: t('dashboard.tour.steps.alerts.title'),
+      description: t('dashboard.tour.steps.alerts.description'),
+      targetRef: dashboardAlertsRef,
+    },
+    {
+      id: 'notifications',
+      page: 'dashboard',
+      title: t('dashboard.tour.steps.notifications.title'),
+      description: t('dashboard.tour.steps.notifications.description'),
+      targetRef: dashboardNotificationsRef,
+    },
+    {
+      id: 'activity',
+      page: 'dashboard',
+      title: t('dashboard.tour.steps.activity.title'),
+      description: t('dashboard.tour.steps.activity.description'),
+      targetRef: dashboardActivityRef,
+    },
+    {
+      id: 'disease-map-navigation',
+      page: 'dashboard',
+      title: t('dashboard.tour.steps.diseaseMapNavigation.title'),
+      description: t('dashboard.tour.steps.diseaseMapNavigation.description'),
+      targetRef: diseaseMapNavRef,
+    },
+    {
+      id: 'disease-map-intro',
+      page: 'disease-map',
+      title: t('dashboard.tour.steps.diseaseMapIntro.title'),
+      description: t('dashboard.tour.steps.diseaseMapIntro.description'),
+      targetRef: diseaseMapIntroRef,
+    },
+    {
+      id: 'disease-map-spread',
+      page: 'disease-map',
+      title: t('dashboard.tour.steps.diseaseMapSpread.title'),
+      description: t('dashboard.tour.steps.diseaseMapSpread.description'),
+      targetRef: diseaseMapSpreadRef,
+    },
+    {
+      id: 'disease-map-farm',
+      page: 'disease-map',
+      title: t('dashboard.tour.steps.diseaseMapFarm.title'),
+      description: t('dashboard.tour.steps.diseaseMapFarm.description'),
+      targetRef: diseaseMapFarmRef,
+    },
+  ];
+
   const renderPage = () => {
     switch (activePage) {
       case 'landing':
         return <LandingPage onNavigate={setActivePage} />;
       case 'dashboard':
-        return <Dashboard />;
+        return (
+          <Dashboard
+            onOpenTour={openTour}
+            tourLabel={tourLabel}
+            overviewRef={dashboardOverviewRef}
+            quickActionsRef={dashboardQuickActionsRef}
+            sensorsRef={dashboardSensorsRef}
+            alertsRef={dashboardAlertsRef}
+            notificationsRef={dashboardNotificationsRef}
+            activityRef={dashboardActivityRef}
+          />
+        );
       case 'notebook':
         return <NotebookPage />;
       case 'livestock':
         return <LivestockPage />;
       case 'disease-map':
-        return <HeatDiseaseMapPage />;
+        return (
+          <HeatDiseaseMapPage
+            onOpenTour={openTour}
+            tourLabel={tourLabel}
+            introRef={diseaseMapIntroRef}
+            diseaseSpreadRef={diseaseMapSpreadRef}
+            farmMapRef={diseaseMapFarmRef}
+          />
+        );
       case 'vet-connect':
         return <VetConnectPage />;
       case 'quizzes':
@@ -106,13 +254,27 @@ function AppContent() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-farm-bg">
-      <Sidebar activeItem={activePage} onNavigate={setActivePage} />
+      <Sidebar
+        activeItem={activePage}
+        onNavigate={setActivePage}
+        navigationRef={sidebarNavigationRef}
+        itemRefs={{ 'disease-map': diseaseMapNavRef }}
+      />
       <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar title={PAGE_TITLES[activePage] ?? 'Farm2Vets'} onNavigate={setActivePage} />
         <main className="flex flex-1 overflow-hidden">
           {renderPage()}
         </main>
       </div>
+
+      <DashboardTour
+        isOpen={isTourOpen}
+        activePage={activePage}
+        steps={appTourSteps}
+        onNavigatePage={setActivePage}
+        onFinish={() => closeTour('completed')}
+        onSkip={() => closeTour('skipped')}
+      />
     </div>
   );
 }

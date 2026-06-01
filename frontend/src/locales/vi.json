@@ -110,6 +110,62 @@
     "ongoingTreatments": "Đang điều trị",
     "cattleSwinePoultry": "Bò · Lợn · Gia cầm",
     "inProgress": "Đang tiến hành",
+    "tour": {
+      "label": "Hướng dẫn sử dụng",
+      "start": "Bắt đầu hướng dẫn",
+      "replay": "Xem lại hướng dẫn",
+      "skip": "Bỏ qua hướng dẫn",
+      "back": "Quay lại",
+      "next": "Tiếp theo",
+      "finish": "Hoàn tất",
+      "progress": "Bước {{current}} / {{total}}",
+      "steps": {
+        "navigation": {
+          "title": "Thanh điều hướng",
+          "description": "Dùng thanh điều hướng bên này để chuyển giữa các trang chính của Farm2Vets như dashboard, bản đồ dịch bệnh, notebook, hồ sơ vật nuôi, báo cáo và các công cụ hỗ trợ."
+        },
+        "overview": {
+          "title": "Tổng quan trang trại",
+          "description": "Phần đầu này cho bạn cái nhìn nhanh nhất về sức khỏe đàn, nhu cầu điều trị, tổng đàn và số lượt tư vấn đang hoạt động."
+        },
+        "quickActions": {
+          "title": "Hành động nhanh",
+          "description": "Dùng các phím tắt này để ghi nhận quan sát nhanh, phân tích hình ảnh trang trại hoặc gọi hỗ trợ khẩn cấp mà không rời dashboard."
+        },
+        "sensors": {
+          "title": "Cảm biến chuồng trại trực tiếp",
+          "description": "Thẻ này hiển thị nhiệt độ, độ ẩm, khí amoniac mới nhất cùng số trung bình 24 giờ để bạn phát hiện sớm áp lực môi trường."
+        },
+        "alerts": {
+          "title": "Cảnh báo rủi ro dịch bệnh",
+          "description": "Bảng này tóm tắt áp lực dịch bệnh trong khu vực để bạn biết khi nào cần điều tra sâu hơn hoặc hạn chế di chuyển gia súc."
+        },
+        "notifications": {
+          "title": "Thông báo khẩn",
+          "description": "Xem các cảnh báo đang đến tại đây. Cảnh báo mới sẽ nổi lên đầu danh sách để bạn phản ứng kịp thời khi điều kiện thay đổi."
+        },
+        "activity": {
+          "title": "Xu hướng và hoạt động gần đây",
+          "description": "Theo dõi tăng trưởng đàn bên cạnh các sự kiện mới nhất để hiểu điều gì đã thay đổi và liệu các can thiệp của bạn có hiệu quả hay không."
+        },
+        "diseaseMapNavigation": {
+          "title": "Trang bản đồ dịch bệnh",
+          "description": "Mục menu này mở trang Bản đồ Dịch bệnh & Trang trại, nơi bạn có thể đối chiếu thông tin ổ dịch công khai với điều kiện thực tế trong trang trại."
+        },
+        "diseaseMapIntro": {
+          "title": "Tổng quan bản đồ dịch bệnh",
+          "description": "Phần mở đầu này giải thích mục tiêu của trang: kết hợp diễn biến dịch bệnh theo khu vực với điều kiện cảm biến của chính trang trại bạn trong cùng một màn hình."
+        },
+        "diseaseMapSpread": {
+          "title": "Thông tin lây lan dịch bệnh",
+          "description": "Khu vực này giúp bạn quét các vùng ổ dịch, đổi khu vực theo dõi và đọc bản tin công khai để nhận ra áp lực dịch bệnh trước khi ảnh hưởng tới chuồng trại."
+        },
+        "diseaseMapFarm": {
+          "title": "Bản đồ trang trại và cảm biến",
+          "description": "Bản đồ trang trại này biến dữ liệu cảm biến chuồng trại gần đây thành bố cục dễ nhìn, giúp bạn thấy nhanh nơi nào cần chú ý về nhiệt độ và độ ẩm."
+        }
+      }
+    },
     "iotFarmSensors": "Cảm biến Trang trại IoT",
     "barnARealtime": "Chuồng A · Thời gian thực",
     "temperature": "Nhiệt độ",

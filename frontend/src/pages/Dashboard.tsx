@@ -10,7 +10,27 @@ import QuickActions from '../components/dashboard/QuickActions';
 import { fetchDashboardSummary, fetchLatestSensor, fetchSensorAggregate } from '../services/farm2vets';
 import type { DashboardSummary, SensorReading, SensorAggregate } from '../types';
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+  onOpenTour?: () => void;
+  tourLabel?: string;
+  overviewRef?: React.RefObject<HTMLDivElement | null>;
+  quickActionsRef?: React.RefObject<HTMLDivElement | null>;
+  sensorsRef?: React.RefObject<HTMLDivElement | null>;
+  alertsRef?: React.RefObject<HTMLDivElement | null>;
+  notificationsRef?: React.RefObject<HTMLDivElement | null>;
+  activityRef?: React.RefObject<HTMLDivElement | null>;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({
+  onOpenTour,
+  tourLabel,
+  overviewRef,
+  quickActionsRef,
+  sensorsRef,
+  alertsRef,
+  notificationsRef,
+  activityRef,
+}) => {
   const { t } = useTranslation();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [sensorData, setSensorData] = useState<SensorReading | null>(null);
@@ -91,7 +111,20 @@ const Dashboard: React.FC = () => {
   return (
     <div className="flex flex-1 overflow-hidden">
       <div className="min-w-0 flex-1 space-y-6 overflow-y-auto p-6">
-        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+        {onOpenTour && tourLabel && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onOpenTour}
+              className="inline-flex items-center gap-2 rounded-full border border-farm-border bg-farm-card/80 px-4 py-2 text-sm font-medium text-gray-200 transition hover:bg-farm-border/50 hover:text-white"
+            >
+              <span className="text-base">🧭</span>
+              {tourLabel}
+            </button>
+          </div>
+        )}
+
+        <div ref={overviewRef} className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
           <div className="space-y-4">
             <StatCard
               title={t('dashboard.herdHealthScore')}
@@ -102,7 +135,9 @@ const Dashboard: React.FC = () => {
               trend={{ value: '+3 pts', positive: true }}
               size="large"
             />
-            <QuickActions />
+            <div ref={quickActionsRef}>
+              <QuickActions />
+            </div>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-3 xl:grid-cols-1">
@@ -135,13 +170,19 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <SensorCard sensor={sensorData || summary.latest_sensor} sensorStats={sensorStats} />
-          <AlertCard level={summary.disease_alert_level} />
+          <div ref={sensorsRef}>
+            <SensorCard sensor={sensorData || summary.latest_sensor} sensorStats={sensorStats} />
+          </div>
+          <div ref={alertsRef}>
+            <AlertCard level={summary.disease_alert_level} />
+          </div>
         </div>
 
-        <AlarmingNotifications />
+        <div ref={notificationsRef}>
+          <AlarmingNotifications />
+        </div>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div ref={activityRef} className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <HerdGrowthChart />
           <ActivityStream events={summary.activity_stream} isLoading={false} />
         </div>

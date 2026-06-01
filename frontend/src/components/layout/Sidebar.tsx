@@ -6,9 +6,11 @@ import type { UserAwarenessScore } from '../../types';
 interface SidebarProps {
   activeItem: string;
   onNavigate: (id: string) => void;
+  navigationRef?: React.RefObject<HTMLElement | null>;
+  itemRefs?: Partial<Record<string, React.RefObject<HTMLButtonElement | null>>>;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, navigationRef, itemRefs }) => {
   const { t } = useTranslation();
   const [awarenessScore, setAwarenessScore] = useState<UserAwarenessScore | null>(null);
 
@@ -81,10 +83,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav ref={navigationRef} className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {NAV_ITEMS.map((item) => (
           <button
             key={item.id}
+            ref={itemRefs?.[item.id]}
             onClick={() => onNavigate(item.id)}
             className={`w-full flex items-start justify-start gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors ${
               activeItem === item.id

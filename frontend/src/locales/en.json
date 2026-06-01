@@ -110,6 +110,62 @@
     "ongoingTreatments": "Ongoing treatments",
     "cattleSwinePoultry": "Cattle · Swine · Poultry",
     "inProgress": "In-progress",
+    "tour": {
+      "label": "Guided Tour",
+      "start": "Start Tour",
+      "replay": "Replay Tour",
+      "skip": "Skip Tutorial",
+      "back": "Back",
+      "next": "Next",
+      "finish": "Finish",
+      "progress": "Step {{current}} of {{total}}",
+      "steps": {
+        "navigation": {
+          "title": "Navigation rail",
+          "description": "Use this side navigation to move between the main Farm2Vets pages, including the dashboard, disease map, notebook, livestock, reports, and support tools."
+        },
+        "overview": {
+          "title": "Farm overview",
+          "description": "This top section gives you the fastest snapshot of herd health, treatment demand, livestock count, and active consult load."
+        },
+        "quickActions": {
+          "title": "Quick actions",
+          "description": "Use these shortcuts to capture observations quickly, analyze farm images, or request urgent support without leaving the dashboard."
+        },
+        "sensors": {
+          "title": "Live barn sensors",
+          "description": "This card shows the newest temperature, humidity, ammonia, and 24-hour averages so you can catch environmental stress early."
+        },
+        "alerts": {
+          "title": "Disease risk alerts",
+          "description": "This panel summarizes regional disease pressure and helps you decide when to investigate further or restrict livestock movement."
+        },
+        "notifications": {
+          "title": "Urgent notifications",
+          "description": "Review incoming alarms here. New warnings surface at the top so you can respond quickly when conditions change."
+        },
+        "activity": {
+          "title": "Trends and recent activity",
+          "description": "Track herd growth beside the latest farm events to understand what changed and whether your interventions are working."
+        },
+        "diseaseMapNavigation": {
+          "title": "Disease map page",
+          "description": "This menu item opens Disease Spread & Farm Map, where you can compare public outbreak intelligence with live conditions on your farm."
+        },
+        "diseaseMapIntro": {
+          "title": "Disease map overview",
+          "description": "This header explains the purpose of the page: combine regional disease movement with your own farm conditions in one view."
+        },
+        "diseaseMapSpread": {
+          "title": "Disease spread intelligence",
+          "description": "This section helps you scan outbreak zones, switch regions, and read public bulletins so you can spot pressure building before it reaches your barns."
+        },
+        "diseaseMapFarm": {
+          "title": "Farm map and sensor layout",
+          "description": "This farm map turns recent barn sensor data into an at-a-glance layout, making it easier to see where temperature and humidity conditions need attention."
+        }
+      }
+    },
     "iotFarmSensors": "IoT Farm Sensors",
     "barnARealtime": "Barn A · Real-time",
     "temperature": "Temperature",

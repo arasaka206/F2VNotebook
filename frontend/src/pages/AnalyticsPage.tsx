@@ -3,26 +3,6 @@ import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-interface Production {
-  id: string;
-  production_type: string;
-  quantity: number;
-  unit: string;
-  production_date: string;
-}
-
-interface Sale {
-  id: string;
-  item_name: string;
-  quantity: number;
-  unit: string;
-  price_per_unit: number;
-  total_amount: number;
-  shipping_cost: number;
-  sale_date: string;
-  buyer_name?: string;
-}
-
 interface AnalyticsReport {
   id: string;
   period_type: string;
@@ -73,8 +53,6 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 const AnalyticsPage: React.FC = () => {
   const { t } = useTranslation();
   const [report, setReport] = useState<AnalyticsReport | null>(null);
-  const [productions, setProductions] = useState<Production[]>([]);
-  const [sales, setSales] = useState<Sale[]>([]);
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [revenueBreakdown, setRevenueBreakdown] = useState<RevenueBreakdown[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,17 +90,13 @@ const AnalyticsPage: React.FC = () => {
       setError(null);
       setLoading(true);
 
-      const [reportRes, productionRes, salesRes, chartRes, revenueRes] = await Promise.all([
+      const [reportRes, chartRes, revenueRes] = await Promise.all([
         api.get(`/analytics/report?period_type=${period}`),
-        api.get('/analytics/production'),
-        api.get('/analytics/sales'),
         api.get(`/analytics/chart-data?period_type=${period}&months=6`),
         api.get(`/analytics/revenue-breakdown`),
       ]);
 
       setReport(reportRes.data);
-      setProductions(productionRes.data);
-      setSales(salesRes.data);
       setChartData(chartRes.data);
       setRevenueBreakdown(revenueRes.data);
     } catch (err: any) {
