@@ -13,6 +13,7 @@ interface DashboardTourProps {
   isOpen: boolean;
   activePage?: string;
   steps: DashboardTourStep[];
+  initialStepId?: string;
   onNavigatePage?: (page: string) => void;
   onFinish: () => void;
   onSkip: () => void;
@@ -22,10 +23,13 @@ const OVERLAY_PADDING = 12;
 const TOOLTIP_GAP = 18;
 const HIGHLIGHT_PADDING = 10;
 
+const clampValue = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
 const DashboardTour: React.FC<DashboardTourProps> = ({
   isOpen,
   activePage,
   steps,
+  initialStepId,
   onNavigatePage,
   onFinish,
   onSkip,
@@ -34,7 +38,9 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
+  const [manualPosition, setManualPosition] = useState<{ left: number; top: number } | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const dragOffsetRef = useRef<{ x: number; y: number } | null>(null);
 
   const syncTargetRect = useEffectEvent(() => {
     if (!isOpen) {
@@ -47,9 +53,15 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setCurrentStepIndex(0);
+      const requestedStepIndex = steps.findIndex((step) => step.id === initialStepId);
+      setCurrentStepIndex(requestedStepIndex >= 0 ? requestedStepIndex : 0);
+      setManualPosition(null);
     }
-  }, [isOpen]);
+  }, [initialStepId, isOpen]);
+
+  useEffect(() => {
+    setManualPosition(null);
+  }, [currentStepIndex]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -143,6 +155,23 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
     const tooltipWidth = Math.min(360, viewportWidth - OVERLAY_PADDING * 2);
     const tooltipHeight = tooltipRef.current?.offsetHeight ?? 240;
 
+    if (manualPosition) {
+      setTooltipStyle({
+        left: clampValue(
+          manualPosition.left,
+          OVERLAY_PADDING,
+          Math.max(OVERLAY_PADDING, viewportWidth - tooltipWidth - OVERLAY_PADDING),
+        ),
+        top: clampValue(
+          manualPosition.top,
+          OVERLAY_PADDING,
+          Math.max(OVERLAY_PADDING, viewportHeight - tooltipHeight - OVERLAY_PADDING),
+        ),
+        width: tooltipWidth,
+      });
+      return;
+    }
+
     if (!targetRect) {
       setTooltipStyle({
         left: OVERLAY_PADDING,
@@ -168,7 +197,7 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
       top,
       width: tooltipWidth,
     });
-  }, [currentStepIndex, isOpen, targetRect]);
+  }, [currentStepIndex, isOpen, manualPosition, targetRect]);
 
   if (!isOpen || steps.length === 0) {
     return null;
@@ -192,6 +221,59 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
     }
 
     setCurrentStepIndex((previousIndex) => Math.min(previousIndex + 1, steps.length - 1));
+  };
+
+  const getClampedTooltipPosition = (left: number, top: number) => {
+    const tooltipNode = tooltipRef.current;
+    const tooltipWidth = tooltipNode?.offsetWidth ?? Math.min(360, window.innerWidth - OVERLAY_PADDING * 2);
+    const tooltipHeight = tooltipNode?.offsetHeight ?? 240;
+
+    return {
+      left: clampValue(
+        left,
+        OVERLAY_PADDING,
+        Math.max(OVERLAY_PADDING, window.innerWidth - tooltipWidth - OVERLAY_PADDING),
+      ),
+      top: clampValue(
+        top,
+        OVERLAY_PADDING,
+        Math.max(OVERLAY_PADDING, window.innerHeight - tooltipHeight - OVERLAY_PADDING),
+      ),
+    };
+  };
+
+  const handleDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) {
+      return;
+    }
+
+    const tooltipRect = tooltipRef.current?.getBoundingClientRect();
+    if (!tooltipRect) {
+      return;
+    }
+
+    dragOffsetRef.current = {
+      x: event.clientX - tooltipRect.left,
+      y: event.clientY - tooltipRect.top,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleDragMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragOffsetRef.current) {
+      return;
+    }
+
+    const nextLeft = event.clientX - dragOffsetRef.current.x;
+    const nextTop = event.clientY - dragOffsetRef.current.y;
+    setManualPosition(getClampedTooltipPosition(nextLeft, nextTop));
+  };
+
+  const handleDragEnd = (event: React.PointerEvent<HTMLDivElement>) => {
+    dragOffsetRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   };
 
   return (
@@ -241,11 +323,17 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={`dashboard-tour-title-${activeStep.id}`}
-        className="pointer-events-auto fixed z-[2] rounded-[28px] border border-farm-border bg-farm-card/95 p-5 text-left shadow-2xl backdrop-blur-xl transition-all duration-300"
+        className={`pointer-events-auto fixed z-[2] rounded-[28px] border border-farm-border bg-farm-card/95 p-5 text-left shadow-2xl backdrop-blur-xl ${manualPosition ? '' : 'transition-all duration-300'}`}
         style={tooltipStyle}
       >
         <div className="flex items-start justify-between gap-4">
-          <div>
+          <div
+            className="min-w-0 cursor-move select-none"
+            onPointerDown={handleDragStart}
+            onPointerMove={handleDragMove}
+            onPointerUp={handleDragEnd}
+            onPointerCancel={handleDragEnd}
+          >
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-farm-accent">
               {t('dashboard.tour.label')}
             </p>

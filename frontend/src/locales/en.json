@@ -163,6 +163,70 @@
         "diseaseMapFarm": {
           "title": "Farm map and sensor layout",
           "description": "This farm map turns recent barn sensor data into an at-a-glance layout, making it easier to see where temperature and humidity conditions need attention."
+        },
+        "notebookNavigation": {
+          "title": "AI Herd Notebook page",
+          "description": "Open the notebook from here when you need to record field observations, analyze symptoms, or generate follow-up learning from critical notes."
+        },
+        "notebookIntro": {
+          "title": "Notebook overview",
+          "description": "This page is where farm observations become a structured health record for the herd."
+        },
+        "notebookAddNote": {
+          "title": "Add and analyze notes",
+          "description": "Write a field note here, then either save it directly or ask AI to summarize urgency, tags, and next steps."
+        },
+        "notebookHistory": {
+          "title": "Notebook history and quizzes",
+          "description": "Review saved notes, AI findings, recommendations, and generated quiz follow-ups for important herd health events."
+        },
+        "forumNavigation": {
+          "title": "Community Forum page",
+          "description": "Use the forum to compare local farm reports, ask questions, and follow what nearby farmers are searching for."
+        },
+        "forumComposer": {
+          "title": "Share a community update",
+          "description": "Create a post here when you want to report a field observation, ask for advice, or share a useful farm experience."
+        },
+        "forumRegionalSearch": {
+          "title": "Regional search trends",
+          "description": "This panel suggests demo regional topics, helping farmers quickly search high-interest disease and livestock issues."
+        },
+        "forumFeed": {
+          "title": "Forum feed",
+          "description": "Browse posts, search results, and community activity here to see what farmers are discussing right now."
+        },
+        "inventoryNavigation": {
+          "title": "Inventory & Supplies page",
+          "description": "Open inventory when you need to check feed, medicine, equipment, low stock, and supply movements."
+        },
+        "inventoryOverview": {
+          "title": "Inventory overview",
+          "description": "These cards summarize total items, inventory value, low-stock pressure, and the categories currently tracked."
+        },
+        "inventoryStock": {
+          "title": "Stock and item controls",
+          "description": "Use this area to move between overview, item lists, and transaction records while checking supply status."
+        },
+        "inventoryTransactions": {
+          "title": "Add items and transactions",
+          "description": "Use this action area to add supplies, then track incoming or outgoing inventory from the transaction view."
+        },
+        "reportsNavigation": {
+          "title": "Reports & Analytics page",
+          "description": "Open reports to review revenue, costs, production efficiency, and AI-generated business recommendations."
+        },
+        "reportsOverview": {
+          "title": "Analytics overview",
+          "description": "These metrics summarize revenue, cost, profit, margin, and production efficiency for the selected period."
+        },
+        "reportsCharts": {
+          "title": "Charts and breakdowns",
+          "description": "Use these charts to compare trends, revenue sources, cost categories, and farm performance over time."
+        },
+        "reportsRecommendations": {
+          "title": "Recommendations tab",
+          "description": "Switch to Recommendations when you want AI-generated guidance based on the current farm financial report."
         }
       }
     },

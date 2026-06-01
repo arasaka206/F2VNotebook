@@ -23,6 +23,15 @@ const APP_TOUR_STORAGE_KEY = 'f2v.guidedTourStatus.v2';
 
 type AppTourStatus = 'unseen' | 'skipped' | 'completed';
 
+const GUIDED_PAGE_TOUR_START_STEPS: Record<string, string> = {
+  dashboard: 'navigation',
+  'disease-map': 'disease-map-intro',
+  notebook: 'notebook-intro',
+  'public-dashboard': 'forum-composer',
+  inventory: 'inventory-overview',
+  reports: 'reports-overview',
+};
+
 const readAppTourStatus = (): AppTourStatus => {
   if (typeof window === 'undefined') {
     return 'unseen';
@@ -39,11 +48,16 @@ const readAppTourStatus = (): AppTourStatus => {
 function AppContent() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
-  const [activePage, setActivePage] = useState('landing');
+  const [activePage, setActivePage] = useState('dashboard');
   const [tourStatus, setTourStatus] = useState<AppTourStatus>(() => readAppTourStatus());
   const [isTourOpen, setIsTourOpen] = useState(false);
+  const [initialTourStepId, setInitialTourStepId] = useState('navigation');
   const sidebarNavigationRef = useRef<HTMLElement | null>(null);
   const diseaseMapNavRef = useRef<HTMLButtonElement | null>(null);
+  const notebookNavRef = useRef<HTMLButtonElement | null>(null);
+  const forumNavRef = useRef<HTMLButtonElement | null>(null);
+  const inventoryNavRef = useRef<HTMLButtonElement | null>(null);
+  const reportsNavRef = useRef<HTMLButtonElement | null>(null);
   const dashboardOverviewRef = useRef<HTMLDivElement | null>(null);
   const dashboardQuickActionsRef = useRef<HTMLDivElement | null>(null);
   const dashboardSensorsRef = useRef<HTMLDivElement | null>(null);
@@ -53,12 +67,34 @@ function AppContent() {
   const diseaseMapIntroRef = useRef<HTMLDivElement | null>(null);
   const diseaseMapSpreadRef = useRef<HTMLDivElement | null>(null);
   const diseaseMapFarmRef = useRef<HTMLDivElement | null>(null);
+  const notebookIntroRef = useRef<HTMLDivElement | null>(null);
+  const notebookAddNoteRef = useRef<HTMLDivElement | null>(null);
+  const notebookHistoryRef = useRef<HTMLDivElement | null>(null);
+  const forumComposerRef = useRef<HTMLDivElement | null>(null);
+  const forumRegionalSearchRef = useRef<HTMLDivElement | null>(null);
+  const forumFeedRef = useRef<HTMLDivElement | null>(null);
+  const inventoryHeaderRef = useRef<HTMLDivElement | null>(null);
+  const inventorySummaryRef = useRef<HTMLDivElement | null>(null);
+  const inventoryStockRef = useRef<HTMLDivElement | null>(null);
+  const inventoryTransactionRef = useRef<HTMLDivElement | null>(null);
+  const reportsHeaderRef = useRef<HTMLDivElement | null>(null);
+  const reportsPeriodRef = useRef<HTMLDivElement | null>(null);
+  const reportsSummaryRef = useRef<HTMLDivElement | null>(null);
+  const reportsChartsRef = useRef<HTMLDivElement | null>(null);
+  const reportsRecommendationsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (tourStatus === 'unseen' && activePage === 'dashboard') {
+      setInitialTourStepId('navigation');
       setIsTourOpen(true);
     }
   }, [activePage, tourStatus]);
+
+  useEffect(() => {
+    if (user && activePage === 'landing') {
+      setActivePage('dashboard');
+    }
+  }, [activePage, user]);
 
   // Show loading spinner while checking authentication
   if (loading) {
@@ -98,7 +134,8 @@ function AppContent() {
     profile: t('app.farmerProfile'),
   };
 
-  const openTour = () => {
+  const openTour = (startStepId = 'navigation') => {
+    setInitialTourStepId(startStepId);
     setIsTourOpen(true);
   };
 
@@ -107,8 +144,6 @@ function AppContent() {
     setTourStatus(status);
     window.localStorage.setItem(APP_TOUR_STORAGE_KEY, status);
   };
-
-  const tourLabel = tourStatus === 'unseen' ? t('dashboard.tour.start') : t('dashboard.tour.replay');
 
   const appTourSteps: DashboardTourStep[] = [
     {
@@ -188,6 +223,118 @@ function AppContent() {
       description: t('dashboard.tour.steps.diseaseMapFarm.description'),
       targetRef: diseaseMapFarmRef,
     },
+    {
+      id: 'notebook-navigation',
+      page: 'disease-map',
+      title: t('dashboard.tour.steps.notebookNavigation.title'),
+      description: t('dashboard.tour.steps.notebookNavigation.description'),
+      targetRef: notebookNavRef,
+    },
+    {
+      id: 'notebook-intro',
+      page: 'notebook',
+      title: t('dashboard.tour.steps.notebookIntro.title'),
+      description: t('dashboard.tour.steps.notebookIntro.description'),
+      targetRef: notebookIntroRef,
+    },
+    {
+      id: 'notebook-add-note',
+      page: 'notebook',
+      title: t('dashboard.tour.steps.notebookAddNote.title'),
+      description: t('dashboard.tour.steps.notebookAddNote.description'),
+      targetRef: notebookAddNoteRef,
+    },
+    {
+      id: 'notebook-history',
+      page: 'notebook',
+      title: t('dashboard.tour.steps.notebookHistory.title'),
+      description: t('dashboard.tour.steps.notebookHistory.description'),
+      targetRef: notebookHistoryRef,
+    },
+    {
+      id: 'forum-navigation',
+      page: 'notebook',
+      title: t('dashboard.tour.steps.forumNavigation.title'),
+      description: t('dashboard.tour.steps.forumNavigation.description'),
+      targetRef: forumNavRef,
+    },
+    {
+      id: 'forum-composer',
+      page: 'public-dashboard',
+      title: t('dashboard.tour.steps.forumComposer.title'),
+      description: t('dashboard.tour.steps.forumComposer.description'),
+      targetRef: forumComposerRef,
+    },
+    {
+      id: 'forum-regional-search',
+      page: 'public-dashboard',
+      title: t('dashboard.tour.steps.forumRegionalSearch.title'),
+      description: t('dashboard.tour.steps.forumRegionalSearch.description'),
+      targetRef: forumRegionalSearchRef,
+    },
+    {
+      id: 'forum-feed',
+      page: 'public-dashboard',
+      title: t('dashboard.tour.steps.forumFeed.title'),
+      description: t('dashboard.tour.steps.forumFeed.description'),
+      targetRef: forumFeedRef,
+    },
+    {
+      id: 'inventory-navigation',
+      page: 'public-dashboard',
+      title: t('dashboard.tour.steps.inventoryNavigation.title'),
+      description: t('dashboard.tour.steps.inventoryNavigation.description'),
+      targetRef: inventoryNavRef,
+    },
+    {
+      id: 'inventory-overview',
+      page: 'inventory',
+      title: t('dashboard.tour.steps.inventoryOverview.title'),
+      description: t('dashboard.tour.steps.inventoryOverview.description'),
+      targetRef: inventorySummaryRef,
+    },
+    {
+      id: 'inventory-stock',
+      page: 'inventory',
+      title: t('dashboard.tour.steps.inventoryStock.title'),
+      description: t('dashboard.tour.steps.inventoryStock.description'),
+      targetRef: inventoryStockRef,
+    },
+    {
+      id: 'inventory-transactions',
+      page: 'inventory',
+      title: t('dashboard.tour.steps.inventoryTransactions.title'),
+      description: t('dashboard.tour.steps.inventoryTransactions.description'),
+      targetRef: inventoryTransactionRef,
+    },
+    {
+      id: 'reports-navigation',
+      page: 'inventory',
+      title: t('dashboard.tour.steps.reportsNavigation.title'),
+      description: t('dashboard.tour.steps.reportsNavigation.description'),
+      targetRef: reportsNavRef,
+    },
+    {
+      id: 'reports-overview',
+      page: 'reports',
+      title: t('dashboard.tour.steps.reportsOverview.title'),
+      description: t('dashboard.tour.steps.reportsOverview.description'),
+      targetRef: reportsSummaryRef,
+    },
+    {
+      id: 'reports-charts',
+      page: 'reports',
+      title: t('dashboard.tour.steps.reportsCharts.title'),
+      description: t('dashboard.tour.steps.reportsCharts.description'),
+      targetRef: reportsChartsRef,
+    },
+    {
+      id: 'reports-recommendations',
+      page: 'reports',
+      title: t('dashboard.tour.steps.reportsRecommendations.title'),
+      description: t('dashboard.tour.steps.reportsRecommendations.description'),
+      targetRef: reportsRecommendationsRef,
+    },
   ];
 
   const renderPage = () => {
@@ -197,8 +344,6 @@ function AppContent() {
       case 'dashboard':
         return (
           <Dashboard
-            onOpenTour={openTour}
-            tourLabel={tourLabel}
             overviewRef={dashboardOverviewRef}
             quickActionsRef={dashboardQuickActionsRef}
             sensorsRef={dashboardSensorsRef}
@@ -208,14 +353,18 @@ function AppContent() {
           />
         );
       case 'notebook':
-        return <NotebookPage />;
+        return (
+          <NotebookPage
+            introRef={notebookIntroRef}
+            addNoteRef={notebookAddNoteRef}
+            historyRef={notebookHistoryRef}
+          />
+        );
       case 'livestock':
         return <LivestockPage />;
       case 'disease-map':
         return (
           <HeatDiseaseMapPage
-            onOpenTour={openTour}
-            tourLabel={tourLabel}
             introRef={diseaseMapIntroRef}
             diseaseSpreadRef={diseaseMapSpreadRef}
             farmMapRef={diseaseMapFarmRef}
@@ -226,13 +375,34 @@ function AppContent() {
       case 'quizzes':
         return <QuizPage />;
       case 'public-dashboard':
-        return <PublicDashboard />;
+        return (
+          <PublicDashboard
+            composerRef={forumComposerRef}
+            regionalSearchRef={forumRegionalSearchRef}
+            feedRef={forumFeedRef}
+          />
+        );
       case 'chat':
         return <ChatPage />;
       case 'inventory':
-        return <InventoryPage />;
+        return (
+          <InventoryPage
+            headerRef={inventoryHeaderRef}
+            summaryRef={inventorySummaryRef}
+            stockRef={inventoryStockRef}
+            transactionRef={inventoryTransactionRef}
+          />
+        );
       case 'reports':
-        return <AnalyticsPage />;
+        return (
+          <AnalyticsPage
+            headerRef={reportsHeaderRef}
+            periodRef={reportsPeriodRef}
+            summaryRef={reportsSummaryRef}
+            chartsRef={reportsChartsRef}
+            recommendationsRef={reportsRecommendationsRef}
+          />
+        );
       case 'profile':
         return <ProfilePage />;
       default:
@@ -248,9 +418,7 @@ function AppContent() {
     }
   };
 
-  if (activePage === 'landing') {
-    return <LandingPage onNavigate={setActivePage} />;
-  }
+  const currentPageTourStartStep = GUIDED_PAGE_TOUR_START_STEPS[activePage];
 
   return (
     <div className="flex h-screen overflow-hidden bg-farm-bg">
@@ -258,11 +426,24 @@ function AppContent() {
         activeItem={activePage}
         onNavigate={setActivePage}
         navigationRef={sidebarNavigationRef}
-        itemRefs={{ 'disease-map': diseaseMapNavRef }}
+        itemRefs={{
+          'disease-map': diseaseMapNavRef,
+          notebook: notebookNavRef,
+          'public-dashboard': forumNavRef,
+          inventory: inventoryNavRef,
+          reports: reportsNavRef,
+        }}
+        showTourButton={Boolean(currentPageTourStartStep)}
+        tourLabel={t('dashboard.tour.replay')}
+        onOpenTour={() => {
+          if (currentPageTourStartStep) {
+            openTour(currentPageTourStartStep);
+          }
+        }}
       />
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <TopBar title={PAGE_TITLES[activePage] ?? 'Farm2Vets'} onNavigate={setActivePage} />
-        <main className="flex flex-1 overflow-hidden">
+        <main className="flex min-w-0 flex-1 overflow-hidden">
           {renderPage()}
         </main>
       </div>
@@ -271,6 +452,7 @@ function AppContent() {
         isOpen={isTourOpen}
         activePage={activePage}
         steps={appTourSteps}
+        initialStepId={initialTourStepId}
         onNavigatePage={setActivePage}
         onFinish={() => closeTour('completed')}
         onSkip={() => closeTour('skipped')}

@@ -30,7 +30,13 @@ const REGIONAL_SEARCH_SUGGESTIONS = [
   },
 ];
 
-const PublicDashboard: React.FC = () => {
+interface PublicDashboardProps {
+  composerRef?: React.RefObject<HTMLDivElement | null>;
+  regionalSearchRef?: React.RefObject<HTMLDivElement | null>;
+  feedRef?: React.RefObject<HTMLDivElement | null>;
+}
+
+const PublicDashboard: React.FC<PublicDashboardProps> = ({ composerRef, regionalSearchRef, feedRef }) => {
   const { t } = useTranslation();
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [trendingTags, setTrendingTags] = useState<ForumHashtagTrend[]>([]);
@@ -175,9 +181,11 @@ const PublicDashboard: React.FC = () => {
             </div>
           )}
 
-          <ForumCreatePost onPostCreated={handlePostCreated} />
+          <div ref={composerRef}>
+            <ForumCreatePost onPostCreated={handlePostCreated} />
+          </div>
 
-          <div className="space-y-4">
+          <div ref={feedRef} className="space-y-4">
             {loading ? (
               <div className="flex justify-center py-8">
                 <span className="animate-pulse text-gray-400">{t('forum.loadingPosts')}</span>
@@ -236,7 +244,7 @@ const PublicDashboard: React.FC = () => {
         </div>
 
         <aside className="w-72 flex-shrink-0 space-y-6">
-          <div className="rounded-lg bg-gray-800 p-4">
+          <div ref={regionalSearchRef} className="rounded-lg bg-gray-800 p-4">
             <h3 className="mb-2 text-lg font-semibold text-gray-200">{t('forum.regionalSearchTitle')}</h3>
             <p className="mb-4 text-xs text-gray-400">{t('forum.regionalSearchSubtitle')}</p>
             <div className="relative">

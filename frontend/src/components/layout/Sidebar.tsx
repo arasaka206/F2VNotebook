@@ -8,9 +8,20 @@ interface SidebarProps {
   onNavigate: (id: string) => void;
   navigationRef?: React.RefObject<HTMLElement | null>;
   itemRefs?: Partial<Record<string, React.RefObject<HTMLButtonElement | null>>>;
+  showTourButton?: boolean;
+  tourLabel?: string;
+  onOpenTour?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, navigationRef, itemRefs }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  activeItem,
+  onNavigate,
+  navigationRef,
+  itemRefs,
+  showTourButton = false,
+  tourLabel,
+  onOpenTour,
+}) => {
   const { t } = useTranslation();
   const [awarenessScore, setAwarenessScore] = useState<UserAwarenessScore | null>(null);
 
@@ -81,6 +92,19 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, navigationRef
           <div className="text-xs text-gray-400">{t('sidebar.productSubtitle')}</div>
         </div>
       </div>
+
+      {showTourButton && tourLabel && onOpenTour && (
+        <div className="border-b border-farm-border px-3 py-3">
+          <button
+            type="button"
+            onClick={onOpenTour}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-farm-border bg-farm-bg/45 px-3 py-2 text-sm font-semibold text-farm-text transition hover:border-farm-accent/60 hover:bg-farm-border/40"
+          >
+            <span aria-hidden="true">?</span>
+            <span>{tourLabel}</span>
+          </button>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav ref={navigationRef} className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">

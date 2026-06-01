@@ -4,16 +4,12 @@ import GeoHeatmapChart from '../components/dashboard/GeoHeatmapChart';
 import HeatmapChart from '../components/dashboard/HeatmapChart';
 
 interface HeatDiseaseMapPageProps {
-  onOpenTour?: () => void;
-  tourLabel?: string;
   introRef?: React.RefObject<HTMLDivElement | null>;
   diseaseSpreadRef?: React.RefObject<HTMLDivElement | null>;
   farmMapRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 const HeatDiseaseMapPage: React.FC<HeatDiseaseMapPageProps> = ({
-  onOpenTour,
-  tourLabel,
   introRef,
   diseaseSpreadRef,
   farmMapRef,
@@ -23,19 +19,6 @@ const HeatDiseaseMapPage: React.FC<HeatDiseaseMapPageProps> = ({
   return (
     <div className="flex-1 overflow-y-auto p-6">
       <div className="space-y-6">
-        <div className="flex justify-end">
-          {onOpenTour && tourLabel && (
-            <button
-              type="button"
-              onClick={onOpenTour}
-              className="inline-flex items-center gap-2 rounded-full border border-farm-border bg-farm-card/80 px-4 py-2 text-sm font-medium text-gray-200 transition hover:bg-farm-border/50 hover:text-white"
-            >
-              <span className="text-base">🧭</span>
-              {tourLabel}
-            </button>
-          )}
-        </div>
-
         <div ref={introRef}>
           <section className="card">
             <div className="space-y-2">

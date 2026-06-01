@@ -6,15 +6,25 @@ interface StatCardProps {
   subtitle?: string;
   icon?: string;
   accentColor?: string;
+  surfaceClassName?: string;
   trend?: { value: string; positive: boolean };
   size?: 'small' | 'large';
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, accentColor = 'text-farm-accent', trend, size = 'large' }) => {
+const StatCard: React.FC<StatCardProps> = ({
+  title,
+  value,
+  subtitle,
+  icon,
+  accentColor = 'text-farm-accent',
+  surfaceClassName = '',
+  trend,
+  size = 'large',
+}) => {
   const isSmall = size === 'small';
   
   return (
-    <div className={`card flex flex-col gap-3 ${isSmall ? 'p-3' : ''}`}>
+    <div className={`card flex flex-col gap-3 overflow-hidden ${isSmall ? 'p-3' : ''} ${surfaceClassName}`}>
       <div className="flex items-start justify-between">
         <p className={`text-xs text-gray-400 font-medium uppercase tracking-wide ${isSmall ? 'text-[10px]' : ''}`}>{title}</p>
         {icon && <span className={`${isSmall ? 'text-lg' : 'text-2xl'}`}>{icon}</span>}

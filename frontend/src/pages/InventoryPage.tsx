@@ -45,7 +45,14 @@ interface StockAlert {
   status: string;
 }
 
-const InventoryPage: React.FC = () => {
+interface InventoryPageProps {
+  headerRef?: React.RefObject<HTMLDivElement | null>;
+  summaryRef?: React.RefObject<HTMLDivElement | null>;
+  stockRef?: React.RefObject<HTMLDivElement | null>;
+  transactionRef?: React.RefObject<HTMLDivElement | null>;
+}
+
+const InventoryPage: React.FC<InventoryPageProps> = ({ headerRef, summaryRef, stockRef, transactionRef }) => {
   const { t } = useTranslation();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [summary, setSummary] = useState<InventorySummary | null>(null);
@@ -154,7 +161,7 @@ const InventoryPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex items-center justify-center">
+      <div className="flex min-h-0 w-full flex-1 items-center justify-center bg-gray-50 p-8 dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">{t('inventory.loading')}</p>
@@ -170,9 +177,9 @@ const InventoryPage: React.FC = () => {
   const categories = [...new Set(items.map(item => item.category))];
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-8 py-6 flex-shrink-0">
+      <div ref={headerRef} className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-8 py-6 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -182,18 +189,20 @@ const InventoryPage: React.FC = () => {
               {t('inventory.subtitle')}
             </p>
           </div>
-          <button
-            onClick={() => {
-              setShowAddForm(!showAddForm);
-              setActiveTab('add');
-            }}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            {t('inventory.addItem')}
-          </button>
+          <div ref={transactionRef}>
+            <button
+              onClick={() => {
+                setShowAddForm(!showAddForm);
+                setActiveTab('add');
+              }}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              {t('inventory.addItem')}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -203,11 +212,11 @@ const InventoryPage: React.FC = () => {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-8">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="w-full p-8">
         {/* Summary Cards */}
         {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div ref={summaryRef} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -317,7 +326,7 @@ const InventoryPage: React.FC = () => {
         )}
 
         {/* Navigation Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-gray-200 dark:border-gray-700">
+        <div ref={stockRef} className="flex gap-4 mb-8 border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-4 py-2 font-medium border-b-2 transition ${
@@ -352,7 +361,7 @@ const InventoryPage: React.FC = () => {
 
         {/* Overview Tab */}
         {activeTab === 'overview' && summary && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
             {/* Low Stock Items */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
               <div className="bg-gradient-to-r from-red-500 to-orange-500 px-6 py-4">
@@ -439,7 +448,7 @@ const InventoryPage: React.FC = () => {
 
         {/* Items Tab */}
         {activeTab === 'items' && (
-          <div>
+          <div className="w-full">
             {/* Category Filter */}
             {categories.length > 0 && (
               <div className="mb-6 flex gap-2 flex-wrap">
@@ -557,7 +566,7 @@ const InventoryPage: React.FC = () => {
 
         {/* Transactions Tab */}
         {activeTab === 'transactions' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Add Transaction Form */}
             <div className="lg:col-span-1">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">

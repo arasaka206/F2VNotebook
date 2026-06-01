@@ -27,7 +27,6 @@ export const MOCK_VETS: Vet[] = [
 ];
 
 export const NAV_ITEMS = [
-  { id: 'landing', label: 'Home', icon: '🏠' },
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'disease-map', label: 'Disease Spread & Farm Map', icon: '🗺️' },
   { id: 'notebook', label: 'AI Herd Notebook', icon: '📓' },

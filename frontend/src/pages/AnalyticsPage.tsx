@@ -48,9 +48,23 @@ interface RevenueBreakdown {
   percentage: number;
 }
 
+interface AnalyticsPageProps {
+  headerRef?: React.RefObject<HTMLDivElement | null>;
+  periodRef?: React.RefObject<HTMLDivElement | null>;
+  summaryRef?: React.RefObject<HTMLDivElement | null>;
+  chartsRef?: React.RefObject<HTMLDivElement | null>;
+  recommendationsRef?: React.RefObject<HTMLDivElement | null>;
+}
+
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
 
-const AnalyticsPage: React.FC = () => {
+const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
+  headerRef,
+  periodRef,
+  summaryRef,
+  chartsRef,
+  recommendationsRef,
+}) => {
   const { t } = useTranslation();
   const [report, setReport] = useState<AnalyticsReport | null>(null);
   const [chartData, setChartData] = useState<ChartData | null>(null);
@@ -155,7 +169,7 @@ const AnalyticsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 flex items-center justify-center">
+      <div className="flex min-h-0 w-full flex-1 items-center justify-center bg-gray-50 p-8 dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">{t('analytics.loading')}</p>
@@ -175,9 +189,9 @@ const AnalyticsPage: React.FC = () => {
   const recommendations = getRecommendations();
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-8 py-6 flex-shrink-0">
+      <div ref={headerRef} className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-8 py-6 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -216,9 +230,9 @@ const AnalyticsPage: React.FC = () => {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="min-h-0 flex-1 overflow-y-auto p-8">
         {/* Period Selector */}
-        <div className="flex gap-2 mb-8">
+        <div ref={periodRef} className="flex gap-2 mb-8">
           {(['daily', 'weekly', 'monthly', 'quarterly', 'yearly'] as const).map(p => (
             <button
               key={p}
@@ -236,7 +250,7 @@ const AnalyticsPage: React.FC = () => {
 
         {/* Summary Cards */}
         {report && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <div ref={summaryRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
@@ -319,7 +333,7 @@ const AnalyticsPage: React.FC = () => {
         )}
 
         {/* Navigation Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+        <div ref={recommendationsRef} className="flex gap-4 mb-8 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
           {(['overview', 'revenue', 'costs', 'performance', 'recommendations'] as const).map(tab => (
             <button
               key={tab}
@@ -337,7 +351,7 @@ const AnalyticsPage: React.FC = () => {
 
         {/* Overview Tab */}
         {activeTab === 'overview' && chartData && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div ref={chartsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Trend Chart */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">

@@ -11,8 +11,6 @@ import { fetchDashboardSummary, fetchLatestSensor, fetchSensorAggregate } from '
 import type { DashboardSummary, SensorReading, SensorAggregate } from '../types';
 
 interface DashboardProps {
-  onOpenTour?: () => void;
-  tourLabel?: string;
   overviewRef?: React.RefObject<HTMLDivElement | null>;
   quickActionsRef?: React.RefObject<HTMLDivElement | null>;
   sensorsRef?: React.RefObject<HTMLDivElement | null>;
@@ -22,8 +20,6 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
-  onOpenTour,
-  tourLabel,
   overviewRef,
   quickActionsRef,
   sensorsRef,
@@ -109,21 +105,8 @@ const Dashboard: React.FC<DashboardProps> = ({
         : 'text-red-400';
 
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-1 overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.12),transparent_28%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_26%)]">
       <div className="min-w-0 flex-1 space-y-6 overflow-y-auto p-6">
-        {onOpenTour && tourLabel && (
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={onOpenTour}
-              className="inline-flex items-center gap-2 rounded-full border border-farm-border bg-farm-card/80 px-4 py-2 text-sm font-medium text-gray-200 transition hover:bg-farm-border/50 hover:text-white"
-            >
-              <span className="text-base">🧭</span>
-              {tourLabel}
-            </button>
-          </div>
-        )}
-
         <div ref={overviewRef} className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
           <div className="space-y-4">
             <StatCard
@@ -132,6 +115,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               subtitle={`${summary.total_livestock} ${t('dashboard.cattleSwinePoultry').toLowerCase()}`}
               icon="💚"
               accentColor={healthScoreColor}
+              surfaceClassName="border-emerald-500/30 bg-gradient-to-br from-emerald-950/35 via-farm-card to-teal-950/20 shadow-lg shadow-emerald-950/10"
               trend={{ value: '+3 pts', positive: true }}
               size="large"
             />
@@ -147,6 +131,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               subtitle={t('dashboard.ongoingTreatments')}
               icon="💊"
               accentColor="text-orange-400"
+              surfaceClassName="border-amber-500/30 bg-gradient-to-br from-amber-950/30 via-farm-card to-orange-950/15"
               trend={{ value: '1 new', positive: false }}
               size="small"
             />
@@ -156,6 +141,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               subtitle={t('dashboard.cattleSwinePoultry')}
               icon="🐄"
               accentColor="text-blue-400"
+              surfaceClassName="border-sky-500/30 bg-gradient-to-br from-sky-950/30 via-farm-card to-cyan-950/15"
               size="small"
             />
             <StatCard
@@ -164,6 +150,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               subtitle={t('dashboard.inProgress')}
               icon="🩺"
               accentColor="text-purple-400"
+              surfaceClassName="border-fuchsia-500/25 bg-gradient-to-br from-rose-950/25 via-farm-card to-violet-950/20"
               size="small"
             />
           </div>

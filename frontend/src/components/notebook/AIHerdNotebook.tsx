@@ -16,7 +16,12 @@ interface Note {
   analysis?: AnalysisResult | null;
 }
 
-const AIHerdNotebook: React.FC = () => {
+interface AIHerdNotebookProps {
+  addNoteRef?: React.RefObject<HTMLDivElement | null>;
+  historyRef?: React.RefObject<HTMLDivElement | null>;
+}
+
+const AIHerdNotebook: React.FC<AIHerdNotebookProps> = ({ addNoteRef, historyRef }) => {
   const { t, i18n } = useTranslation();
   const [log, setLog] = useState('');
   const [loading, setLoading] = useState(false);
@@ -121,7 +126,7 @@ const AIHerdNotebook: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-900 rounded-lg p-5 shadow-lg border border-gray-800 flex flex-col space-y-4">
+      <div ref={addNoteRef} className="bg-gray-900 rounded-lg p-5 shadow-lg border border-gray-800 flex flex-col space-y-4">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xl">📓</span>
           <div>
@@ -156,7 +161,7 @@ const AIHerdNotebook: React.FC = () => {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div ref={historyRef} className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-200">{t('notebook.historyTitle')}</h3>
 
         {notes.length === 0 ? (

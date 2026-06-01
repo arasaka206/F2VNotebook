@@ -163,6 +163,70 @@
         "diseaseMapFarm": {
           "title": "Bản đồ trang trại và cảm biến",
           "description": "Bản đồ trang trại này biến dữ liệu cảm biến chuồng trại gần đây thành bố cục dễ nhìn, giúp bạn thấy nhanh nơi nào cần chú ý về nhiệt độ và độ ẩm."
+        },
+        "notebookNavigation": {
+          "title": "Trang Sổ tay đàn gia súc AI",
+          "description": "Mở sổ tay tại đây khi bạn cần ghi lại quan sát thực địa, phân tích triệu chứng hoặc tạo nội dung học tập từ ghi chú quan trọng."
+        },
+        "notebookIntro": {
+          "title": "Tổng quan sổ tay",
+          "description": "Trang này biến các quan sát trong trang trại thành hồ sơ sức khỏe có cấu trúc cho cả đàn."
+        },
+        "notebookAddNote": {
+          "title": "Thêm và phân tích ghi chú",
+          "description": "Viết ghi chú thực địa tại đây, sau đó lưu trực tiếp hoặc nhờ AI tóm tắt mức khẩn cấp, thẻ và bước xử lý tiếp theo."
+        },
+        "notebookHistory": {
+          "title": "Lịch sử sổ tay và bài kiểm tra",
+          "description": "Xem lại ghi chú đã lưu, kết quả AI, khuyến nghị và bài kiểm tra theo dõi cho các sự kiện sức khỏe quan trọng."
+        },
+        "forumNavigation": {
+          "title": "Trang Diễn đàn cộng đồng",
+          "description": "Dùng diễn đàn để so sánh báo cáo địa phương, đặt câu hỏi và theo dõi điều nông dân gần bạn đang tìm kiếm."
+        },
+        "forumComposer": {
+          "title": "Chia sẻ cập nhật cộng đồng",
+          "description": "Tạo bài viết tại đây khi bạn muốn báo cáo quan sát thực địa, hỏi lời khuyên hoặc chia sẻ kinh nghiệm hữu ích."
+        },
+        "forumRegionalSearch": {
+          "title": "Xu hướng tìm kiếm khu vực",
+          "description": "Bảng này gợi ý các chủ đề khu vực dạng demo, giúp nông dân tìm nhanh các vấn đề dịch bệnh và chăn nuôi đang được quan tâm."
+        },
+        "forumFeed": {
+          "title": "Luồng bài viết diễn đàn",
+          "description": "Duyệt bài viết, kết quả tìm kiếm và hoạt động cộng đồng tại đây để xem nông dân đang thảo luận điều gì."
+        },
+        "inventoryNavigation": {
+          "title": "Trang Kho hàng và vật tư",
+          "description": "Mở kho hàng khi bạn cần kiểm tra thức ăn, thuốc, thiết bị, cảnh báo tồn kho thấp và luân chuyển vật tư."
+        },
+        "inventoryOverview": {
+          "title": "Tổng quan kho hàng",
+          "description": "Các thẻ này tóm tắt tổng số mặt hàng, giá trị tồn kho, áp lực thiếu hàng và những nhóm vật tư đang được theo dõi."
+        },
+        "inventoryStock": {
+          "title": "Kho và danh sách vật tư",
+          "description": "Dùng khu vực này để chuyển giữa tổng quan, danh sách vật tư và lịch sử giao dịch khi kiểm tra trạng thái kho."
+        },
+        "inventoryTransactions": {
+          "title": "Thêm vật tư và giao dịch",
+          "description": "Dùng khu vực hành động này để thêm vật tư, sau đó theo dõi nhập hoặc xuất kho trong mục giao dịch."
+        },
+        "reportsNavigation": {
+          "title": "Trang Báo cáo và phân tích",
+          "description": "Mở báo cáo để xem doanh thu, chi phí, hiệu quả sản xuất và khuyến nghị kinh doanh do AI tạo."
+        },
+        "reportsOverview": {
+          "title": "Tổng quan phân tích",
+          "description": "Các chỉ số này tóm tắt doanh thu, chi phí, lợi nhuận, biên lợi nhuận và hiệu quả sản xuất trong kỳ đã chọn."
+        },
+        "reportsCharts": {
+          "title": "Biểu đồ và phân tích chi tiết",
+          "description": "Dùng các biểu đồ này để so sánh xu hướng, nguồn doanh thu, nhóm chi phí và hiệu quả trang trại theo thời gian."
+        },
+        "reportsRecommendations": {
+          "title": "Thẻ khuyến nghị",
+          "description": "Chuyển sang Khuyến nghị khi bạn muốn xem hướng dẫn do AI tạo dựa trên báo cáo tài chính hiện tại."
         }
       }
     },
