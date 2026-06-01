@@ -152,8 +152,9 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
 
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const tooltipWidth = Math.min(360, viewportWidth - OVERLAY_PADDING * 2);
+    const tooltipWidth = Math.min(400, viewportWidth - OVERLAY_PADDING * 2);
     const tooltipHeight = tooltipRef.current?.offsetHeight ?? 240;
+    const tooltipMaxHeight = viewportHeight - OVERLAY_PADDING * 2;
 
     if (manualPosition) {
       setTooltipStyle({
@@ -168,6 +169,7 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
           Math.max(OVERLAY_PADDING, viewportHeight - tooltipHeight - OVERLAY_PADDING),
         ),
         width: tooltipWidth,
+        maxHeight: tooltipMaxHeight,
       });
       return;
     }
@@ -177,6 +179,7 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
         left: OVERLAY_PADDING,
         top: Math.max(OVERLAY_PADDING, viewportHeight - tooltipHeight - OVERLAY_PADDING),
         width: tooltipWidth,
+        maxHeight: tooltipMaxHeight,
       });
       return;
     }
@@ -196,6 +199,7 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
       left,
       top,
       width: tooltipWidth,
+      maxHeight: tooltipMaxHeight,
     });
   }, [currentStepIndex, isOpen, manualPosition, targetRect]);
 
@@ -225,7 +229,7 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
 
   const getClampedTooltipPosition = (left: number, top: number) => {
     const tooltipNode = tooltipRef.current;
-    const tooltipWidth = tooltipNode?.offsetWidth ?? Math.min(360, window.innerWidth - OVERLAY_PADDING * 2);
+    const tooltipWidth = tooltipNode?.offsetWidth ?? Math.min(400, window.innerWidth - OVERLAY_PADDING * 2);
     const tooltipHeight = tooltipNode?.offsetHeight ?? 240;
 
     return {
@@ -323,7 +327,7 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={`dashboard-tour-title-${activeStep.id}`}
-        className={`pointer-events-auto fixed z-[2] rounded-[28px] border border-farm-border bg-farm-card/95 p-5 text-left shadow-2xl backdrop-blur-xl ${manualPosition ? '' : 'transition-all duration-300'}`}
+        className={`pointer-events-auto fixed z-[2] overflow-y-auto rounded-[28px] border border-farm-border bg-farm-card/95 p-5 text-left shadow-2xl backdrop-blur-xl ${manualPosition ? '' : 'transition-all duration-300'}`}
         style={tooltipStyle}
       >
         <div className="flex items-start justify-between gap-4">
@@ -348,26 +352,26 @@ const DashboardTour: React.FC<DashboardTourProps> = ({
           <button
             type="button"
             onClick={onSkip}
-            className="rounded-full border border-farm-border/80 px-3 py-1 text-xs font-medium text-gray-300 transition hover:border-farm-accent/50 hover:text-white"
+            className="shrink-0 whitespace-nowrap rounded-full border border-farm-border/80 px-3 py-1 text-xs font-medium text-gray-300 transition hover:border-farm-accent/50 hover:text-white"
           >
             {t('dashboard.tour.skip')}
           </button>
         </div>
 
-        <div className="mt-5 flex items-center justify-between gap-3">
-          <span className="text-xs text-gray-400">
+        <div className="mt-5 space-y-3">
+          <span className="block text-xs text-gray-400">
             {t('dashboard.tour.progress', {
               current: currentStepIndex + 1,
               total: steps.length,
             })}
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="mx-auto flex max-w-[280px] flex-wrap items-center justify-center gap-1.5">
             {steps.map((step, index) => (
               <span
                 key={step.id}
                 className={`h-2 rounded-full transition-all ${
-                  index === currentStepIndex ? 'w-6 bg-farm-accent' : 'w-2 bg-farm-border'
+                  index === currentStepIndex ? 'w-5 bg-farm-accent' : 'w-1.5 bg-farm-border'
                 }`}
               />
             ))}
