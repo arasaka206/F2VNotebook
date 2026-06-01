@@ -348,3 +348,203 @@ class NotebookLog(Base):
     urgency = Column(String, nullable=True)
     tags = Column(Text, nullable=True) # Lưu json string: '["tag1", "tag2"]'
     recommendations = Column(Text, nullable=True) # Lưu json string
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NHÓM 8: INVENTORY & SUPPLIES (Kho hàng và vật tư)
+# ─────────────────────────────────────────────────────────────────────────────
+class InventoryItem(Base):
+    __tablename__ = "inventory_items"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    
+    # Nông dân chủ sở hữu
+    farmer_id = Column(String, index=True, nullable=False)
+    
+    # Tên sản phẩm
+    name = Column(String, nullable=False)
+    
+    # Loại (feed, medicine, equipment, seed, etc.)
+    category = Column(String, nullable=False)
+    
+    # Số lượng hiện tại
+    quantity = Column(Float, nullable=False, default=0)
+    
+    # Đơn vị (kg, lít, hộp, cái, etc.)
+    unit = Column(String, nullable=False)
+    
+    # Giá mua (VND)
+    unit_cost = Column(Float, nullable=True)
+    
+    # Giá bán (VND)
+    unit_price = Column(Float, nullable=True)
+    
+    # Ngưỡng cảnh báo (khi hết, cần order)
+    min_quantity = Column(Float, default=0)
+    
+    # Mô tả
+    description = Column(Text, nullable=True)
+    
+    # Trạng thái
+    is_active = Column(Boolean, default=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class InventoryTransaction(Base):
+    __tablename__ = "inventory_transactions"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    
+    # Nông dân
+    farmer_id = Column(String, index=True, nullable=False)
+    
+    # Sản phẩm
+    item_id = Column(String, ForeignKey("inventory_items.id"), nullable=False, index=True)
+    
+    # Loại giao dịch: in (nhập kho), out (xuất kho), return (trả lại), adjustment (điều chỉnh)
+    transaction_type = Column(String, nullable=False)
+    
+    # Số lượng
+    quantity = Column(Float, nullable=False)
+    
+    # Giá tại thời điểm giao dịch
+    price_at_transaction = Column(Float, nullable=True)
+    
+    # Tổng tiền
+    total_amount = Column(Float, nullable=True)
+    
+    # Ghi chú
+    notes = Column(Text, nullable=True)
+    
+    # Liên quan đến mục nào (có thể để NULL)
+    related_to = Column(String, nullable=True)  # e.g., "livestock_id", "treatment_id"
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NHÓM 9: PRODUCTION & SALES (Sản lượng và bán hàng)
+# ─────────────────────────────────────────────────────────────────────────────
+class Production(Base):
+    __tablename__ = "productions"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    
+    # Nông dân
+    farmer_id = Column(String, index=True, nullable=False)
+    
+    # Loại sản xuất (milk, eggs, meat, wool, etc.)
+    production_type = Column(String, nullable=False)
+    
+    # Liên quan đến vật nuôi (nếu có)
+    livestock_id = Column(String, ForeignKey("livestock.id"), nullable=True, index=True)
+    
+    # Số lượng sản xuất
+    quantity = Column(Float, nullable=False)
+    
+    # Đơn vị
+    unit = Column(String, nullable=False)
+    
+    # Ngày sản xuất
+    production_date = Column(Date, nullable=False)
+    
+    # Ghi chú (chất lượng, điều kiện, etc.)
+    notes = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Sale(Base):
+    __tablename__ = "sales"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    
+    # Nông dân
+    farmer_id = Column(String, index=True, nullable=False)
+    
+    # Sản phẩm (từ inventory hoặc production)
+    item_name = Column(String, nullable=False)
+    
+    # Số lượng bán
+    quantity = Column(Float, nullable=False)
+    
+    # Đơn vị
+    unit = Column(String, nullable=False)
+    
+    # Giá bán (VND)
+    price_per_unit = Column(Float, nullable=False)
+    
+    # Tổng tiền bán
+    total_amount = Column(Float, nullable=False)
+    
+    # Chi phí vận chuyển
+    shipping_cost = Column(Float, default=0)
+    
+    # Ngày bán
+    sale_date = Column(Date, nullable=False)
+    
+    # Người mua
+    buyer_name = Column(String, nullable=True)
+    
+    # Ghi chú
+    notes = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NHÓM 10: ANALYTICS REPORT (Báo cáo phân tích)
+# ─────────────────────────────────────────────────────────────────────────────
+class AnalyticsReport(Base):
+    __tablename__ = "analytics_reports"
+
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
+    
+    # Nông dân
+    farmer_id = Column(String, index=True, nullable=False)
+    
+    # Khoảng thời gian: daily, weekly, monthly, quarterly, yearly
+    period_type = Column(String, nullable=False)
+    
+    # Ngày bắt đầu - kết thúc
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    
+    # DOANH THU
+    total_revenue = Column(Float, default=0)  # Tổng tiền bán
+    
+    # CHI PHÍ
+    total_feed_cost = Column(Float, default=0)  # Chi phí thức ăn
+    total_medicine_cost = Column(Float, default=0)  # Chi phí thuốc
+    total_equipment_cost = Column(Float, default=0)  # Chi phí thiết bị
+    total_labor_cost = Column(Float, default=0)  # Chi phí nhân công
+    total_other_cost = Column(Float, default=0)  # Chi phí khác
+    
+    # Tính toán lợi nhuận
+    total_cost = Column(Float, default=0)  # Tổng chi phí
+    net_profit = Column(Float, default=0)  # Lợi nhuận ròng
+    profit_margin = Column(Float, default=0)  # Tỷ suất lợi nhuận (%)
+    
+    # SẢN LƯỢNG
+    total_production_quantity = Column(Float, default=0)
+    production_unit = Column(String, nullable=True)
+    
+    # TỒNKHO
+    inventory_value = Column(Float, default=0)  # Giá trị tồn kho
+    low_stock_items = Column(Integer, default=0)  # Số sản phẩm còn ít
+    
+    # PHÂN TÍCH HIỆU SUẤT
+    production_efficiency = Column(Float, default=0)  # Hiệu suất sản xuất (%)
+    cost_per_unit = Column(Float, default=0)  # Chi phí trên đơn vị sản phẩm
+    revenue_per_unit = Column(Float, default=0)  # Doanh thu trên đơn vị
+    
+    # KHUYẾN NGHỊ
+    recommendations = Column(Text, nullable=True)  # JSON recommendations
+    
+    # TRẠNG THÁI
+    is_analyzed = Column(Boolean, default=False)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

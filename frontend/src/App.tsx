@@ -15,6 +15,8 @@ import HeatDiseaseMapPage from './pages/HeatDiseaseMapPage';
 import VetConnectPage from './pages/VetConnectPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import InventoryPage from './pages/InventoryPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -79,6 +81,10 @@ function AppContent() {
         return <PublicDashboard />;
       case 'chat':
         return <ChatPage />;
+      case 'inventory':
+        return <InventoryPage />;
+      case 'reports':
+        return <AnalyticsPage />;
       case 'profile':
         return <ProfilePage />;
       default:
